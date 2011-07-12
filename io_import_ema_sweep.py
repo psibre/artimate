@@ -1,0 +1,99 @@
+# adapted from /Applications/blender.app/Contents/MacOS/2.58/scripts/addons/io_import_images_as_planes.py
+
+bl_info = {
+    "name": "AG500 EMA pos file importer (.pos)",
+    "author": "Ingmar Steiner",
+    "version": (0,0,1),
+    "blender": (2,5,8),
+    "location": "File > Import > Import AG500 EMA sweep (.pos file)",
+    "description": "Import AG500 EMA sweep from .pos file",
+    "warning": "",
+    "wiki_url" : "",
+    "category": "Import-Export"}
+
+import bpy, os
+from bpy.props import *
+from add_utils import *
+from bpy_extras.io_utils import ImportHelper
+
+def generate_paths(self):
+    directory, file = os.path.split(self.filepath)
+    if file:
+        return [self.filepath], directory
+    else:
+    	return [], directory
+
+def generate_header(self, num_coils = 12):
+	# hard-coded for AG500
+	dimensions = ['X', 'Y', 'Z', 'phi', 'theta', 'RMS', 'Extra']
+	channels = []
+	for coil in range(num_coils):
+		channels.extend(["Channel%02d_%s" % (coil+1, dimension) \
+						 for dimension in dimensions])
+	return channels
+
+##### MAIN #####
+def import_sweep(self, context):
+    import_list, directory = generate_paths(self)
+    
+    header = generate_header(self)
+    
+    self.report(type='INFO',
+                message='Done' + header.__str__())
+
+##### OPERATOR #####
+class IMPORT_OT_image_to_plane(bpy.types.Operator, ImportHelper, AddObjectHelper):
+    ''''''
+    bl_idname = "import.ema_sweep"
+    bl_label = "Import EMA Sweep from .pos file"
+    bl_description = "Import AG500 EMA sweep from .pos file"
+    bl_options = {'REGISTER', 'UNDO'}
+    
+    ## OPTIONS ##
+    sampling_freq = IntProperty(name='Sampling frequency',
+                                description='Number of frames per second',
+                                min=1,
+                                default=200)
+    header_file_name = StringProperty(name="Header file name",
+    								  description="List of EMA channel names",
+    								  default="headers.txt")
+
+    ## DRAW ##
+    def draw(self, context):
+        layout = self.layout
+        box = layout.box()
+        box.label('Import Options:', icon='FILTER')
+        box.prop(self, 'sampling_freq')
+        box.prop(self, 'header_file_name')
+
+    ## EXECUTE ##
+    def execute(self, context):
+        #the add utils don't work in this case
+        #because many objects are added
+        #disable relevant things beforehand
+        editmode = context.user_preferences.edit.use_enter_edit_mode
+        context.user_preferences.edit.use_enter_edit_mode = False
+        if context.active_object\
+        and context.active_object.mode == 'EDIT':
+            bpy.ops.object.mode_set(mode='OBJECT')
+        
+        import_sweep(self, context)
+        
+        context.user_preferences.edit.use_enter_edit_mode = editmode
+        return {'FINISHED'}
+
+##### REGISTER #####
+
+def import_ema_sweep_button(self, context):
+    self.layout.operator(IMPORT_OT_image_to_plane.bl_idname, text="AG500 EMA Sweep", icon='PLUGIN')
+
+def register():
+    bpy.utils.register_module(__name__)
+    bpy.types.INFO_MT_file_import.append(import_ema_sweep_button)
+
+def unregister():
+    bpy.utils.unregister_module(__name__)
+    bpy.types.INFO_MT_file_import.remove(import_ema_sweep_button)
+
+if __name__ == '__main__':
+    register()
