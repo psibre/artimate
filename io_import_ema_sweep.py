@@ -86,14 +86,20 @@ def generate_header(self, num_coils = 12):
     return channels
 
 def generate_coil_objects(sweep):
+    bpy.ops.object.add()
+    bpy.context.active_object.name = "EMA"
+
     for coil in sweep.coils:
         bpy.ops.object.add(location = sweep.getLoc(coil),\
                            rotation = sweep.getRot(coil))
-        bpy.context.active_object.name = coil
+        bpy.context.active_object.name = coil + "Coil"
+
+        bpy.ops.object.select_name(name = "EMA", extend = True)
+        bpy.ops.object.parent_set()
 
 def generate_animation(sweep):
     for coil_name in sweep.coils:
-        coil = bpy.data.objects[coil_name]
+        coil = bpy.data.objects[coil_name + "Coil"]
 
         coil.animation_data_create()
         coil.animation_data.action = bpy.data.actions.new(coil_name+"Action")
@@ -134,6 +140,8 @@ def import_sweep(self, context):
     sweep = Sweep(pos_file_name, header)
     generate_coil_objects(sweep)
     generate_animation(sweep)
+    # hack: downscale
+    bpy.data.objects["EMA"].scale = (0.1, 0.1, 0.1)
 
     message += "Done"
     self.report(type='INFO', message=message)
