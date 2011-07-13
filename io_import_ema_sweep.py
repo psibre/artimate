@@ -97,18 +97,20 @@ def generate_animation(sweep):
 
         coil.animation_data_create()
         coil.animation_data.action = bpy.data.actions.new(coil_name+"Action")
-        coil_action = coil.animation_data.action
+        fcurves = coil.animation_data.action.fcurves
 
-        coil_action.fcurves.new(data_path="location", index=0)
-        coil_action.fcurves.new(data_path="location", index=1)
-        coil_action.fcurves.new(data_path="location", index=2)
-        coil_action.fcurves.new(data_path="rotation_euler", index=0)
-        coil_action.fcurves.new(data_path="rotation_euler", index=1)
+        fcurves.new(data_path="location", index=0)
+        fcurves.new(data_path="location", index=1)
+        fcurves.new(data_path="location", index=2)
+        fcurves.new(data_path="rotation_euler", index=0)
+        fcurves.new(data_path="rotation_euler", index=1)
 
-        for f, fcurve in enumerate(coil_action.fcurves):
+        for f, fcurve in enumerate(fcurves):
             fcurve.keyframe_points.add(sweep.size)
 
             for frame_number in range(sweep.size):
+                # there should be a better way to set interpolation...
+                fcurve.keyframe_points[frame_number].interpolation = 'LINEAR'
                 value = sweep.getValue(coil_name, f, frame_number)
                 fcurve.keyframe_points[frame_number].co = frame_number, value
 
