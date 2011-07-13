@@ -11,7 +11,7 @@ bl_info = {
 	"wiki_url" : "",
 	"category": "Import-Export"}
 
-import bpy, os
+import bpy, os, math
 from array import array
 from bpy.props import *
 from add_utils import *
@@ -56,9 +56,11 @@ class Sweep:
 		return x, y, z
 
 	def getRot(self, coil, frame = 0):
-		phi = self.data[coil + "_phi"][frame]
-		theta = self.data[coil + "_theta"][frame]
-		return phi, theta, 0
+		phi_deg = self.data[coil + "_phi"][frame]
+		theta_deg = self.data[coil + "_theta"][frame]
+		phi_rad = math.radians(phi_deg)
+		theta_rad = math.radians(theta_deg)
+		return phi_rad, theta_rad, 0
 
 ##### FUNCTIONS #####
 
