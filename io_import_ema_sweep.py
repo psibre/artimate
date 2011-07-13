@@ -35,7 +35,7 @@ class Sweep:
 		data = {}
 		for h, h_item in enumerate(self.header):
 			data[h_item] = arr[h:len(arr):len(self.header)]
-		self.size = len(arr) / len(self.header)
+		self.size = int(len(arr) / len(self.header))
 		return data
 
 	def decimate(self):
@@ -62,6 +62,10 @@ class Sweep:
 		theta_rad = math.radians(theta_deg)
 		return phi_rad, theta_rad, 0
 
+	def getValue(self, coil, index, frame = 0):
+		values = self.getLoc(coil, frame) + self.getRot(coil, frame)
+		return values[index]
+
 ##### FUNCTIONS #####
 
 def generate_paths(self):
@@ -86,8 +90,26 @@ def generate_coil_objects(sweep):
 						   rotation = sweep.getRot(coil))
 		bpy.context.active_object.name = coil
 
-def generate_keyframes(sweep):
-	pass
+def generate_animation(sweep):
+	for coil_name in sweep.coils:
+		coil = bpy.data.objects[coil_name]
+
+		coil.animation_data_create()
+		coil.animation_data.action = bpy.data.actions.new(coil_name+"Action")
+		coil_action = coil.animation_data.action
+
+		coil_action.fcurves.new(data_path="location", index=0)
+		coil_action.fcurves.new(data_path="location", index=1)
+		coil_action.fcurves.new(data_path="location", index=2)
+		coil_action.fcurves.new(data_path="rotation_euler", index=0)
+		coil_action.fcurves.new(data_path="rotation_euler", index=1)
+
+		for f, fcurve in enumerate(coil_action.fcurves):
+			fcurve.keyframe_points.add(sweep.size)
+
+			for frame_number in range(sweep.size):
+				value = sweep.getValue(coil_name, f, frame_number)
+				fcurve.keyframe_points[frame_number].co = frame_number, value
 
 def decimate(arr):
 	# not yet implemented
@@ -108,7 +130,7 @@ def import_sweep(self, context):
 
 	sweep = Sweep(pos_file_name, header)
 	generate_coil_objects(sweep)
-	generate_keyframes(sweep)
+	generate_animation(sweep)
 
 	message += "Done"
 	self.report(type='INFO',
