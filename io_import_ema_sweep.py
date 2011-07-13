@@ -90,8 +90,12 @@ def generate_coil_objects(sweep):
     bpy.context.active_object.name = "EMA"
 
     for coil in sweep.coils:
-        bpy.ops.object.add(location = sweep.getLoc(coil),\
-                           rotation = sweep.getRot(coil))
+        # remember, the size parameters are scaled down:
+        bpy.ops.mesh.primitive_cone_add(vertices = 8, \
+                                        radius = 2.5, \
+                                        depth = 10.0, \
+                                        location = sweep.getLoc(coil), \
+                                        rotation = sweep.getRot(coil))
         bpy.context.active_object.name = coil + "Coil"
 
         bpy.ops.object.select_name(name = "EMA", extend = True)
