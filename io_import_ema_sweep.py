@@ -38,6 +38,11 @@ class Sweep:
 		self.size = len(arr) / len(self.header)
 		return data
 
+	def decimate(self):
+		for channel in data.keys():
+			decimated = decimate(data[channel])
+			data[channel] = decimated
+
 	def coils(self):
 		coils = [channel.split('_')[0] \
 				 for channel in self.header if channel.endswith('X')]
@@ -77,9 +82,14 @@ def generate_coil_objects(sweep):
 	for coil in sweep.coils:
 		bpy.ops.object.add(location = sweep.getLoc(coil),\
 						   rotation = sweep.getRot(coil))
+		bpy.context.active_object.name = coil
 
 def generate_keyframes(sweep):
 	pass
+
+def decimate(arr):
+	# not yet implemented
+	return arr
 
 ##### MAIN #####
 
