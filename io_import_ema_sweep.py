@@ -45,7 +45,7 @@ class Sweep:
             data[channel] = decimated
 
     def coils(self):
-        coils = [channel.split('_')[0] \
+        coils = [channel.split('_')[0]
                  for channel in self.header if channel.endswith('X')]
         return coils
     coils = property(coils)
@@ -81,23 +81,34 @@ def generate_header(self, num_coils = 12):
     dimensions = ["X", "Y", "Z", "phi", "theta", "RMS", "Extra"]
     channels = []
     for coil in range(num_coils):
-        channels.extend(["Channel%02d_%s" % (coil+1, dimension) \
+        channels.extend(["Channel%02d_%s" % (coil+1, dimension)
                          for dimension in dimensions])
     return channels
 
 def generate_coil_objects(sweep):
+    # add empty EMA node as parent of all coils:
     bpy.ops.object.add()
     bpy.context.active_object.name = "EMA"
 
+    # make coil objects:
     for coil in sweep.coils:
         # remember, the size parameters are scaled down:
-        bpy.ops.mesh.primitive_cone_add(vertices = 8, \
-                                        radius = 2.5, \
-                                        depth = 10.0, \
-                                        location = sweep.getLoc(coil), \
-                                        rotation = sweep.getRot(coil))
+        depth = 10.0
+        bpy.ops.mesh.primitive_cone_add(vertices = 8,
+                                        radius = 2.5,
+                                        depth = depth,
+                                        location = (0, 0, depth / 2))
         bpy.context.active_object.name = coil + "Coil"
 
+        # move object origin so that it lies at center of cone base:
+        bpy.context.scene.cursor_location = 0, 0, 0
+        bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+
+        # THEN locate and rotate:
+        bpy.context.active_object.location = sweep.getLoc(coil)
+        bpy.context.active_object.rotation_euler = sweep.getRot(coil)
+
+        # make child of EMA node:
         bpy.ops.object.select_name(name = "EMA", extend = True)
         bpy.ops.object.parent_set()
 
@@ -147,6 +158,11 @@ def import_sweep(self, context):
     # hack: downscale
     bpy.data.objects["EMA"].scale = (0.1, 0.1, 0.1)
 
+    # TODO: use API to set FPS to 25, Framerate Base to 0.125
+    # for 200 Hz (adjust dependng on self.sampling_freq)
+    # also set End of Frame Range to sweep.size
+    # also set Time Remapping appropriately?
+
     message += "Done"
     self.report(type='INFO', message=message)
 
@@ -183,8 +199,7 @@ class IMPORT_OT_image_to_plane(bpy.types.Operator, ImportHelper, AddObjectHelper
         #disable relevant things beforehand
         editmode = context.user_preferences.edit.use_enter_edit_mode
         context.user_preferences.edit.use_enter_edit_mode = False
-        if context.active_object\
-        and context.active_object.mode == 'EDIT':
+        if context.active_object and context.active_object.mode == 'EDIT':
             bpy.ops.object.mode_set(mode='OBJECT')
 
         import_sweep(self, context)
