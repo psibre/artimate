@@ -112,7 +112,10 @@ def generate_coil_objects(sweep):
         bpy.ops.object.select_name(name = "EMA", extend = True)
         bpy.ops.object.parent_set()
 
-def generate_animation(sweep):
+def generate_animation(sweep, start_frame = 1, end_frame = -1):
+    end_frame = sweep.size if end_frame == -1 else end_frame
+    assert end_frame - start_frame <= sweep.size
+
     for coil_name in sweep.coils:
         coil = bpy.data.objects[coil_name + "Coil"]
 
@@ -129,7 +132,7 @@ def generate_animation(sweep):
         for f, fcurve in enumerate(fcurves):
             fcurve.keyframe_points.add(sweep.size)
 
-            for frame_number in range(sweep.size):
+            for frame_number in range(start_frame - 1, end_frame):
                 # there should be a better way to set interpolation...
                 fcurve.keyframe_points[frame_number].interpolation = 'LINEAR'
                 value = sweep.getValue(coil_name, f, frame_number)
@@ -154,7 +157,7 @@ def import_sweep(self, context):
 
     sweep = Sweep(pos_file_name, header)
     generate_coil_objects(sweep)
-    generate_animation(sweep)
+    generate_animation(sweep, self.start_frame, self.end_frame)
     # hack: downscale
     bpy.data.objects["EMA"].scale = (0.1, 0.1, 0.1)
 
@@ -180,6 +183,12 @@ class IMPORT_OT_image_to_plane(bpy.types.Operator, ImportHelper, AddObjectHelper
                                 description="Number of frames per second",
                                 min=1,
                                 default=200)
+    start_frame = IntProperty(name="Start frame",
+                              description="Number of first frame to import",
+                              default=1)
+    end_frame = IntProperty(name="End frame",
+                              description="Number of last frame to import (-1 = last)",
+                              default=-1)
     header_file_name = StringProperty(name="Header file name",
                                       description="List of EMA channel names",
                                       default="headers.txt")
@@ -190,6 +199,8 @@ class IMPORT_OT_image_to_plane(bpy.types.Operator, ImportHelper, AddObjectHelper
         box = layout.box()
         box.label('Import Options:', icon='FILTER')
         box.prop(self, 'sampling_freq')
+        box.prop(self, 'start_frame')
+        box.prop(self, 'end_frame')
         box.prop(self, 'header_file_name')
 
     ## EXECUTE ##
