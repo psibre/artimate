@@ -132,10 +132,11 @@ def generate_animation(sweep, start_frame = 1, end_frame = -1):
         for f, fcurve in enumerate(fcurves):
             fcurve.keyframe_points.add(sweep.size)
 
-            for frame_number in range(start_frame - 1, end_frame):
+            for frame_number in range(end_frame - start_frame):
                 # there should be a better way to set interpolation...
                 fcurve.keyframe_points[frame_number].interpolation = 'LINEAR'
-                value = sweep.getValue(coil_name, f, frame_number)
+                value = sweep.getValue(coil_name, f,
+                                       start_frame - 1 + frame_number)
                 fcurve.keyframe_points[frame_number].co = frame_number, value
 
 def decimate(arr):
