@@ -130,7 +130,7 @@ def generate_animation(sweep, start_frame = 1, end_frame = -1):
         fcurves.new(data_path="rotation_euler", index=1)
 
         for f, fcurve in enumerate(fcurves):
-            fcurve.keyframe_points.add(sweep.size)
+            fcurve.keyframe_points.add(end_frame - start_frame)
 
             for frame_number in range(end_frame - start_frame):
                 # there should be a better way to set interpolation...
