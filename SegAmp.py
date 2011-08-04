@@ -54,7 +54,7 @@ if __name__ == '__main__':
     options.add_option("-a", "--ampfile", dest="ampsname")
     options.add_option("-s", "--segfile", dest="segsname")
     options.set_defaults(ampsname = "test.amp",
-                         segsname = "test.Table")
+                         segsname = "test.seg")
     options, args = options.parse_args()
     
     amps = Amps(options.ampsname)
