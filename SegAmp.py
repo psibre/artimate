@@ -62,3 +62,4 @@ if __name__ == '__main__':
     for s, seg in enumerate(segs.segs):
         newamps = "amps/%04d.amp" % (s + 1)
         amps.slice(seg['tmin'], seg['tmax']).save(newamps)
+        print "wrote", newamps
