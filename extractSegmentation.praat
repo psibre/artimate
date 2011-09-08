@@ -8,8 +8,6 @@ form Extract segmentation from TextGrid
 	positive window 0.5
 endform
 
-samp_rate = 200
-
 if !fileReadable(textGrid_file$) && !startsWith("/", textGrid_file$)
   textGrid_file$ = "'shellDirectory$'/'textGrid_file$'"
 endif
@@ -19,8 +17,6 @@ tier = Extract one tier... tier_number
 Down to Table... 0 6 0 'include_empy_intervals'
 Formula... tmin if self - window > Object_'tier'.xmin then self - window else Object_'tier'.xmin fi
 Formula... tmax if self + window < Object_'tier'.xmax then self + window else Object_'tier'.xmax fi
-Formula... tmin floor(self * samp_rate)
-Formula... tmax floor(self * samp_rate)
 segFile$ = textGrid_file$ - "TextGrid" + "seg"
 Save as tab-separated file... 'segFile$'
 
