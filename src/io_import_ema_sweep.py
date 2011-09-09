@@ -12,7 +12,7 @@ bl_info = {
     "wiki_url" : "",
     "category": "Import-Export"}
 
-import bpy, os, math
+import bpy, os, math, re
 import bpy_extras
 from array import array
 
@@ -75,14 +75,17 @@ class Sweep:
         values = self.getLoc(coil, frame) + self.getRot(coil, frame)
         return values[index]
 
-##### FUNCTIONS #####
+class Segmentation:
+    def __init__(self, lab_file=None):
+        if lab_file != None:
+            self.read(lab_file)
+    
+    def read(self, lab_file):
+        lines = lab_file.readlines()
+        print(lines)
+        return
 
-def generate_paths(self):
-    directory, file = os.path.split(self.filepath)
-    if file:
-        return directory, self.filepath
-    else:
-        return directory
+##### FUNCTIONS #####
 
 def generate_header(self, num_coils=12):
     # hard-coded for AG500
@@ -154,17 +157,36 @@ def decimate(arr):
 ##### MAIN #####
 
 def import_sweep(self, context):
-    directory, pos_file_name = generate_paths(self)
+    directory, pos_file_name = os.path.split(self.filepath)
     message = ""
 
     header = generate_header(self)
     try:
-        headerfile = open("%s/%s" % (directory, self.header_file_name))
-        header = headerfile.readline().strip().split()
+        header_file = open("%s/%s" % (directory, self.header_file_name))
+        header = header_file.readline().strip().split()
     except IOError:
-        message += "No header file found, generating default one\n"
+        message += "No header file found, generating default header\n"
+    
+    if self.lab_file_name != "<auto>":
+        try:
+            label_file = open(self.lab_file_name)
+        except IOError:
+            message += "Label file could not be read, ignoring\n"
+            label_file = None
+    else:
+        lab_file_name = "%s.lab" % os.path.splitext(pos_file_name)[0]
+        try:
+            label_file = open("%s/%s.lab" % (directory, lab_file_name))
+        except IOError:
+            try:
+                label_file = open("%s/%s" % (re.sub(r'pos$', "wav", directory), lab_file_name))                
+            except IOError:
+                message += "No label file found, generating empty segmentation\n"
+                label_file = None
+                raise
+    segmentation = Segmentation(label_file)
 
-    sweep = Sweep(pos_file_name, header)
+    sweep = Sweep(self.filepath, header)
     generate_coil_objects(sweep)
     generate_animation(sweep, self.start_frame, self.end_frame)
     # hack: downscale
@@ -175,7 +197,6 @@ def import_sweep(self, context):
     # also set End of Frame Range to sweep.size
     # also set Time Remapping appropriately?
     # also figure out how to use bpy.ops.graph.smooth() in this script context
-
 
     message += "Done"
     self.report(type='INFO', message=message)
@@ -203,6 +224,9 @@ class IMPORT_OT_ema_sweep(types.Operator, io_utils.ImportHelper):
     header_file_name = props.StringProperty(name="Header file name",
                                       description="List of EMA channel names",
                                       default="headers.txt")
+    lab_file_name = props.StringProperty(name="Label file",
+                                   description="Named like the .pos file",
+                                   default="<auto>")
 
     ## DRAW ##
     def draw(self, context):
@@ -213,6 +237,7 @@ class IMPORT_OT_ema_sweep(types.Operator, io_utils.ImportHelper):
         box.prop(self, 'start_frame')
         box.prop(self, 'end_frame')
         box.prop(self, 'header_file_name')
+        box.prop(self, 'lab_file_name')
 
     ## EXECUTE ##
     def execute(self, context):
