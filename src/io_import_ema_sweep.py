@@ -47,6 +47,7 @@ class Sweep:
         return data
 
     def decimate(self):
+        '''not implemented'''
         for channel in self.data.keys():
             decimated = decimate(self.data[channel])
             self.data[channel] = decimated
@@ -173,13 +174,15 @@ def import_sweep(self, context):
     # for 200 Hz (adjust dependng on self.sampling_freq)
     # also set End of Frame Range to sweep.size
     # also set Time Remapping appropriately?
+    # also figure out how to use bpy.ops.graph.smooth() in this script context
+
 
     message += "Done"
     self.report(type='INFO', message=message)
 
 ##### OPERATOR #####
 
-class IMPORT_OT_image_to_plane(types.Operator, io_utils.ImportHelper):
+class IMPORT_OT_ema_sweep(types.Operator, io_utils.ImportHelper):
     ''''''
     bl_idname = "import.ema_sweep"
     bl_label = "Import EMA Sweep from .pos file"
@@ -229,7 +232,7 @@ class IMPORT_OT_image_to_plane(types.Operator, io_utils.ImportHelper):
 ##### REGISTER #####
 
 def import_ema_sweep_button(self, context):
-    self.layout.operator(IMPORT_OT_image_to_plane.bl_idname, text="AG500 EMA Sweep", icon='PLUGIN')
+    self.layout.operator(IMPORT_OT_ema_sweep.bl_idname, text="AG500 EMA Sweep", icon='PLUGIN')
 
 def register():
     utils.register_module(__name__)
