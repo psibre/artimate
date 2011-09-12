@@ -28,7 +28,7 @@ utils = bpy.utils
 ##### CLASSES #####
 
 class Sweep:
-    def __init__(self, pos_file_name, header, segmentation = None):
+    def __init__(self, pos_file_name, header, segmentation=None):
         self.header = header
         self.data = self.load(pos_file_name)
         self.segmentation = segmentation
@@ -90,6 +90,7 @@ class Segmentation:
     def parse(self, lab_file):
         header = True
         segments = []
+        start = 0
         for line in lab_file:
             if line.strip() == '#':
                 header = False
@@ -97,17 +98,32 @@ class Segmentation:
             if header:
                 continue
             match = re.match(r'\s*(?P<end>\d+(\.\d+)?)\s+\d+\s+(?P<label>.*)\s*', line)
-            segment = Segment(match.group('end'), match.group('label'))
+            segment = Segment(start, match.group('end'), match.group('label'))
             segments.append(segment)
+            start = match.group('end')
         return segments
 
+    def __str__(self):
+        return '\n'.join(['start\tend\tlabel'] + [str(segment) for segment in self.segments])
+
 class Segment:
-    def __init__(self, end, label):
+    def __init__(self, start, end, label):
+        self.start = start
         self.end = end
         self.label = label
 
+    def startframe(self):
+        # TODO set this from context
+        return self.start * 200.0
+    startframe = property(startframe)
+
+    def endframe(self):
+        # TODO set this from context
+        return self.end * 200.0
+    endframe = property(endframe)
+
     def __str__(self):
-        return "end: %s\tlabel: %s" % (self.end, self.label)
+        return "%s\t%s\t%s" % (self.start, self.end, self.label)
 
 ##### FUNCTIONS #####
 
