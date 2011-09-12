@@ -28,9 +28,14 @@ utils = bpy.utils
 ##### CLASSES #####
 
 class Sweep:
-    def __init__(self, pos_file_name, header):
+    def __init__(self, pos_file_name, header, segmentation = None):
         self.header = header
         self.data = self.load(pos_file_name)
+        self.segmentation = segmentation
+        try:
+            print("loaded %d segments" % len(segmentation.segments))
+        except TypeError:
+            pass
 
     def load(self, pos_file_name):
         arr = array('f')
@@ -77,8 +82,10 @@ class Sweep:
 
 class Segmentation:
     def __init__(self, lab_file=None):
-        if lab_file != None:
-            self.parse(lab_file)
+        try:
+            self.segments = self.parse(lab_file)
+        except TypeError:
+            self.segments = None
     
     def parse(self, lab_file):
         header = True
@@ -92,7 +99,6 @@ class Segmentation:
             match = re.match(r'\s*(?P<end>\d+(\.\d+)?)\s+\d+\s+(?P<label>.*)\s*', line)
             segment = Segment(match.group('end'), match.group('label'))
             segments.append(segment)
-            print(segment)
         return segments
 
 class Segment:
@@ -201,10 +207,9 @@ def import_sweep(self, context):
             except IOError:
                 message += "No label file found, generating empty segmentation\n"
                 label_file = None
-                raise
     segmentation = Segmentation(label_file)
 
-    sweep = Sweep(self.filepath, header)
+    sweep = Sweep(self.filepath, header, segmentation)
     generate_coil_objects(sweep)
     generate_animation(sweep, self.start_frame, self.end_frame)
     # hack: downscale
