@@ -78,12 +78,30 @@ class Sweep:
 class Segmentation:
     def __init__(self, lab_file=None):
         if lab_file != None:
-            self.read(lab_file)
+            self.parse(lab_file)
     
-    def read(self, lab_file):
-        lines = lab_file.readlines()
-        print(lines)
-        return
+    def parse(self, lab_file):
+        header = True
+        segments = []
+        for line in lab_file:
+            if line.strip() == '#':
+                header = False
+                continue
+            if header:
+                continue
+            match = re.match(r'\s*(?P<end>\d+(\.\d+)?)\s+\d+\s+(?P<label>.*)\s*', line)
+            segment = Segment(match.group('end'), match.group('label'))
+            segments.append(segment)
+            print(segment)
+        return segments
+
+class Segment:
+    def __init__(self, end, label):
+        self.end = end
+        self.label = label
+
+    def __str__(self):
+        return "end: %s\tlabel: %s" % (self.end, self.label)
 
 ##### FUNCTIONS #####
 
