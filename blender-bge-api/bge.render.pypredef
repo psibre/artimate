@@ -1,0 +1,76 @@
+'''This is the Python API for the game engine of Rasterizer'''
+
+KX_BLENDER_GLSL_MATERIAL = int
+KX_BLENDER_MULTITEX_MATERIAL = int
+KX_TEXFACE_MATERIAL = int
+def disableMist(*argv):
+	'''turn off mist'''
+
+def disableMotionBlur(*argv):
+	'''disable motion blur'''
+
+def drawLine(*argv):
+	'''draw a line on the screen'''
+
+def enableMotionBlur(*argv):
+	'''enable motion blur'''
+
+def enableVisibility(*argv):
+	'''enableVisibility doc'''
+
+error = str
+def getEyeSeparation(*argv):
+	'''get the eye separation for stereo mode'''
+
+def getFocalLength(*argv):
+	'''get the focal length for stereo mode'''
+
+def getGLSLMaterialSetting(*argv):
+	'''get the state of a GLSL material setting'''
+
+def getMaterialMode(*argv):
+	'''get the material mode being used for OpenGL rendering'''
+
+def getWindowHeight(*argv):
+	'''getWindowHeight doc'''
+
+def getWindowWidth(*argv):
+	'''getWindowWidth doc'''
+
+def makeScreenshot(*argv):
+	'''make Screenshot doc'''
+
+def setAmbientColor(*argv):
+	'''set Ambient Color (rgb)'''
+
+def setBackgroundColor(*argv):
+	'''set Background Color (rgb)'''
+
+def setEyeSeparation(*argv):
+	'''set the eye separation for stereo mode'''
+
+def setFocalLength(*argv):
+	'''set the focal length for stereo mode'''
+
+def setGLSLMaterialSetting(*argv):
+	'''set the state of a GLSL material setting'''
+
+def setMaterialMode(*argv):
+	'''set the material mode to use for OpenGL rendering'''
+
+def setMistColor(*argv):
+	'''set Mist Color (rgb)'''
+
+def setMistEnd(*argv):
+	'''set Mist End(rgb)'''
+
+def setMistStart(*argv):
+	'''set Mist Start(rgb)'''
+
+def setMousePosition(*argv):
+	'''setMousePosition(int x,int y)'''
+
+def showMouse(*argv):
+	'''showMouse(bool visible)'''
+
+

@@ -1,0 +1,42 @@
+'''The Blender geometry module'''
+
+def BarycentricTransform(*argv):
+	pass
+
+def BezierInterp(*argv):
+	pass
+
+def BoxPack2D(*argv):
+	pass
+
+def ClosestPointOnLine(*argv):
+	'''(pt, line_p1, line_p2) - takes a point and a line and returns a (Vector, float) for the point on the line, and the bool so you can know if the point was between the 2 points'''
+
+def Intersect(*argv):
+	'''(v1, v2, v3, ray, orig, clip=1) - returns the intersection between a ray and a triangle, if possible, returns None otherwise'''
+
+def LineIntersect(*argv):
+	'''(v1, v2, v3, v4) - returns a tuple with the points on each line respectively closest to the other'''
+
+def LineIntersect2D(*argv):
+	'''(lineA_p1, lineA_p2, lineB_p1, lineB_p2) - takes 2 lines (as 4 vectors) and returns a vector for their point of intersection or None'''
+
+def PointInQuad2D(*argv):
+	'''(pt, quad_p1, quad_p2, quad_p3, quad_p4) - takes 5 vectors, one is the point and the next 4 define the quad, only the x and y are used from the vectors'''
+
+def PointInTriangle2D(*argv):
+	'''(pt, tri_p1, tri_p2, tri_p3) - takes 4 vectors, one is the point and the next 3 define the triangle, only the x and y are used from the vectors'''
+
+def PolyFill(*argv):
+	'''(veclist_list) - takes a list of polylines (each point a vector) and returns the point indicies for a polyline filled with triangles'''
+
+def QuadNormal(*argv):
+	'''(v1, v2, v3, v4) - returns the normal of the 3D quad defined'''
+
+def TriangleArea(*argv):
+	'''(v1, v2, v3) - returns the area size of the 2D or 3D triangle defined'''
+
+def TriangleNormal(*argv):
+	'''(v1, v2, v3) - returns the normal of the 3D triangle defined'''
+
+

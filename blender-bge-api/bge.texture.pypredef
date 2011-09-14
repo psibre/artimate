@@ -1,0 +1,364 @@
+'''Module that allows to play video files on textures in GameBlender.'''
+
+class FilterBGR24:
+	'''Source filter BGR24 objects'''
+
+	pass
+
+class FilterBlueScreen:
+	'''Filter for Blue Screen objects'''
+
+	color = getset_descriptor
+	'''Filter for Blue Screen objects'''
+
+	limits = getset_descriptor
+	'''Filter for Blue Screen objects'''
+
+	previous = getset_descriptor
+	'''Filter for Blue Screen objects'''
+
+
+class FilterColor:
+	'''Filter for color calculations'''
+
+	matrix = getset_descriptor
+	'''Filter for color calculations'''
+
+	previous = getset_descriptor
+	'''Filter for color calculations'''
+
+
+class FilterGray:
+	'''Filter for gray scale effect'''
+
+	previous = getset_descriptor
+	'''Filter for gray scale effect'''
+
+
+class FilterLevel:
+	'''Filter for levels calculations'''
+
+	levels = getset_descriptor
+	'''Filter for levels calculations'''
+
+	previous = getset_descriptor
+	'''Filter for levels calculations'''
+
+
+class FilterNormal:
+	'''Filter for Blue Screen objects'''
+
+	colorIdx = getset_descriptor
+	'''Filter for Blue Screen objects'''
+
+	depth = getset_descriptor
+	'''Filter for Blue Screen objects'''
+
+	previous = getset_descriptor
+	'''Filter for Blue Screen objects'''
+
+
+class FilterRGB24:
+	'''Source filter RGB24 objects'''
+
+	pass
+
+class FilterRGBA32:
+	'''Source filter RGBA32 objects'''
+
+	pass
+
+class ImageBuff:
+	'''Image source from image buffer'''
+
+	filter = getset_descriptor
+	'''Image source from image buffer'''
+
+	flip = getset_descriptor
+	'''Image source from image buffer'''
+
+	image = getset_descriptor
+	'''Image source from image buffer'''
+
+	def load(*argv):
+		'''Load image from buffer'''
+
+	def plot(*argv):
+		'''update image buffer'''
+
+	scale = getset_descriptor
+	'''Image source from image buffer'''
+
+	size = getset_descriptor
+	'''Image source from image buffer'''
+
+	valid = getset_descriptor
+	'''Image source from image buffer'''
+
+
+class ImageFFmpeg:
+	'''FFmpeg image source'''
+
+	filter = getset_descriptor
+	'''FFmpeg image source'''
+
+	flip = getset_descriptor
+	'''FFmpeg image source'''
+
+	image = getset_descriptor
+	'''FFmpeg image source'''
+
+	def refresh(*argv):
+		'''Refresh image, i.e. load it'''
+
+	def reload(*argv):
+		'''Reload image, i.e. reopen it'''
+
+	scale = getset_descriptor
+	'''FFmpeg image source'''
+
+	size = getset_descriptor
+	'''FFmpeg image source'''
+
+	status = getset_descriptor
+	'''FFmpeg image source'''
+
+	valid = getset_descriptor
+	'''FFmpeg image source'''
+
+
+class ImageMirror:
+	'''Image source from mirror'''
+
+	alpha = getset_descriptor
+	'''Image source from mirror'''
+
+	background = getset_descriptor
+	'''Image source from mirror'''
+
+	capsize = getset_descriptor
+	'''Image source from mirror'''
+
+	clip = getset_descriptor
+	'''Image source from mirror'''
+
+	filter = getset_descriptor
+	'''Image source from mirror'''
+
+	flip = getset_descriptor
+	'''Image source from mirror'''
+
+	image = getset_descriptor
+	'''Image source from mirror'''
+
+	def refresh(*argv):
+		'''Refresh image - invalidate its current content'''
+
+	scale = getset_descriptor
+	'''Image source from mirror'''
+
+	size = getset_descriptor
+	'''Image source from mirror'''
+
+	valid = getset_descriptor
+	'''Image source from mirror'''
+
+	whole = getset_descriptor
+	'''Image source from mirror'''
+
+
+class ImageMix:
+	'''Image mixer'''
+
+	filter = getset_descriptor
+	'''Image mixer'''
+
+	flip = getset_descriptor
+	'''Image mixer'''
+
+	def getSource(*argv):
+		'''get image source'''
+
+	def getWeight(*argv):
+		'''get image source weight'''
+
+	image = getset_descriptor
+	'''Image mixer'''
+
+	def refresh(*argv):
+		'''Refresh image - invalidate its current content'''
+
+	scale = getset_descriptor
+	'''Image mixer'''
+
+	def setSource(*argv):
+		'''set image source'''
+
+	def setWeight(*argv):
+		'''set image source weight'''
+
+	size = getset_descriptor
+	'''Image mixer'''
+
+	valid = getset_descriptor
+	'''Image mixer'''
+
+
+class ImageRender:
+	'''Image source from render'''
+
+	alpha = getset_descriptor
+	'''Image source from render'''
+
+	background = getset_descriptor
+	'''Image source from render'''
+
+	capsize = getset_descriptor
+	'''Image source from render'''
+
+	filter = getset_descriptor
+	'''Image source from render'''
+
+	flip = getset_descriptor
+	'''Image source from render'''
+
+	image = getset_descriptor
+	'''Image source from render'''
+
+	def refresh(*argv):
+		'''Refresh image - invalidate its current content'''
+
+	scale = getset_descriptor
+	'''Image source from render'''
+
+	size = getset_descriptor
+	'''Image source from render'''
+
+	valid = getset_descriptor
+	'''Image source from render'''
+
+	whole = getset_descriptor
+	'''Image source from render'''
+
+
+class ImageViewport:
+	'''Image source from viewport'''
+
+	alpha = getset_descriptor
+	'''Image source from viewport'''
+
+	capsize = getset_descriptor
+	'''Image source from viewport'''
+
+	filter = getset_descriptor
+	'''Image source from viewport'''
+
+	flip = getset_descriptor
+	'''Image source from viewport'''
+
+	image = getset_descriptor
+	'''Image source from viewport'''
+
+	position = getset_descriptor
+	'''Image source from viewport'''
+
+	def refresh(*argv):
+		'''Refresh image - invalidate its current content'''
+
+	scale = getset_descriptor
+	'''Image source from viewport'''
+
+	size = getset_descriptor
+	'''Image source from viewport'''
+
+	valid = getset_descriptor
+	'''Image source from viewport'''
+
+	whole = getset_descriptor
+	'''Image source from viewport'''
+
+
+class Texture:
+	'''Texture objects'''
+
+	bindId = getset_descriptor
+	'''Texture objects'''
+
+	def close(*argv):
+		'''Close dynamic texture and restore original'''
+
+	mipmap = getset_descriptor
+	'''Texture objects'''
+
+	def refresh(*argv):
+		'''Refresh texture from source'''
+
+	source = getset_descriptor
+	'''Texture objects'''
+
+
+class VideoFFmpeg:
+	'''FFmpeg video source'''
+
+	deinterlace = getset_descriptor
+	'''FFmpeg video source'''
+
+	filter = getset_descriptor
+	'''FFmpeg video source'''
+
+	flip = getset_descriptor
+	'''FFmpeg video source'''
+
+	framerate = getset_descriptor
+	'''FFmpeg video source'''
+
+	image = getset_descriptor
+	'''FFmpeg video source'''
+
+	def pause(*argv):
+		'''pause video'''
+
+	def play(*argv):
+		'''Play (restart) video'''
+
+	preseek = getset_descriptor
+	'''FFmpeg video source'''
+
+	range = getset_descriptor
+	'''FFmpeg video source'''
+
+	def refresh(*argv):
+		'''Refresh video - get its status'''
+
+	repeat = getset_descriptor
+	'''FFmpeg video source'''
+
+	scale = getset_descriptor
+	'''FFmpeg video source'''
+
+	size = getset_descriptor
+	'''FFmpeg video source'''
+
+	status = getset_descriptor
+	'''FFmpeg video source'''
+
+	def stop(*argv):
+		'''stop video (play will replay it from start)'''
+
+	valid = getset_descriptor
+	'''FFmpeg video source'''
+
+
+def getLastError(*argv):
+	'''Gets last error description'''
+
+def imageToArray(*argv):
+	'''get buffer from image source, color channels are selectable'''
+
+def materialID(*argv):
+	'''Gets object's Blender Material ID'''
+
+def setLogFile(*argv):
+	'''Sets log file name'''
+
+
