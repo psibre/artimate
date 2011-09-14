@@ -14,7 +14,8 @@ Returns a copy of this color.
 :return: A copy of the color.
 :rtype: :class:`Color`
 
-.. note:: use this to get a copy of a wrapped color with no reference to the original data.'''
+.. note:: use this to get a copy of a wrapped color with
+   no reference to the original data.'''
 
 	g = getset_descriptor
 	'''This object gives access to Colors in Blender.'''
@@ -52,7 +53,8 @@ Returns a copy of this euler.
 :return: A copy of the euler.
 :rtype: :class:`Euler`
 
-.. note:: use this to get a copy of a wrapped euler with no reference to the original data.'''
+.. note:: use this to get a copy of a wrapped euler with
+   no reference to the original data.'''
 
 	is_wrapped = getset_descriptor
 	'''This object gives access to Eulers in Blender.'''
@@ -60,14 +62,10 @@ Returns a copy of this euler.
 	def make_compatible(*argv):
 		'''.. method:: make_compatible(other)
 
-Make this euler compatible with another, so interpolating between them works as intended.
+Make this euler compatible with another,
+so interpolating between them works as intended.
 
-:arg other: make compatible with this rotation.
-:type other: :class:`Euler`
-:return: an instance of itself.
-:rtype: :class:`Euler`
-
-.. note:: the order of eulers must match or an exception is raised.'''
+.. note:: the rotation order is not taken into account for this function.'''
 
 	order = getset_descriptor
 	'''This object gives access to Eulers in Blender.'''
@@ -75,17 +73,24 @@ Make this euler compatible with another, so interpolating between them works as 
 	owner = getset_descriptor
 	'''This object gives access to Eulers in Blender.'''
 
+	def rotate(*argv):
+		'''.. method:: rotate(other)
+
+Rotates the euler a by another mathutils value.
+
+:arg other: rotation component of mathutils value
+:type other: :class:`Euler`, :class:`Quaternion` or :class:`Matrix`'''
+
 	def rotate_axis(*argv):
 		'''.. method:: rotate_axis(axis, angle)
 
-Rotates the euler a certain amount and returning a unique euler rotation (no 720 degree pitches).
+Rotates the euler a certain amount and returning a unique euler rotation
+(no 720 degree pitches).
 
 :arg axis: single character in ['X, 'Y', 'Z'].
 :type axis: string
 :arg angle: angle in radians.
-:type angle: float
-:return: an instance of itself
-:rtype: :class:`Euler`'''
+:type angle: float'''
 
 	def to_matrix(*argv):
 		'''.. method:: to_matrix()
@@ -95,21 +100,13 @@ Return a matrix representation of the euler.
 :return: A 3x3 roation matrix representation of the euler.
 :rtype: :class:`Matrix`'''
 
-	def to_quat(*argv):
-		'''.. method:: to_quat()
+	def to_quaternion(*argv):
+		'''.. method:: to_quaternion()
 
 Return a quaternion representation of the euler.
 
 :return: Quaternion representation of the euler.
 :rtype: :class:`Quaternion`'''
-
-	def unique(*argv):
-		'''.. method:: unique()
-
-Calculate a unique rotation for this euler. Avoids gimble lock.
-
-:return: an instance of itself
-:rtype: :class:`Euler`'''
 
 	x = getset_descriptor
 	'''This object gives access to Eulers in Blender.'''
@@ -123,26 +120,23 @@ Calculate a unique rotation for this euler. Avoids gimble lock.
 	def zero(*argv):
 		'''.. method:: zero()
 
-Set all values to zero.
-
-:return: an instance of itself
-:rtype: :class:`Euler`'''
+Set all values to zero.'''
 
 
 class Matrix:
 	'''This object gives access to Matrices in Blender.'''
 
 	def OrthoProjection(*argv):
-		'''.. classmethod:: OrthoProjection(plane, size, axis)
+		'''.. classmethod:: OrthoProjection(axis, size)
 
 Create a matrix to represent an orthographic projection.
 
-:arg plane: Can be any of the following: ['X', 'Y', 'XY', 'XZ', 'YZ', 'R'], where a single axis is for a 2D matrix and 'R' requires axis is given.
-:type plane: string
+:arg axis: Can be any of the following: ['X', 'Y', 'XY', 'XZ', 'YZ'],
+   where a single axis is for a 2D matrix.
+   Or a vector for an arbitrary axis
+:type axis: string or :class:`Vector`
 :arg size: The size of the projection matrix to construct [2, 4].
 :type size: int
-:arg axis: Arbitrary perpendicular plane vector (optional).
-:type axis: :class:`Vector`
 :return: A new projection matrix.
 :rtype: :class:`Matrix`'''
 
@@ -155,7 +149,8 @@ Create a matrix representing a rotation.
 :type angle: float
 :arg size: The size of the rotation matrix to construct [2, 4].
 :type size: int
-:arg axis: a string in ['X', 'Y', 'Z'] or a 3D Vector Object (optional when size is 2).
+:arg axis: a string in ['X', 'Y', 'Z'] or a 3D Vector Object
+   (optional when size is 2).
 :type axis: string or :class:`Vector`
 :return: A new rotation matrix.
 :rtype: :class:`Matrix`'''
@@ -175,16 +170,18 @@ Create a matrix representing a scaling.
 :rtype: :class:`Matrix`'''
 
 	def Shear(*argv):
-		'''.. classmethod:: Shear(plane, factor, size)
+		'''.. classmethod:: Shear(plane, size, factor)
 
 Create a matrix to represent an shear transformation.
 
-:arg plane: Can be any of the following: ['X', 'Y', 'XY', 'XZ', 'YZ'], where a single axis is for a 2D matrix.
+:arg plane: Can be any of the following: ['X', 'Y', 'XY', 'XZ', 'YZ'],
+   where a single axis is for a 2D matrix only.
 :type plane: string
-:arg factor: The factor of shear to apply.
-:type factor: float
 :arg size: The size of the shear matrix to construct [2, 4].
 :type size: int
+:arg factor: The factor of shear to apply. For a 3 or 4 *size* matrix
+   pass a pair of floats corrasponding with the *plane* axis.
+:type factor: float or float pair
 :return: A new shear matrix.
 :rtype: :class:`Matrix`'''
 
@@ -232,10 +229,8 @@ Return the determinant of a matrix.
 
 Set the matrix to the identity matrix.
 
-:return: an instance of itself
-:rtype: :class:`Matrix`
-
-.. note:: An object with zero location and rotation, a scale of one, will have an identity matrix.
+.. note:: An object with zero location and rotation, a scale of one,
+   will have an identity matrix.
 
 .. seealso:: <http://en.wikipedia.org/wiki/Identity_matrix>'''
 
@@ -244,14 +239,24 @@ Set the matrix to the identity matrix.
 
 Set the matrix to its inverse.
 
-:return: an instance of itself.
-:rtype: :class:`Matrix`
-
 .. note:: :exc:`ValueError` exception is raised.
 
 .. seealso:: <http://en.wikipedia.org/wiki/Inverse_matrix>'''
 
+	def inverted(*argv):
+		'''.. method:: inverted()
+
+Return an inverted copy of the matrix.
+
+:return: the  inverted matrix.
+:rtype: :class:`Matrix`
+
+.. note:: :exc:`ValueError` exception is raised.'''
+
 	is_negative = getset_descriptor
+	'''This object gives access to Matrices in Blender.'''
+
+	is_orthogonal = getset_descriptor
 	'''This object gives access to Matrices in Blender.'''
 
 	is_wrapped = getset_descriptor
@@ -275,36 +280,23 @@ Returns the interpolation of two matricies.
 	owner = getset_descriptor
 	'''This object gives access to Matrices in Blender.'''
 
-	def resize4x4(*argv):
-		'''.. method:: resize4x4()
+	def resize_4x4(*argv):
+		'''.. method:: resize_4x4()
 
-Resize the matrix to 4x4.
+Resize the matrix to 4x4.'''
 
-:return: an instance of itself.
-:rtype: :class:`Matrix`'''
+	def rotate(*argv):
+		'''.. method:: rotate(other)
 
-	def rotation_part(*argv):
-		'''.. method:: rotation_part()
+Rotates the matrix a by another mathutils value.
 
-Return the 3d submatrix corresponding to the linear term of the embedded affine transformation in 3d. This matrix represents rotation and scale.
+:arg other: rotation component of mathutils value
+:type other: :class:`Euler`, :class:`Quaternion` or :class:`Matrix`
 
-:return: Return the 3d matrix for rotation and scale.
-:rtype: :class:`Matrix`
-
-.. note:: Note that the (4,4) element of a matrix can be used for uniform scaling too.'''
+.. note:: If any of the columns are not unit length this may not have desired results.'''
 
 	row_size = getset_descriptor
 	'''This object gives access to Matrices in Blender.'''
-
-	def scale_part(*argv):
-		'''.. method:: scale_part()
-
-Return a the scale part of a 3x3 or 4x4 matrix.
-
-:return: Return a the scale of a matrix.
-:rtype: :class:`Vector`
-
-.. note:: This method does not return negative a scale on any axis because it is not possible to obtain this data from the matrix alone.'''
 
 	def to_3x3(*argv):
 		'''.. method:: to_3x3()
@@ -325,42 +317,59 @@ Return a 4x4 copy of this matrix.
 	def to_euler(*argv):
 		'''.. method:: to_euler(order, euler_compat)
 
-Return an Euler representation of the rotation matrix (3x3 or 4x4 matrix only).
+Return an Euler representation of the rotation matrix
+(3x3 or 4x4 matrix only).
 
-:arg order: Optional rotation order argument in ['XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX'].
+:arg order: Optional rotation order argument in
+   ['XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX'].
 :type order: string
-:arg euler_compat: Optional euler argument the new euler will be made compatible with (no axis flipping between them). Useful for converting a series of matrices to animation curves.
+:arg euler_compat: Optional euler argument the new euler will be made
+   compatible with (no axis flipping between them).
+   Useful for converting a series of matrices to animation curves.
 :type euler_compat: :class:`Euler`
 :return: Euler representation of the matrix.
 :rtype: :class:`Euler`'''
 
-	def to_quat(*argv):
-		'''.. method:: to_quat()
+	def to_quaternion(*argv):
+		'''.. method:: to_quaternion()
 
 Return a quaternion representation of the rotation matrix.
 
 :return: Quaternion representation of the rotation matrix.
 :rtype: :class:`Quaternion`'''
 
-	def translation_part(*argv):
-		'''.. method:: translation_part()
+	def to_scale(*argv):
+		'''.. method:: to_scale()
+
+Return a the scale part of a 3x3 or 4x4 matrix.
+
+:return: Return a the scale of a matrix.
+:rtype: :class:`Vector`
+
+.. note:: This method does not return negative a scale on any axis because it is not possible to obtain this data from the matrix alone.'''
+
+	def to_translation(*argv):
+		'''.. method:: to_translation()
 
 Return a the translation part of a 4 row matrix.
 
 :return: Return a the translation of a matrix.
-:rtype: :class:`Matrix`
-
-.. note:: Note that the (4,4) element of a matrix can be used for uniform scaling too.'''
+:rtype: :class:`Vector`'''
 
 	def transpose(*argv):
 		'''.. method:: transpose()
 
 Set the matrix to its transpose.
 
-:return: an instance of itself
-:rtype: :class:`Matrix`
-
 .. seealso:: <http://en.wikipedia.org/wiki/Transpose>'''
+
+	def transposed(*argv):
+		'''.. method:: transposed()
+
+Return a new, transposed matrix.
+
+:return: a transposed matrix
+:rtype: :class:`Matrix`'''
 
 	def zero(*argv):
 		'''.. method:: zero()
@@ -383,9 +392,14 @@ class Quaternion:
 	def conjugate(*argv):
 		'''.. function:: conjugate()
 
-Set the quaternion to its conjugate (negate x, y, z).
+Set the quaternion to its conjugate (negate x, y, z).'''
 
-:return: an instance of itself.
+	def conjugated(*argv):
+		'''.. function:: conjugated()
+
+Return a new conjugated quaternion.
+
+:return: a new quaternion.
 :rtype: :class:`Quaternion`'''
 
 	def copy(*argv):
@@ -396,7 +410,8 @@ Returns a copy of this quaternion.
 :return: A copy of the quaternion.
 :rtype: :class:`Quaternion`
 
-.. note:: use this to get a copy of a wrapped quaternion with no reference to the original data.'''
+.. note:: use this to get a copy of a wrapped quaternion with
+   no reference to the original data.'''
 
 	def cross(*argv):
 		'''.. method:: cross(other)
@@ -406,16 +421,6 @@ Return the cross product of this quaternion and another.
 :arg other: The other quaternion to perform the cross product with.
 :type other: :class:`Quaternion`
 :return: The cross product.
-:rtype: :class:`Quaternion`'''
-
-	def difference(*argv):
-		'''.. function:: difference(other)
-
-Returns a quaternion representing the rotational difference.
-
-:arg other: second quaternion.
-:type other: :class:`Quaternion`
-:return: the rotational difference between the two quat rotations.
 :rtype: :class:`Quaternion`'''
 
 	def dot(*argv):
@@ -436,12 +441,17 @@ Set the quaternion to an identity quaternion.
 :return: an instance of itself.
 :rtype: :class:`Quaternion`'''
 
-	def inverse(*argv):
-		'''.. function:: inverse()
+	def invert(*argv):
+		'''.. function:: invert()
 
-Set the quaternion to its inverse.
+Set the quaternion to its inverse.'''
 
-:return: an instance of itself.
+	def inverted(*argv):
+		'''.. function:: inverted()
+
+Return a new, inverted quaternion.
+
+:return: the inverted value.
 :rtype: :class:`Quaternion`'''
 
 	is_wrapped = getset_descriptor
@@ -461,13 +471,36 @@ Set the quaternion to its negative.
 	def normalize(*argv):
 		'''.. function:: normalize()
 
-Normalize the quaternion.
+Normalize the quaternion.'''
 
-:return: an instance of itself.
+	def normalized(*argv):
+		'''.. function:: normalized()
+
+Return a new normalized quaternion.
+
+:return: a normalized copy.
 :rtype: :class:`Quaternion`'''
 
 	owner = getset_descriptor
 	'''This object gives access to Quaternions in Blender.'''
+
+	def rotate(*argv):
+		'''.. method:: rotate(other)
+
+Rotates the quaternion a by another mathutils value.
+
+:arg other: rotation component of mathutils value
+:type other: :class:`Euler`, :class:`Quaternion` or :class:`Matrix`'''
+
+	def rotation_difference(*argv):
+		'''.. function:: difference(other)
+
+Returns a quaternion representing the rotational difference.
+
+:arg other: second quaternion.
+:type other: :class:`Quaternion`
+:return: the rotational difference between the two quat rotations.
+:rtype: :class:`Quaternion`'''
 
 	def slerp(*argv):
 		'''.. function:: slerp(other, factor)
@@ -486,9 +519,12 @@ Returns the interpolation of two quaternions.
 
 Return Euler representation of the quaternion.
 
-:arg order: Optional rotation order argument in ['XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX'].
+:arg order: Optional rotation order argument in
+   ['XYZ', 'XZY', 'YXZ', 'YZX', 'ZXY', 'ZYX'].
 :type order: string
-:arg euler_compat: Optional euler argument the new euler will be made compatible with (no axis flipping between them). Useful for converting a series of matrices to animation curves.
+:arg euler_compat: Optional euler argument the new euler will be made
+   compatible with (no axis flipping between them).
+   Useful for converting a series of matrices to animation curves.
 :type euler_compat: :class:`Euler`
 :return: Euler representation of the quaternion.
 :rtype: :class:`Euler`'''
@@ -524,7 +560,8 @@ Return the angle between two vectors.
 
 :arg other: another vector to compare the angle with
 :type other: :class:`Vector`
-:arg fallback: return this value when the angle cant be calculated (zero length vector)
+:arg fallback: return this value when the angle cant be calculated
+   (zero length vector)
 :type fallback: any
 :return: angle in radians or fallback when given
 :rtype: float
@@ -539,7 +576,8 @@ Returns a copy of this vector.
 :return: A copy of the vector.
 :rtype: :class:`Vector`
 
-.. note:: use this to get a copy of a wrapped vector with no reference to the original data.'''
+.. note:: use this to get a copy of a wrapped vector with
+   no reference to the original data.'''
 
 	def cross(*argv):
 		'''.. method:: cross(other)
@@ -552,18 +590,6 @@ Return the cross product of this vector and another.
 :rtype: :class:`Vector`
 
 .. note:: both vectors must be 3D'''
-
-	def difference(*argv):
-		'''.. function:: difference(other)
-
-Returns a quaternion representing the rotational difference between this vector and another.
-
-:arg other: second vector.
-:type other: :class:`Vector`
-:return: the rotational difference between the two vectors.
-:rtype: :class:`Quaternion`
-
-.. note:: 2D vectors raise an :exc:`AttributeError`.'''
 
 	def dot(*argv):
 		'''.. method:: dot(other)
@@ -579,6 +605,9 @@ Return the dot product of this vector and another.
 	'''This object gives access to Vectors in Blender.'''
 
 	length = getset_descriptor
+	'''This object gives access to Vectors in Blender.'''
+
+	length_squared = getset_descriptor
 	'''This object gives access to Vectors in Blender.'''
 
 	def lerp(*argv):
@@ -609,12 +638,19 @@ Set all values to their negative.
 
 Normalize the vector, making the length of the vector always 1.0.
 
-:return: an instance of itself
-:rtype: :class:`Vector`
+.. warning:: Normalizing a vector where all values are zero results
+   in all axis having a nan value (not a number).
 
-.. warning:: Normalizing a vector where all values are zero results in all axis having a nan value (not a number).
+.. note:: Normalize works for vectors of all sizes,
+   however 4D Vectors w axis is left untouched.'''
 
-.. note:: Normalize works for vectors of all sizes, however 4D Vectors w axis is left untouched.'''
+	def normalized(*argv):
+		'''.. method:: normalized()
+
+Return a new, normalized vector.
+
+:return: a normalized copy of the vector
+:rtype: :class:`Vector`'''
 
 	owner = getset_descriptor
 	'''This object gives access to Vectors in Blender.'''
@@ -639,24 +675,24 @@ Return the reflection vector from the *mirror* argument.
 :return: The reflected vector matching the size of this vector.
 :rtype: :class:`Vector`'''
 
-	def resize2D(*argv):
-		'''.. method:: resize2D()
+	def resize_2d(*argv):
+		'''.. method:: resize_2d()
 
 Resize the vector to 2D  (x, y).
 
 :return: an instance of itself
 :rtype: :class:`Vector`'''
 
-	def resize3D(*argv):
-		'''.. method:: resize3D()
+	def resize_3d(*argv):
+		'''.. method:: resize_3d()
 
 Resize the vector to 3D  (x, y, z).
 
 :return: an instance of itself
 :rtype: :class:`Vector`'''
 
-	def resize4D(*argv):
-		'''.. method:: resize4D()
+	def resize_4d(*argv):
+		'''.. method:: resize_4d()
 
 Resize the vector to 4D (x, y, z, w).
 
@@ -664,15 +700,48 @@ Resize the vector to 4D (x, y, z, w).
 :rtype: :class:`Vector`'''
 
 	def rotate(*argv):
-		'''.. function:: rotate(axis, angle)
+		'''.. function:: rotate(other)
 
-Return vector rotated around axis by angle.
+Return vector by a rotation value.
 
-:arg axis: rotation axis.
-:type axis: :class:`Vector`
-:arg angle: angle in radians.
-:type angle: float
-:return: an instance of itself
+:arg other: rotation component of mathutils value
+:type other: :class:`Euler`, :class:`Quaternion` or :class:`Matrix`'''
+
+	def rotation_difference(*argv):
+		'''.. function:: difference(other)
+
+Returns a quaternion representing the rotational difference between this
+vector and another.
+
+:arg other: second vector.
+:type other: :class:`Vector`
+:return: the rotational difference between the two vectors.
+:rtype: :class:`Quaternion`
+
+.. note:: 2D vectors raise an :exc:`AttributeError`.'''
+
+	def to_2d(*argv):
+		'''.. method:: to_2d()
+
+Return a 2d copy of the vector.
+
+:return: a new vector
+:rtype: :class:`Vector`'''
+
+	def to_3d(*argv):
+		'''.. method:: to_3d()
+
+Return a 3d copy of the vector.
+
+:return: a new vector
+:rtype: :class:`Vector`'''
+
+	def to_4d(*argv):
+		'''.. method:: to_4d()
+
+Return a 4d copy of the vector.
+
+:return: a new vector
 :rtype: :class:`Vector`'''
 
 	def to_track_quat(*argv):
@@ -964,10 +1033,7 @@ Return this vector as a tuple with.
 	def zero(*argv):
 		'''.. method:: zero()
 
-Set all values to zero.
-
-:return: an instance of itself
-:rtype: :class:`Vector`'''
+Set all values to zero.'''
 
 	zw = getset_descriptor
 	zww = getset_descriptor

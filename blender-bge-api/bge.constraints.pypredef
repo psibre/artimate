@@ -1,9 +1,31 @@
 '''This is the Python API for the Physics Constraints'''
 
+ANGULAR_CONSTRAINT = int
+CONETWIST_CONSTRAINT = int
+DBG_DISABLEBULLETLCP = int
+DBG_DRAWAABB = int
+DBG_DRAWCONSTRAINTLIMITS = int
+DBG_DRAWCONSTRAINTS = int
+DBG_DRAWCONTACTPOINTS = int
+DBG_DRAWFREATURESTEXT = int
+DBG_DRAWTEXT = int
+DBG_DRAWWIREFRAME = int
+DBG_ENABLECDD = int
+DBG_ENABLESATCOMPARISION = int
+DBG_FASTWIREFRAME = int
+DBG_NODEBUG = int
+DBG_NOHELPTEXT = int
+DBG_PROFILETIMINGS = int
+LINEHINGE_CONSTRAINT = int
+POINTTOPOINT_CONSTRAINT = int
+VEHICLE_CONSTRAINT = int
 def createConstraint(*argv):
 	'''createConstraint(ob1,ob2,float restLength,float restitution,float damping)'''
 
 error = str
+def exportBulletFile(*argv):
+	'''export a .bullet file'''
+
 def getAppliedImpulse(*argv):
 	'''getAppliedImpulse(int constraintId)'''
 
