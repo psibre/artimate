@@ -108,18 +108,18 @@ class Segmentation:
 
 class Segment:
     def __init__(self, start, end, label):
-        self.start = start
-        self.end = end
+        self.start = float(start)
+        self.end = float(end)
         self.label = label
 
     def startframe(self):
         # TODO set this from context
-        return self.start * 200.0
+        return int(self.start * 200.0)
     startframe = property(startframe)
 
     def endframe(self):
         # TODO set this from context
-        return self.end * 200.0
+        return int(self.end * 200.0)
     endframe = property(endframe)
 
     def __str__(self):
