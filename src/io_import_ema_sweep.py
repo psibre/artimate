@@ -163,16 +163,28 @@ def generate_coil_objects(sweep):
         ops.object.select_name(name="EMA", extend=True)
         ops.object.parent_set()
 
-def generate_animation(sweep, start_frame=1, end_frame= -1):
+def generate_animation(self, sweep):
+    if sweep.segmentation.segments == None:
+        generate_action(sweep, self.start_frame, self.end_frame)
+    else:
+        for s, segment in enumerate(sweep.segmentation.segments):
+            if segment.label != "sil":
+                generate_action(sweep, segment.startframe, segment.endframe, "Action_%d_%s" % (s+1, segment.label))
+
+def generate_action(sweep, start_frame=1, end_frame= -1, actionname = "Action"):
     end_frame = sweep.size if end_frame == -1 else end_frame
     assert end_frame - start_frame <= sweep.size
 
     for coil_name in sweep.coils:
         coil = data.objects[coil_name + "Coil"]
 
-        coil.animation_data_create()
-        coil.animation_data.action = data.actions.new(coil_name + "Action")
-        fcurves = coil.animation_data.action.fcurves
+        if coil.animation_data is None:
+            print("creating animation_data for coil", coil_name)
+            coil.animation_data_create()
+        track = coil.animation_data.nla_tracks.new()
+        track.name = coil_name + actionname
+        action = data.actions.new(coil_name + actionname)
+        fcurves = action.fcurves
 
         fcurves.new(data_path="location", index=0)
         fcurves.new(data_path="location", index=1)
@@ -189,6 +201,11 @@ def generate_animation(sweep, start_frame=1, end_frame= -1):
                 value = sweep.getValue(coil_name, f,
                                        start_frame - 1 + frame_number)
                 fcurve.keyframe_points[frame_number].co = frame_number, value
+
+        current_context = context.area.type
+        context.area.type = 'NLA_EDITOR'
+        ops.nla.actionclip_add(action=action.name)
+        context.area.type = current_context
 
 def decimate(arr):
     # not yet implemented
@@ -227,7 +244,7 @@ def import_sweep(self, context):
 
     sweep = Sweep(self.filepath, header, segmentation)
     generate_coil_objects(sweep)
-    generate_animation(sweep, self.start_frame, self.end_frame)
+    generate_animation(self, sweep)
     # hack: downscale
     data.objects["EMA"].scale = (0.1, 0.1, 0.1)
 
