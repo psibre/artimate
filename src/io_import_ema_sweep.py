@@ -150,6 +150,7 @@ def generate_coil_objects(sweep):
                                         depth=depth,
                                         location=(0, 0, depth / 2))
         context.active_object.name = coil + "Coil"
+        context.active_object.show_name = True
 
         # move object origin so that it lies at center of cone base:
         context.scene.cursor_location = 0, 0, 0
