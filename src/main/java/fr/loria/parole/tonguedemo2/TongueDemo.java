@@ -1,5 +1,7 @@
 package fr.loria.parole.tonguedemo2;
 
+import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
+import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.lwjgl.LwjglCanvas;
@@ -10,11 +12,15 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.Timer;
+import com.ardor3d.util.resource.ResourceLocatorTool;
+import com.ardor3d.util.resource.ResourceSource;
 
 /**
  * Borrowing heavily from <a href=
  * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/basic/LwjglBasicExample.java?rev=1745"
- * >LwjglBasicExample</a>
+ * >LwjglBasicExample</a> and <a href=
+ * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/pipeline/ColladaExample.java?rev=1745"
+ * >ColladaExample</a>
  * 
  * @author steiner
  * 
@@ -25,6 +31,7 @@ public class TongueDemo implements Scene {
 	private Timer timer = new Timer();
 	private final Node root = new Node();
 	private boolean exit;
+	private Node colladaNode;
 
 	TongueDemo() {
 		canvas = initLwjgl();
@@ -56,7 +63,30 @@ public class TongueDemo implements Scene {
 	}
 
 	private void initExample() {
-		// TODO Auto-generated method stub
+		ResourceSource model = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "flexiquad.dae");
+		loadColladaModel(model);
+	}
+
+	private void loadColladaModel(final ResourceSource source) {
+		try {
+			// detach the old colladaNode, if present.
+			root.detachChild(colladaNode);
+
+			final long time = System.currentTimeMillis();
+			final ColladaImporter colladaImporter = new ColladaImporter();
+
+			// Load the collada scene
+			final ColladaStorage storage = colladaImporter.load(source);
+			colladaNode = storage.getScene();
+
+			System.out.println("Importing: " + source);
+			System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
+
+			// Add colladaNode to root
+			root.attachChild(colladaNode);
+		} catch (final Exception ex) {
+			ex.printStackTrace();
+		}
 	}
 
 	private void updateExample() {
@@ -90,7 +120,7 @@ public class TongueDemo implements Scene {
 
 	@Override
 	public PickResults doPick(Ray3 pickRay) {
-        // Ignore
-        return null;
+		// Ignore
+		return null;
 	}
 }

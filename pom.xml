@@ -25,6 +25,12 @@
 			<version>0.8-SNAPSHOT</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.ardor3d</groupId>
+			<artifactId>ardor3d-collada</artifactId>
+			<version>0.8-SNAPSHOT</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>
