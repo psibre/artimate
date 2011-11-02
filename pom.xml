@@ -10,8 +10,47 @@
 		<project.mainclass>fr.loria.parole.tonguedemo2.TongueDemo</project.mainclass>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>com.ardor3d</groupId>
+			<artifactId>ardor3d-lwjgl</artifactId>
+			<version>0.8-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>com.googlecode.mavennatives</groupId>
+			<artifactId>maven-nativedependencies-plugin</artifactId>
+			<version>0.0.5</version>
+			<type>maven-plugin</type>
+		</dependency>
+	</dependencies>
+
 	<build>
+		<resources>
+			<resource>
+				<directory>${project.resource.directory}</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>*.blend*</exclude>
+				</excludes>
+			</resource>
+		</resources>
+
 		<plugins>
+
+			<plugin>
+				<groupId>com.googlecode.mavennatives</groupId>
+				<artifactId>maven-nativedependencies-plugin</artifactId>
+				<version>0.0.5</version>
+				<executions>
+					<execution>
+						<id>unpacknatives</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
