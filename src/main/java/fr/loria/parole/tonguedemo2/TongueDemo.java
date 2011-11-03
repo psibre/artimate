@@ -1,7 +1,16 @@
 package fr.loria.parole.tonguedemo2;
 
+import java.util.List;
+
+import com.ardor3d.extension.animation.skeletal.AnimationManager;
+import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
+import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
+import com.ardor3d.extension.animation.skeletal.state.SteadyState;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
+import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.lwjgl.LwjglCanvas;
@@ -32,6 +41,8 @@ public class TongueDemo implements Scene {
 	private final Node root = new Node();
 	private boolean exit;
 	private Node colladaNode;
+	private AnimationManager manager;
+	private List<SkinData> skinDatas;
 
 	TongueDemo() {
 		canvas = initLwjgl();
@@ -79,6 +90,9 @@ public class TongueDemo implements Scene {
 			final ColladaStorage storage = colladaImporter.load(source);
 			colladaNode = storage.getScene();
 
+			setupSkins(storage);
+			setupAnimations(storage);
+
 			System.out.println("Importing: " + source);
 			System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
 
@@ -89,16 +103,49 @@ public class TongueDemo implements Scene {
 		}
 	}
 
+	private void setupSkins(final ColladaStorage storage) {
+		skinDatas = storage.getSkins();
+	}
+
+	private void setupAnimations(final ColladaStorage storage) {
+		// Check if there is any animationdata in the file
+		if (storage.getJointChannels().isEmpty() || storage.getSkins().isEmpty()) {
+			return;
+		}
+
+		// Make our manager
+		manager = new AnimationManager(timer, skinDatas.get(0).getPose());
+
+		final AnimationClip clipA = new AnimationClip("clipA");
+		for (final JointChannel channel : storage.getJointChannels()) {
+			// add it to a clip
+			clipA.addChannel(channel);
+		}
+
+		// Set some clip instance specific data - repeat, time scaling
+		manager.getClipInstance(clipA).setLoopCount(Integer.MAX_VALUE);
+
+		// Add our "applier logic".
+		manager.setApplier(new SimpleAnimationApplier());
+
+		// Add our clip as a state in the default animation layer
+		final SteadyState animState = new SteadyState("anim_state");
+		animState.setSourceTree(new ClipSource(clipA, manager));
+		manager.getBaseAnimationLayer().addSteadyState(animState);
+
+		// Set the current animation state on default layer
+		manager.getBaseAnimationLayer().setCurrentState("anim_state", true);
+	}
+
 	private void updateExample() {
 		if (canvas.isClosing()) {
 			exit = true;
 			return;
 		}
 
-		timer.update();
-
-		// Update controllers/render states/transforms/bounds for rootNode.
-		root.updateGeometricState(timer.getTimePerFrame(), true);
+		if (manager != null) {
+			manager.update();
+		}
 	}
 
 	public static void main(String args[]) {
