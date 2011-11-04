@@ -21,32 +21,32 @@ import com.ardor3d.renderer.Renderer;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.Timer;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.ResourceSource;
 
 /**
  * Borrowing heavily from <a href=
  * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/basic/LwjglBasicExample.java?rev=1745"
- * >LwjglBasicExample</a> and <a href=
+ * >LwjglBasicExample</a>, <a href=
  * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/pipeline/ColladaExample.java?rev=1745"
- * >ColladaExample</a>
+ * >ColladaExample</a>, and <a href=
+ * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/ExampleBase.java?rev=1745"
+ * >ExampleBase</a>
  * 
  * @author steiner
  * 
  */
 public class TongueDemo implements Scene {
 
-	private LwjglCanvas canvas;
-	private Timer timer = new Timer();
-	private final Node root = new Node();
-	private boolean exit;
+	private LwjglCanvas _canvas;
+	private Timer _timer = new Timer();
+	private final Node _root = new Node();
+	private boolean _exit;
 	private Node colladaNode;
 	private AnimationManager manager;
 	private List<SkinData> skinDatas;
 
-	TongueDemo() {
-		canvas = initLwjgl();
-		canvas.init();
+	public TongueDemo() {
+		_canvas = initLwjgl();
+		_canvas.init();
 	}
 
 	private LwjglCanvas initLwjgl() {
@@ -59,29 +59,28 @@ public class TongueDemo implements Scene {
 		initExample();
 
 		// Run in this same thread.
-		while (!exit) {
+		while (!_exit) {
 			updateExample();
-			canvas.draw(null);
+			_canvas.draw(null);
 			Thread.yield();
 		}
-		canvas.getCanvasRenderer().makeCurrentContext();
+		_canvas.getCanvasRenderer().makeCurrentContext();
 
 		// Done, do cleanup
-		ContextGarbageCollector.doFinalCleanup(canvas.getCanvasRenderer().getRenderer());
-		canvas.close();
+		ContextGarbageCollector.doFinalCleanup(_canvas.getCanvasRenderer().getRenderer());
+		_canvas.close();
 
-		canvas.getCanvasRenderer().releaseCurrentContext();
+		_canvas.getCanvasRenderer().releaseCurrentContext();
 	}
 
 	private void initExample() {
-		ResourceSource model = ResourceLocatorTool.locateResource(ResourceLocatorTool.TYPE_MODEL, "flexiquad.dae");
-		loadColladaModel(model);
+		loadColladaModel("flexiquad.dae");
 	}
 
-	private void loadColladaModel(final ResourceSource source) {
+	private void loadColladaModel(String source) {
 		try {
 			// detach the old colladaNode, if present.
-			root.detachChild(colladaNode);
+			_root.detachChild(colladaNode);
 
 			final long time = System.currentTimeMillis();
 			final ColladaImporter colladaImporter = new ColladaImporter();
@@ -97,7 +96,7 @@ public class TongueDemo implements Scene {
 			System.out.println("Took " + (System.currentTimeMillis() - time) + " ms");
 
 			// Add colladaNode to root
-			root.attachChild(colladaNode);
+			_root.attachChild(colladaNode);
 		} catch (final Exception ex) {
 			ex.printStackTrace();
 		}
@@ -114,7 +113,7 @@ public class TongueDemo implements Scene {
 		}
 
 		// Make our manager
-		manager = new AnimationManager(timer, skinDatas.get(0).getPose());
+		manager = new AnimationManager(_timer, skinDatas.get(0).getPose());
 
 		final AnimationClip clipA = new AnimationClip("clipA");
 		for (final JointChannel channel : storage.getJointChannels()) {
@@ -138,8 +137,8 @@ public class TongueDemo implements Scene {
 	}
 
 	private void updateExample() {
-		if (canvas.isClosing()) {
-			exit = true;
+		if (_canvas.isClosing()) {
+			_exit = true;
 			return;
 		}
 
@@ -155,10 +154,10 @@ public class TongueDemo implements Scene {
 
 	@Override
 	public boolean renderUnto(Renderer renderer) {
-		if (!canvas.isClosing()) {
+		if (!_canvas.isClosing()) {
 
 			// Draw the root and all its children.
-			renderer.draw(root);
+			renderer.draw(_root);
 
 			return true;
 		}
