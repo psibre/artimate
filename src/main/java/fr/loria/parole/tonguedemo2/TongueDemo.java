@@ -1,12 +1,10 @@
 package fr.loria.parole.tonguedemo2;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.example.ExampleBase;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
@@ -69,8 +67,6 @@ import com.ardor3d.util.GameTaskQueueManager;
 import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 import com.ardor3d.util.geom.Debugger;
-import com.ardor3d.util.resource.ResourceLocatorTool;
-import com.ardor3d.util.resource.SimpleResourceLocator;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
@@ -282,17 +278,6 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		registerInputTriggers();
 
 		AWTImageLoader.registerLoader();
-
-		try {
-			SimpleResourceLocator srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ExampleBase.class,
-					"com/ardor3d/example/media/"));
-			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_TEXTURE, srl);
-			srl = new SimpleResourceLocator(ResourceLocatorTool.getClassPathResource(ExampleBase.class,
-					"com/ardor3d/example/media/models/"));
-			ResourceLocatorTool.addResourceLocator(ResourceLocatorTool.TYPE_MODEL, srl);
-		} catch (final URISyntaxException ex) {
-			ex.printStackTrace();
-		}
 
 		/**
 		 * Create a ZBuffer to display pixels closest to the camera above farther ones.

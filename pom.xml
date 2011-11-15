@@ -33,7 +33,7 @@
 
 		<dependency>
 			<groupId>com.ardor3d</groupId>
-			<artifactId>ardor3d-examples</artifactId>
+			<artifactId>ardor3d-awt</artifactId>
 			<version>0.8-SNAPSHOT</version>
 		</dependency>
 
