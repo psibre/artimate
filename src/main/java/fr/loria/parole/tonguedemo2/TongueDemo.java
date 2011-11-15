@@ -12,6 +12,7 @@ import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
 import com.ardor3d.extension.animation.skeletal.state.SteadyState;
+import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
@@ -120,6 +121,8 @@ public class TongueDemo implements Runnable, Updater, Scene {
 	private ColladaStorage storage;
 	private AnimationManager manager;
 
+	private boolean _showSkeleton = false;
+
 	public static void main(final String[] args) {
 		start(TongueDemo.class);
 	}
@@ -170,6 +173,12 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.N), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
 				_showNormals = !_showNormals;
+			}
+		}));
+
+		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.S), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+				_showSkeleton = !_showSkeleton;
 			}
 		}));
 
@@ -386,6 +395,9 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		if (_showNormals) {
 			Debugger.drawNormals(_root, renderer);
 			Debugger.drawTangents(_root, renderer);
+		}
+		if (_showSkeleton) {
+			SkeletalDebugger.drawSkeletons(_root, renderer, false, true);
 		}
 	}
 
