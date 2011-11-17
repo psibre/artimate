@@ -40,7 +40,6 @@ import com.ardor3d.input.logical.MouseButtonPressedCondition;
 import com.ardor3d.input.logical.MouseButtonReleasedCondition;
 import com.ardor3d.input.logical.TriggerAction;
 import com.ardor3d.input.logical.TwoInputStates;
-import com.ardor3d.input.lwjgl.LwjglControllerWrapper;
 import com.ardor3d.input.lwjgl.LwjglKeyboardWrapper;
 import com.ardor3d.input.lwjgl.LwjglMouseManager;
 import com.ardor3d.input.lwjgl.LwjglMouseWrapper;
@@ -376,7 +375,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			renderDebug(renderer);
 
 			if (_doShot) {
-				// force any waiting scene elements to be renderer.
+				// force any waiting scene elements to be rendered.
 				renderer.renderBuckets();
 				ScreenExporter.exportCurrentScreen(_canvas.getCanvasRenderer().getRenderer(), _screenShotExp);
 				_doShot = false;
@@ -411,6 +410,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 	}
 
 	public static void start(final Class<? extends TongueDemo> demoClazz) {
+		// TODO make this configurable
 		final DisplaySettings settings = new DisplaySettings(800, 600, 24, -1, 0, 8, 0, 0, false, false);
 
 		TongueDemo demo;
@@ -425,8 +425,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		// get our framework
 		final LwjglCanvasRenderer canvasRenderer = new LwjglCanvasRenderer(demo);
 		demo._canvas = new LwjglCanvas(canvasRenderer, settings);
-		demo._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(),
-				new LwjglControllerWrapper(), (LwjglCanvas) demo._canvas);
+		demo._physicalLayer = new PhysicalLayer(new LwjglKeyboardWrapper(), new LwjglMouseWrapper(), (LwjglCanvas) demo._canvas);
 		demo._mouseManager = new LwjglMouseManager();
 		TextureRendererFactory.INSTANCE.setProvider(new LwjglTextureRendererProvider());
 
