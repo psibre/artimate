@@ -38,13 +38,13 @@ public class TransformChannel extends AbstractAnimationChannel {
     // XXX: Could then also optimize execution time by checking object equality (==) and skipping (s)lerps.
 
     /** Our rotation samples. */
-    private final ReadOnlyQuaternion[] _rotations;
+    protected final ReadOnlyQuaternion[] _rotations;
 
     /** Our translation samples. */
-    private final ReadOnlyVector3[] _translations;
+    protected final ReadOnlyVector3[] _translations;
 
     /** Our scale samples. */
-    private final ReadOnlyVector3[] _scales;
+    protected final ReadOnlyVector3[] _scales;
 
     private final Quaternion _compQuat1 = new Quaternion();
     private final Quaternion _compQuat2 = new Quaternion();
