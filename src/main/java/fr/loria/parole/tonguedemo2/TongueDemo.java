@@ -1,6 +1,7 @@
 package fr.loria.parole.tonguedemo2;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -70,6 +71,8 @@ import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
+import fr.loria.parole.tonguedemo2.segmentation.Segment;
+
 /**
  * Borrowing heavily from <a href=
  * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/basic/OrbitCamExample.java?rev=1393"
@@ -122,6 +125,9 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 	private boolean _showSkeleton = false;
 
+	protected ArrayList<Segment> _animations = new ArrayList<Segment>();
+	protected int _animationIndex = 0;
+
 	public static void main(final String[] args) {
 		start(TongueDemo.class);
 	}
@@ -152,6 +158,16 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
 				exit();
+			}
+		}));
+
+		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.A), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+				_animationIndex++;
+				if (_animationIndex >= _animations.size()) {
+					_animationIndex = 0;
+				}
+				manager.getBaseAnimationLayer().setCurrentState(_animations.get(_animationIndex).getLabel(), true);
 			}
 		}));
 
@@ -228,25 +244,36 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		// Make our manager
 		manager = new AnimationManager(_timer, skinDatas.get(0).getPose());
 
-		final AnimationClip clipA = new AnimationClip("clipA");
-		for (final JointChannel channel : storage.getJointChannels()) {
-			// add it to a clip
-			clipA.addChannel(channel);
+		// TODO temporary:
+		float cut1 = 1.75f;
+		float cut2 = 2.5f;
+		_animations.add(new Segment(0.0f, cut1, "foo"));
+		_animations.add(new Segment(cut1, cut2, "bar"));
+		_animations.add(new Segment(cut2, 3.3f, "baz"));
+
+		for (Segment segment : _animations) {
+			final AnimationClip clip = new AnimationClip(segment.getLabel());
+
+			for (final JointChannel channel : storage.getJointChannels()) {
+				JointChannel subChannel = (JointChannel) channel.getSubchannelByTime(segment.getStart(), segment.getEnd());
+				// add it to a clip
+				clip.addChannel(subChannel);
+			}
+
+			// Set some clip instance specific data - repeat, time scaling
+			manager.getClipInstance(clip).setLoopCount(Integer.MAX_VALUE);
+
+			// Add our "applier logic".
+			manager.setApplier(new SimpleAnimationApplier());
+
+			// Add our clip as a state in the default animation layer
+			final SteadyState animState = new SteadyState(segment.getLabel());
+			animState.setSourceTree(new ClipSource(clip, manager));
+			manager.getBaseAnimationLayer().addSteadyState(animState);
 		}
 
-		// Set some clip instance specific data - repeat, time scaling
-		manager.getClipInstance(clipA).setLoopCount(Integer.MAX_VALUE);
-
-		// Add our "applier logic".
-		manager.setApplier(new SimpleAnimationApplier());
-
-		// Add our clip as a state in the default animation layer
-		final SteadyState animState = new SteadyState("anim_state");
-		animState.setSourceTree(new ClipSource(clipA, manager));
-		manager.getBaseAnimationLayer().addSteadyState(animState);
-
 		// Set the current animation state on default layer
-		manager.getBaseAnimationLayer().setCurrentState("anim_state", true);
+		manager.getBaseAnimationLayer().setCurrentState(_animations.get(0).getLabel(), true);
 	}
 
 	public void run() {
