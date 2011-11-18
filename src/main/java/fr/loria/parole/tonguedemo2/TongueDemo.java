@@ -71,6 +71,7 @@ import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
+import fr.loria.parole.tonguedemo2.io.XWavesSegmentation;
 import fr.loria.parole.tonguedemo2.segmentation.Segment;
 
 /**
@@ -167,6 +168,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 				if (_animationIndex >= _animations.size()) {
 					_animationIndex = 0;
 				}
+				logger.info("Switched to animation " + _animations.get(_animationIndex).getLabel());
 				manager.getBaseAnimationLayer().setCurrentState(_animations.get(_animationIndex).getLabel(), true);
 			}
 		}));
@@ -244,12 +246,14 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		// Make our manager
 		manager = new AnimationManager(_timer, skinDatas.get(0).getPose());
 
-		// TODO temporary:
-		float cut1 = 1.75f;
-		float cut2 = 2.5f;
-		_animations.add(new Segment(0.0f, cut1, "foo"));
-		_animations.add(new Segment(cut1, cut2, "bar"));
-		_animations.add(new Segment(cut2, 3.3f, "baz"));
+		try {
+			String labFileName = "flexiquad.lab";
+			XWavesSegmentation labFile = new XWavesSegmentation(labFileName);
+			_animations = labFile.getSegments();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		for (Segment segment : _animations) {
 			final AnimationClip clip = new AnimationClip(segment.getLabel());
