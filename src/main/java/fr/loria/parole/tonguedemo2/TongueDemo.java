@@ -138,10 +138,14 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 		// Load the collada scene
 		try {
-			storage = new ColladaImporter().load("flexiquad.dae");
-			Node cube = (Node) storage.getScene().getChild("Cube");
+//			storage = new ColladaImporter().load("flexiquad.dae");
+//			Node cube = (Node) storage.getScene().getChild("Cube");
+//			Node geom = (Node) cube.getChild("geometry");
+//			SkinnedMesh mesh = (SkinnedMesh) geom.getChild("Cube_001-mesh");
+			storage = new ColladaImporter().load("Tongue.dae");
+			Node cube = (Node) storage.getScene().getChild("TongueMesh");
 			Node geom = (Node) cube.getChild("geometry");
-			SkinnedMesh mesh = (SkinnedMesh) geom.getChild("Cube_001-mesh");
+			SkinnedMesh mesh = (SkinnedMesh) geom.getChild("grp9-mesh[mtl91]");
 			control.setLookAtSpatial(mesh);
 			_root.attachChild(storage.getScene());
 			setupAnimations(storage);
@@ -238,6 +242,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 	private void setupAnimations(final ColladaStorage storage) {
 		// Check if there is any animationdata in the file
 		if (storage.getJointChannels().isEmpty() || storage.getSkins().isEmpty()) {
+			logger.warning("No animations found!");
 			return;
 		}
 
