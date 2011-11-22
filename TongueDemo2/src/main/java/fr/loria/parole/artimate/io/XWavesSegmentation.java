@@ -1,4 +1,4 @@
-package fr.loria.parole.tonguedemo2.io;
+package fr.loria.parole.artimate.io;
 
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
-import fr.loria.parole.tonguedemo2.segmentation.Segment;
+import fr.loria.parole.artimate.segmentation.Segment;
 
 import jregex.Matcher;
 import jregex.Pattern;

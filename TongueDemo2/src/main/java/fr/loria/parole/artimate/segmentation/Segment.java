@@ -1,4 +1,4 @@
-package fr.loria.parole.tonguedemo2.segmentation;
+package fr.loria.parole.artimate.segmentation;
 
 public class Segment {
 	protected float start;

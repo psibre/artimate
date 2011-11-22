@@ -1,4 +1,4 @@
-package fr.loria.parole.tonguedemo2;
+package fr.loria.parole.artimate;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -71,8 +71,8 @@ import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
-import fr.loria.parole.tonguedemo2.io.XWavesSegmentation;
-import fr.loria.parole.tonguedemo2.segmentation.Segment;
+import fr.loria.parole.artimate.io.XWavesSegmentation;
+import fr.loria.parole.artimate.segmentation.Segment;
 
 /**
  * Borrowing heavily from <a href=
