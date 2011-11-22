@@ -1,22 +1,13 @@
 package fr.loria.parole.artimate;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
-import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
-import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
-import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
-import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
-import com.ardor3d.extension.animation.skeletal.state.SteadyState;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
-import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
@@ -71,8 +62,7 @@ import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
-import fr.loria.parole.artimate.io.XWavesSegmentation;
-import fr.loria.parole.artimate.segmentation.Segment;
+import fr.loria.parole.artimate.io.Animation;
 
 /**
  * Borrowing heavily from <a href=
@@ -121,16 +111,9 @@ public class TongueDemo implements Runnable, Updater, Scene {
 	/** Our orbiter control. */
 	private OrbitCamControl control;
 	private ColladaStorage storage;
-	private AnimationManager manager;
+	private Animation manager;
 
 	private boolean _showSkeleton = false;
-
-	protected ArrayList<Segment> _animations = new ArrayList<Segment>();
-	protected int _animationIndex = 0;
-
-	public static void main(final String[] args) {
-		start(TongueDemo.class);
-	}
 
 	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
 		_canvas.setTitle("OrbitCam TongueDemo");
@@ -143,7 +126,9 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			SkinnedMesh mesh = (SkinnedMesh) geom.getChild(targetMeshName);
 			control.setLookAtSpatial(mesh);
 			_root.attachChild(storage.getScene());
-			setupAnimations(storage);
+			// Make our manager
+			manager = new Animation(_timer);
+			manager.setupAnimations(manager, storage);
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
@@ -163,12 +148,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.A), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-				_animationIndex++;
-				if (_animationIndex >= _animations.size()) {
-					_animationIndex = 0;
-				}
-				logger.info("Switched to animation " + _animations.get(_animationIndex).getLabel());
-				manager.getBaseAnimationLayer().setCurrentState(_animations.get(_animationIndex).getLabel(), true);
+				manager.cycleAnimation();
 			}
 		}));
 
@@ -232,52 +212,6 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		control.setInvertedX(true);
 		control.setInvertedY(true);
 		control.setSphereCoords(15, 0, 0);
-	}
-
-	private void setupAnimations(final ColladaStorage storage) {
-		// Check if there is any animationdata in the file
-		if (storage.getJointChannels().isEmpty() || storage.getSkins().isEmpty()) {
-			logger.warning("No animations found!");
-			return;
-		}
-
-		List<SkinData> skinDatas = storage.getSkins();
-
-		// Make our manager
-		manager = new AnimationManager(_timer, skinDatas.get(0).getPose());
-
-		try {
-			String labFileName = "flexiquad.lab";
-			XWavesSegmentation labFile = new XWavesSegmentation(labFileName);
-			_animations = labFile.getSegments();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		for (Segment segment : _animations) {
-			final AnimationClip clip = new AnimationClip(segment.getLabel());
-
-			for (final JointChannel channel : storage.getJointChannels()) {
-				JointChannel subChannel = (JointChannel) channel.getSubchannelByTime(segment.getStart(), segment.getEnd());
-				// add it to a clip
-				clip.addChannel(subChannel);
-			}
-
-			// Set some clip instance specific data - repeat, time scaling
-			manager.getClipInstance(clip).setLoopCount(Integer.MAX_VALUE);
-
-			// Add our "applier logic".
-			manager.setApplier(new SimpleAnimationApplier());
-
-			// Add our clip as a state in the default animation layer
-			final SteadyState animState = new SteadyState(segment.getLabel());
-			animState.setSourceTree(new ClipSource(clip, manager));
-			manager.getBaseAnimationLayer().addSteadyState(animState);
-		}
-
-		// Set the current animation state on default layer
-		manager.getBaseAnimationLayer().setCurrentState(_animations.get(0).getLabel(), true);
 	}
 
 	public void run() {
@@ -440,6 +374,10 @@ public class TongueDemo implements Runnable, Updater, Scene {
 	protected void quit(final Renderer renderer) {
 		ContextGarbageCollector.doFinalCleanup(renderer);
 		_canvas.close();
+	}
+
+	public static void main(final String[] args) {
+		start(TongueDemo.class);
 	}
 
 	public static void start(final Class<? extends TongueDemo> demoClazz) {
