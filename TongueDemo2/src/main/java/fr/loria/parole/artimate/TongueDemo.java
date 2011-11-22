@@ -142,7 +142,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-				exit();
+				_exit = true;
 			}
 		}));
 
@@ -236,10 +236,6 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		}
 	}
 
-	public void exit() {
-		_exit = true;
-	}
-
 	@MainThread
 	public void init() {
 		final ContextCapabilities caps = ContextManager.getCurrentContext().getCapabilities();
@@ -290,7 +286,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 	@MainThread
 	public void update(final ReadOnlyTimer timer) {
 		if (_canvas.isClosing()) {
-			exit();
+			_exit = true;
 		}
 
 		/** update stats, if enabled. */
