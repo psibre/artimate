@@ -84,7 +84,6 @@ import fr.loria.parole.artimate.segmentation.Segment;
  * @author steiner
  * 
  */
-// public class TongueDemo extends ExampleBase {
 public class TongueDemo implements Runnable, Updater, Scene {
 
 	private static final Logger logger = Logger.getLogger(TongueDemo.class.getName());
@@ -133,19 +132,15 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		start(TongueDemo.class);
 	}
 
-	protected void initExample() {
+	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
 		_canvas.setTitle("OrbitCam TongueDemo");
 
 		// Load the collada scene
 		try {
-//			storage = new ColladaImporter().load("flexiquad.dae");
-//			Node cube = (Node) storage.getScene().getChild("Cube");
-//			Node geom = (Node) cube.getChild("geometry");
-//			SkinnedMesh mesh = (SkinnedMesh) geom.getChild("Cube_001-mesh");
-			storage = new ColladaImporter().load("Tongue.dae");
-			Node cube = (Node) storage.getScene().getChild("TongueMesh");
+			storage = new ColladaImporter().load(modelFileName);
+			Node cube = (Node) storage.getScene().getChild(targetNodeName);
 			Node geom = (Node) cube.getChild("geometry");
-			SkinnedMesh mesh = (SkinnedMesh) geom.getChild("grp9-mesh[mtl91]");
+			SkinnedMesh mesh = (SkinnedMesh) geom.getChild(targetMeshName);
 			control.setLookAtSpatial(mesh);
 			_root.attachChild(storage.getScene());
 			setupAnimations(storage);
@@ -351,7 +346,9 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 		_root.getSceneHints().setRenderBucketType(RenderBucketType.Opaque);
 
-		initExample();
+		// TODO make this flexible!
+		// initExample("flexiquad.dae", "Cube", "Cube_001-mesh");
+		initExample("Tongue.dae", "TongueMesh", "grp9-mesh[mtl91]");
 
 		_root.updateGeometricState(0);
 	}
