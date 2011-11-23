@@ -19,6 +19,9 @@ def enableVisibility(*argv):
 	'''enableVisibility doc'''
 
 error = str
+def getAnisotropicFiltering(*argv):
+	'''get the anisotropic filtering level'''
+
 def getEyeSeparation(*argv):
 	'''get the eye separation for stereo mode'''
 
@@ -42,6 +45,9 @@ def makeScreenshot(*argv):
 
 def setAmbientColor(*argv):
 	'''set Ambient Color (rgb)'''
+
+def setAnisotropicFiltering(*argv):
+	'''set the anisotropic filtering level (must be one of 1, 2, 4, 8, 16)'''
 
 def setBackgroundColor(*argv):
 	'''set Background Color (rgb)'''

@@ -148,6 +148,10 @@ class BL_ArmatureObject:
 	def get(*argv):
 		pass
 
+	def getActionFrame(*argv):
+		'''getActionFrame(layer=0)
+Gets the current frame of the action playing in the supplied layer'''
+
 	def getAngularVelocity(*argv):
 		pass
 
@@ -177,6 +181,10 @@ Returns a 3-tuple with (distance,worldVector,localVector)'''
 		pass
 
 	invalid = getset_descriptor
+	def isPlayingAction(*argv):
+		'''isPlayingAction(layer=0)
+Checks to see if there is an action playing in the given layer'''
+
 	life = getset_descriptor
 	linVelocityMax = getset_descriptor
 	linVelocityMin = getset_descriptor
@@ -193,6 +201,10 @@ Returns a 3-tuple with (distance,worldVector,localVector)'''
 	occlusion = getset_descriptor
 	orientation = getset_descriptor
 	parent = getset_descriptor
+	def playAction(*argv):
+		'''playAction(name, start_frame, end_frame, layer=0, priority=0 blendin=0, play_mode=ACT_MODE_PLAY, layer_weight=0.0, ipo_flags=0, speed=1.0)
+Plays an action'''
+
 	position = getset_descriptor
 	def rayCast(*argv):
 		'''rayCast(to,from,dist,prop,face,xray,poly): cast a ray and return 3-tuple (object,hit,normal) or 4-tuple (object,hit,normal,polygon) or 4-tuple (object,hit,normal,polygon,hituv) of contact point with object within dist that matches prop.
@@ -240,6 +252,10 @@ other = 3-tuple or object reference'''
 sends a message in same manner as a message actuatorsubject = Subject of the message (string)body = Message body (string)to = Name of object to send the message to'''
 
 	sensors = getset_descriptor
+	def setActionFrame(*argv):
+		'''setActionFrame(frame, layer=0)
+Set the current frame of the action playing in the supplied layer'''
+
 	def setAngularVelocity(*argv):
 		pass
 
@@ -259,6 +275,10 @@ sends a message in same manner as a message actuatorsubject = Subject of the mes
 		pass
 
 	state = getset_descriptor
+	def stopAction(*argv):
+		'''stopAction(layer=0)
+Stop playing the action on the given layer'''
+
 	def suspendDynamics(*argv):
 		pass
 
@@ -267,7 +287,7 @@ sends a message in same manner as a message actuatorsubject = Subject of the mes
 		'''update()
 Make sure that the armature will be updated on next graphic frame.
 This is automatically done if a KX_ArmatureActuator with mode run is active
-or if an action is playing. This function is usefull in other cases.'''
+or if an action is playing. This function is useful in other cases.'''
 
 	visible = getset_descriptor
 	worldAngularVelocity = getset_descriptor
@@ -475,6 +495,10 @@ else:
 	def get(*argv):
 		pass
 
+	def getActionFrame(*argv):
+		'''getActionFrame(layer=0)
+Gets the current frame of the action playing in the supplied layer'''
+
 	def getAngularVelocity(*argv):
 		pass
 
@@ -525,6 +549,10 @@ returns the world to camera transformation matrix, as a list of four lists of fo
 ie: [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0, 0.0, 1.0]])'''
 
 	invalid = getset_descriptor
+	def isPlayingAction(*argv):
+		'''isPlayingAction(layer=0)
+Checks to see if there is an action playing in the given layer'''
+
 	lens = getset_descriptor
 	life = getset_descriptor
 	linVelocityMax = getset_descriptor
@@ -546,6 +574,10 @@ ie: [[1.0, 0.0, 0.0, 0.0], [0.0, 1.0, 0.0, 0.0], [0.0, 0.0, 1.0, 0.0], [0.0, 0.0
 	ortho_scale = getset_descriptor
 	parent = getset_descriptor
 	perspective = getset_descriptor
+	def playAction(*argv):
+		'''playAction(name, start_frame, end_frame, layer=0, priority=0 blendin=0, play_mode=ACT_MODE_PLAY, layer_weight=0.0, ipo_flags=0, speed=1.0)
+Plays an action'''
+
 	def pointInsideFrustum(*argv):
 		'''pointInsideFrustum(point) -> Bool
 returns 1 if the given point is inside this camera's viewing frustum.
@@ -612,6 +644,10 @@ other = 3-tuple or object reference'''
 sends a message in same manner as a message actuatorsubject = Subject of the message (string)body = Message body (string)to = Name of object to send the message to'''
 
 	sensors = getset_descriptor
+	def setActionFrame(*argv):
+		'''setActionFrame(frame, layer=0)
+Set the current frame of the action playing in the supplied layer'''
+
 	def setAngularVelocity(*argv):
 		pass
 
@@ -660,6 +696,10 @@ else:
         # Sphere is outside frustum'''
 
 	state = getset_descriptor
+	def stopAction(*argv):
+		'''stopAction(layer=0)
+Stop playing the action on the given layer'''
+
 	def suspendDynamics(*argv):
 		pass
 
@@ -753,6 +793,10 @@ class KX_FontObject:
 	def get(*argv):
 		pass
 
+	def getActionFrame(*argv):
+		'''getActionFrame(layer=0)
+Gets the current frame of the action playing in the supplied layer'''
+
 	def getAngularVelocity(*argv):
 		pass
 
@@ -782,6 +826,10 @@ Returns a 3-tuple with (distance,worldVector,localVector)'''
 		pass
 
 	invalid = getset_descriptor
+	def isPlayingAction(*argv):
+		'''isPlayingAction(layer=0)
+Checks to see if there is an action playing in the given layer'''
+
 	life = getset_descriptor
 	linVelocityMax = getset_descriptor
 	linVelocityMin = getset_descriptor
@@ -798,6 +846,10 @@ Returns a 3-tuple with (distance,worldVector,localVector)'''
 	occlusion = getset_descriptor
 	orientation = getset_descriptor
 	parent = getset_descriptor
+	def playAction(*argv):
+		'''playAction(name, start_frame, end_frame, layer=0, priority=0 blendin=0, play_mode=ACT_MODE_PLAY, layer_weight=0.0, ipo_flags=0, speed=1.0)
+Plays an action'''
+
 	position = getset_descriptor
 	def rayCast(*argv):
 		'''rayCast(to,from,dist,prop,face,xray,poly): cast a ray and return 3-tuple (object,hit,normal) or 4-tuple (object,hit,normal,polygon) or 4-tuple (object,hit,normal,polygon,hituv) of contact point with object within dist that matches prop.
@@ -846,6 +898,10 @@ other = 3-tuple or object reference'''
 sends a message in same manner as a message actuatorsubject = Subject of the message (string)body = Message body (string)to = Name of object to send the message to'''
 
 	sensors = getset_descriptor
+	def setActionFrame(*argv):
+		'''setActionFrame(frame, layer=0)
+Set the current frame of the action playing in the supplied layer'''
+
 	def setAngularVelocity(*argv):
 		pass
 
@@ -866,6 +922,10 @@ sends a message in same manner as a message actuatorsubject = Subject of the mes
 
 	size = getset_descriptor
 	state = getset_descriptor
+	def stopAction(*argv):
+		'''stopAction(layer=0)
+Stop playing the action on the given layer'''
+
 	def suspendDynamics(*argv):
 		pass
 
@@ -924,6 +984,10 @@ class KX_GameObject:
 	def get(*argv):
 		pass
 
+	def getActionFrame(*argv):
+		'''getActionFrame(layer=0)
+Gets the current frame of the action playing in the supplied layer'''
+
 	def getAngularVelocity(*argv):
 		pass
 
@@ -953,6 +1017,10 @@ Returns a 3-tuple with (distance,worldVector,localVector)'''
 		pass
 
 	invalid = getset_descriptor
+	def isPlayingAction(*argv):
+		'''isPlayingAction(layer=0)
+Checks to see if there is an action playing in the given layer'''
+
 	life = getset_descriptor
 	linVelocityMax = getset_descriptor
 	linVelocityMin = getset_descriptor
@@ -969,6 +1037,10 @@ Returns a 3-tuple with (distance,worldVector,localVector)'''
 	occlusion = getset_descriptor
 	orientation = getset_descriptor
 	parent = getset_descriptor
+	def playAction(*argv):
+		'''playAction(name, start_frame, end_frame, layer=0, priority=0 blendin=0, play_mode=ACT_MODE_PLAY, layer_weight=0.0, ipo_flags=0, speed=1.0)
+Plays an action'''
+
 	position = getset_descriptor
 	def rayCast(*argv):
 		'''rayCast(to,from,dist,prop,face,xray,poly): cast a ray and return 3-tuple (object,hit,normal) or 4-tuple (object,hit,normal,polygon) or 4-tuple (object,hit,normal,polygon,hituv) of contact point with object within dist that matches prop.
@@ -1016,6 +1088,10 @@ other = 3-tuple or object reference'''
 sends a message in same manner as a message actuatorsubject = Subject of the message (string)body = Message body (string)to = Name of object to send the message to'''
 
 	sensors = getset_descriptor
+	def setActionFrame(*argv):
+		'''setActionFrame(frame, layer=0)
+Set the current frame of the action playing in the supplied layer'''
+
 	def setAngularVelocity(*argv):
 		pass
 
@@ -1035,6 +1111,10 @@ sends a message in same manner as a message actuatorsubject = Subject of the mes
 		pass
 
 	state = getset_descriptor
+	def stopAction(*argv):
+		'''stopAction(layer=0)
+Stop playing the action on the given layer'''
+
 	def suspendDynamics(*argv):
 		pass
 
@@ -1104,6 +1184,10 @@ class KX_LightObject:
 	def get(*argv):
 		pass
 
+	def getActionFrame(*argv):
+		'''getActionFrame(layer=0)
+Gets the current frame of the action playing in the supplied layer'''
+
 	def getAngularVelocity(*argv):
 		pass
 
@@ -1133,6 +1217,10 @@ Returns a 3-tuple with (distance,worldVector,localVector)'''
 		pass
 
 	invalid = getset_descriptor
+	def isPlayingAction(*argv):
+		'''isPlayingAction(layer=0)
+Checks to see if there is an action playing in the given layer'''
+
 	layer = getset_descriptor
 	life = getset_descriptor
 	linVelocityMax = getset_descriptor
@@ -1151,6 +1239,10 @@ Returns a 3-tuple with (distance,worldVector,localVector)'''
 	occlusion = getset_descriptor
 	orientation = getset_descriptor
 	parent = getset_descriptor
+	def playAction(*argv):
+		'''playAction(name, start_frame, end_frame, layer=0, priority=0 blendin=0, play_mode=ACT_MODE_PLAY, layer_weight=0.0, ipo_flags=0, speed=1.0)
+Plays an action'''
+
 	position = getset_descriptor
 	quad_attenuation = getset_descriptor
 	def rayCast(*argv):
@@ -1199,6 +1291,10 @@ other = 3-tuple or object reference'''
 sends a message in same manner as a message actuatorsubject = Subject of the message (string)body = Message body (string)to = Name of object to send the message to'''
 
 	sensors = getset_descriptor
+	def setActionFrame(*argv):
+		'''setActionFrame(frame, layer=0)
+Set the current frame of the action playing in the supplied layer'''
+
 	def setAngularVelocity(*argv):
 		pass
 
@@ -1220,6 +1316,10 @@ sends a message in same manner as a message actuatorsubject = Subject of the mes
 	spotblend = getset_descriptor
 	spotsize = getset_descriptor
 	state = getset_descriptor
+	def stopAction(*argv):
+		'''stopAction(layer=0)
+Stop playing the action on the given layer'''
+
 	def suspendDynamics(*argv):
 		pass
 
@@ -1289,6 +1389,201 @@ The sensor is put in its initial state as if it was just activated.'''
 	useNegPulseMode = getset_descriptor
 	usePosPulseMode = getset_descriptor
 	usePulseFocus = getset_descriptor
+
+class KX_NavMeshObject:
+	actuators = getset_descriptor
+	def alignAxisToVect(*argv):
+		pass
+
+	angularVelocity = getset_descriptor
+	def applyForce(*argv):
+		pass
+
+	def applyImpulse(*argv):
+		pass
+
+	def applyMovement(*argv):
+		pass
+
+	def applyRotation(*argv):
+		pass
+
+	def applyTorque(*argv):
+		pass
+
+	attrDict = getset_descriptor
+	children = getset_descriptor
+	childrenRecursive = getset_descriptor
+	color = getset_descriptor
+	controllers = getset_descriptor
+	def disableRigidBody(*argv):
+		pass
+
+	def draw(*argv):
+		'''draw(mode): navigation mesh debug drawing
+mode: WALLS, POLYS, TRIS'''
+
+	def enableRigidBody(*argv):
+		pass
+
+	def endObject(*argv):
+		pass
+
+	def findPath(*argv):
+		'''findPath(start, goal): find path from start to goal points
+Returns a path as list of points)'''
+
+	def get(*argv):
+		pass
+
+	def getActionFrame(*argv):
+		'''getActionFrame(layer=0)
+Gets the current frame of the action playing in the supplied layer'''
+
+	def getAngularVelocity(*argv):
+		pass
+
+	def getAxisVect(*argv):
+		pass
+
+	def getDistanceTo(*argv):
+		'''getDistanceTo(other): get distance to another point/KX_GameObject'''
+
+	def getLinearVelocity(*argv):
+		pass
+
+	def getPhysicsId(*argv):
+		pass
+
+	def getPropertyNames(*argv):
+		pass
+
+	def getReactionForce(*argv):
+		pass
+
+	def getVectTo(*argv):
+		'''getVectTo(other): get vector and the distance to another point/KX_GameObject
+Returns a 3-tuple with (distance,worldVector,localVector)'''
+
+	def getVelocity(*argv):
+		pass
+
+	invalid = getset_descriptor
+	def isPlayingAction(*argv):
+		'''isPlayingAction(layer=0)
+Checks to see if there is an action playing in the given layer'''
+
+	life = getset_descriptor
+	linVelocityMax = getset_descriptor
+	linVelocityMin = getset_descriptor
+	linearVelocity = getset_descriptor
+	localAngularVelocity = getset_descriptor
+	localInertia = getset_descriptor
+	localLinearVelocity = getset_descriptor
+	localOrientation = getset_descriptor
+	localPosition = getset_descriptor
+	localScale = getset_descriptor
+	mass = getset_descriptor
+	meshes = getset_descriptor
+	name = getset_descriptor
+	occlusion = getset_descriptor
+	orientation = getset_descriptor
+	parent = getset_descriptor
+	def playAction(*argv):
+		'''playAction(name, start_frame, end_frame, layer=0, priority=0 blendin=0, play_mode=ACT_MODE_PLAY, layer_weight=0.0, ipo_flags=0, speed=1.0)
+Plays an action'''
+
+	position = getset_descriptor
+	def rayCast(*argv):
+		'''rayCast(to,from,dist,prop,face,xray,poly): cast a ray and return 3-tuple (object,hit,normal) or 4-tuple (object,hit,normal,polygon) or 4-tuple (object,hit,normal,polygon,hituv) of contact point with object within dist that matches prop.
+ If no hit, return (None,None,None) or (None,None,None,None) or (None,None,None,None,None).
+ to   = 3-tuple or object reference for destination of ray (if object, use center of object)
+ from = 3-tuple or object reference for origin of ray (if object, use center of object)
+        Can be None or omitted => start from self object center
+ dist = max distance to look (can be negative => look behind); 0 or omitted => detect up to to
+ prop = property name that object must have; can be omitted => detect any object
+ face = normal option: 1=>return face normal; 0 or omitted => normal is oriented towards origin
+ xray = X-ray option: 1=>skip objects that don't match prop; 0 or omitted => stop on first object
+ poly = polygon option: 1=>return value is a 4-tuple and the 4th element is a KX_PolyProxy object
+                           which can be None if hit object has no mesh or if there is no hit
+                        2=>return value is a 5-tuple, the 4th element is the KX_PolyProxy object
+                           and the 5th element is the vector of UV coordinates at the hit point of the None if there is no UV mapping
+        If 0 or omitted, return value is a 3-tuple
+Note: The object on which you call this method matters: the ray will ignore it.
+      prop and xray option interact as follow:
+        prop off, xray off: return closest hit or no hit if there is no object on the full extend of the ray
+        prop off, xray on : idem
+        prop on,  xray off: return closest hit if it matches prop, no hit otherwise
+        prop on,  xray on : return closest hit matching prop or no hit if there is no object matching prop on the full extend of the ray'''
+
+	def rayCastTo(*argv):
+		'''rayCastTo(other,dist,prop): look towards another point/KX_GameObject and return first object hit within dist that matches prop
+prop = property name that object must have; can be omitted => detect any object
+dist = max distance to look (can be negative => look behind); 0 or omitted => detect up to other
+other = 3-tuple or object reference'''
+
+	def raycast(*argv):
+		'''raycast(start, goal): raycast from start to goal points
+Returns hit factor)'''
+
+	def rebuild(*argv):
+		'''rebuild(): rebuild navigation mesh'''
+
+	def reinstancePhysicsMesh(*argv):
+		pass
+
+	def removeParent(*argv):
+		pass
+
+	def replaceMesh(*argv):
+		pass
+
+	def restoreDynamics(*argv):
+		pass
+
+	scaling = getset_descriptor
+	def sendMessage(*argv):
+		'''sendMessage(subject, [body, to])
+sends a message in same manner as a message actuatorsubject = Subject of the message (string)body = Message body (string)to = Name of object to send the message to'''
+
+	sensors = getset_descriptor
+	def setActionFrame(*argv):
+		'''setActionFrame(frame, layer=0)
+Set the current frame of the action playing in the supplied layer'''
+
+	def setAngularVelocity(*argv):
+		pass
+
+	def setCollisionMargin(*argv):
+		pass
+
+	def setLinearVelocity(*argv):
+		pass
+
+	def setOcclusion(*argv):
+		pass
+
+	def setParent(*argv):
+		pass
+
+	def setVisible(*argv):
+		pass
+
+	state = getset_descriptor
+	def stopAction(*argv):
+		'''stopAction(layer=0)
+Stop playing the action on the given layer'''
+
+	def suspendDynamics(*argv):
+		pass
+
+	timeOffset = getset_descriptor
+	visible = getset_descriptor
+	worldAngularVelocity = getset_descriptor
+	worldLinearVelocity = getset_descriptor
+	worldOrientation = getset_descriptor
+	worldPosition = getset_descriptor
+	worldScale = getset_descriptor
 
 class KX_NearSensor:
 	distance = getset_descriptor
@@ -1591,6 +1886,10 @@ Returns the added object.'''
 
 	cameras = getset_descriptor
 	dbvt_culling = getset_descriptor
+	def drawObstacleSimulation(*argv):
+		'''drawObstacleSimulation()
+Draw debug visualization of obstacle simulation.'''
+
 	def end(*argv):
 		'''end()
 Removes this scene from the game.'''
@@ -1651,6 +1950,7 @@ class KX_SoundActuator:
 Pauses the sound.'''
 
 	pitch = getset_descriptor
+	sound = getset_descriptor
 	def startSound(*argv):
 		'''startSound()
 Starts the sound.'''
@@ -1671,6 +1971,24 @@ class KX_StateActuator:
 	name = getset_descriptor
 	operation = getset_descriptor
 	owner = getset_descriptor
+
+class KX_SteeringActuator:
+	acceleration = getset_descriptor
+	behaviour = getset_descriptor
+	distance = getset_descriptor
+	enableVisualization = getset_descriptor
+	executePriority = getset_descriptor
+	facingMode = getset_descriptor
+	invalid = getset_descriptor
+	name = getset_descriptor
+	navmesh = getset_descriptor
+	owner = getset_descriptor
+	pathUpdatePeriod = getset_descriptor
+	selfterminated = getset_descriptor
+	steeringVec = getset_descriptor
+	target = getset_descriptor
+	turnspeed = getset_descriptor
+	velocity = getset_descriptor
 
 class KX_TouchSensor:
 	executePriority = getset_descriptor

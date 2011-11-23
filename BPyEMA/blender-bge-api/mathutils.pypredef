@@ -265,7 +265,7 @@ Return an inverted copy of the matrix.
 	def lerp(*argv):
 		'''.. function:: lerp(other, factor)
 
-Returns the interpolation of two matricies.
+Returns the interpolation of two matrices.
 
 :arg other: value to interpolate with.
 :type other: :class:`Matrix`
@@ -493,7 +493,7 @@ Rotates the quaternion a by another mathutils value.
 :type other: :class:`Euler`, :class:`Quaternion` or :class:`Matrix`'''
 
 	def rotation_difference(*argv):
-		'''.. function:: difference(other)
+		'''.. function:: rotation_difference(other)
 
 Returns a quaternion representing the rotational difference.
 
