@@ -5,16 +5,16 @@ bl_info = {
     "name": "AG500 EMA pos file importer (.pos)",
     "author": "Ingmar Steiner",
     "version": (0, 0, 1),
-    "blender": (2, 5, 8),
+    "blender": (2, 6, 0),
     "location": "File > Import > Import AG500 EMA sweep (.pos file)",
     "description": "Import AG500 EMA sweep from .pos file",
     "warning": "",
     "wiki_url" : "",
     "category": "Import-Export"}
 
-import bpy, os, math, re
+import bpy, os, re
 import bpy_extras
-from array import array
+import lab, ema
 
 # namespace laziness
 context = bpy.context
@@ -27,114 +27,7 @@ utils = bpy.utils
     
 ##### CLASSES #####
 
-class Sweep:
-    def __init__(self, pos_file_name, header, segmentation=None):
-        self.header = header
-        self.data = self.load(pos_file_name)
-        self.segmentation = segmentation
-        try:
-            print("loaded %d segments" % len(segmentation.segments))
-        except TypeError:
-            pass
-
-    def load(self, pos_file_name):
-        arr = array('f')
-        with open(pos_file_name, 'rb') as pos_file:
-            while True:
-                try:
-                    arr.fromfile(pos_file, 4096)
-                except EOFError:
-                    break
-        data = {}
-        for h, h_item in enumerate(self.header):
-            data[h_item] = arr[h:len(arr):len(self.header)]
-        self.size = int(len(arr) / len(self.header))
-        return data
-
-    def decimate(self):
-        '''not implemented'''
-        for channel in self.data.keys():
-            decimated = decimate(self.data[channel])
-            self.data[channel] = decimated
-
-    def coils(self):
-        coils = [channel.split('_')[0]
-                 for channel in self.header if channel.endswith('X')]
-        return coils
-    coils = property(coils)
-
-    def getLoc(self, coil, frame=0):
-        x = self.data[coil + "_X"][frame]
-        y = self.data[coil + "_Y"][frame]
-        z = self.data[coil + "_Z"][frame]
-        return x, y, z
-
-    def getRot(self, coil, frame=0):
-        phi_deg = self.data[coil + "_phi"][frame]
-        theta_deg = self.data[coil + "_theta"][frame]
-        phi_rad = math.radians(phi_deg)
-        theta_rad = math.radians(theta_deg)
-        return phi_rad, theta_rad, 0
-
-    def getValue(self, coil, index, frame=0):
-        values = self.getLoc(coil, frame) + self.getRot(coil, frame)
-        return values[index]
-
-class Segmentation:
-    def __init__(self, lab_file=None):
-        try:
-            self.segments = self.parse(lab_file)
-        except TypeError:
-            self.segments = None
-    
-    def parse(self, lab_file):
-        header = True
-        segments = []
-        start = 0
-        for line in lab_file:
-            if line.strip() == '#':
-                header = False
-                continue
-            if header:
-                continue
-            match = re.match(r'\s*(?P<end>\d+(\.\d+)?)\s+\d+\s+(?P<label>.*)\s*', line)
-            segment = Segment(start, match.group('end'), match.group('label'))
-            segments.append(segment)
-            start = match.group('end')
-        return segments
-
-    def __str__(self):
-        return '\n'.join(['start\tend\tlabel'] + [str(segment) for segment in self.segments])
-
-class Segment:
-    def __init__(self, start, end, label):
-        self.start = float(start)
-        self.end = float(end)
-        self.label = label
-
-    def startframe(self):
-        # TODO set this from context
-        return int(self.start * 200.0)
-    startframe = property(startframe)
-
-    def endframe(self):
-        # TODO set this from context
-        return int(self.end * 200.0)
-    endframe = property(endframe)
-
-    def __str__(self):
-        return "%s\t%s\t%s" % (self.start, self.end, self.label)
-
 ##### FUNCTIONS #####
-
-def generate_header(self, num_coils=12):
-    # hard-coded for AG500
-    dimensions = ["X", "Y", "Z", "phi", "theta", "RMS", "Extra"]
-    channels = []
-    for coil in range(num_coils):
-        channels.extend(["Channel%02d_%s" % (coil + 1, dimension)
-                         for dimension in dimensions])
-    return channels
 
 def generate_coil_objects(sweep):
     # add empty EMA node as parent of all coils:
@@ -241,9 +134,9 @@ def import_sweep(self, context):
             except IOError:
                 message += "No label file found, generating empty segmentation\n"
                 label_file = None
-    segmentation = Segmentation(label_file)
+    segmentation = lab.Segmentation(label_file)
 
-    sweep = Sweep(self.filepath, header, segmentation)
+    sweep = ema.Sweep(self.filepath, header, segmentation)
     generate_coil_objects(sweep)
     generate_animation(self, sweep)
     # hack: downscale
@@ -256,7 +149,7 @@ def import_sweep(self, context):
     # also figure out how to use bpy.ops.graph.smooth() in this script context
 
     message += "Done"
-    self.report(type='INFO', message=message)
+    self.report(type={'INFO'}, message=message)
 
 ##### OPERATOR #####
 
