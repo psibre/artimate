@@ -4,6 +4,7 @@ from optparse import OptionParser
 from numpy import fromfile, loadtxt
 import wave
 from cStringIO import StringIO
+import os.path
 
 TRANS_COILS = 6
 SAMP_RATE = 200.0
@@ -98,9 +99,13 @@ if __name__ == '__main__':
     amps = Amps(options.ampsname)
     segs = Segs(options.segsname)
     wav = Wav(options.wavname)
+    
+    ampsdir = os.path.split(os.path.realpath(options.ampsname))[0]
+    wavdir = os.path.split(os.path.realpath(options.wavname))[0]
+    
     for s, seg in enumerate(segs.segs):
-        newamps = "amps/%04d.amp" % (s + 1)
-        newwav = "wav/%04d.wav" % (s + 1)
+        newamps = "%s/%04d.amp" % (ampsdir, s + 1)
+        newwav = "%s/%04d.wav" % (wavdir, s + 1)
         amps.slice(seg['tmin'], seg['tmax']).save(newamps)
         wav.slice(seg['tmin'], seg['tmax']).save(newwav)
         print "wrote", newamps, newwav
