@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 
-from optparse import OptionParser
+from optparse import OptionParser, OptionGroup
 from numpy import fromfile, loadtxt
 import wave
 from cStringIO import StringIO
 import os.path
+from glob import glob
 
 TRANS_COILS = 6
 SAMP_RATE = 200.0
@@ -86,22 +87,57 @@ class Wav:
         slice = Wav(io)
         return slice
 
-if __name__ == '__main__':
-    options = OptionParser()
-    options.add_option("-a", "--ampfile", dest="ampsname")
-    options.add_option("-s", "--segfile", dest="segsname")
-    options.add_option("-w", "--wavfile", dest="wavname")
-    options.set_defaults(ampsname = "test.amp",
+def parse_options():
+    parser = OptionParser()
+    parser.add_option("-a", "--ampfile", dest = "ampsname", metavar = "AMP",
+        help = "single input .amp file (default: %default)")
+    parser.add_option("-s", "--segfile", dest = "segsname", metavar = "SEG",
+        help = "single input .seg file (default: %default)")
+    parser.add_option("-w", "--wavfile", dest = "wavname", metavar = "WAV",
+        help = "single input .wav file (default: %default)")
+    
+    group = OptionGroup(parser, "Batch processing")
+    group.add_option("-i", "--input-dir", dest = "indir",
+        help = "input directory; must contain wav/ and amps/ subdirectories"
+            " with matching filesets.")
+    group.add_option("-o", "--output-dir", dest = "outdir",
+        help = "output directory (will be created if it doesn't exist)")
+    parser.add_option_group(group)
+
+    parser.set_defaults(ampsname = "test.amp",
                          segsname = "test.seg",
                          wavname = "test.wav")
-    options, args = options.parse_args()
+
+    return parser.parse_args()
     
-    amps = Amps(options.ampsname)
-    segs = Segs(options.segsname)
-    wav = Wav(options.wavname)
+if __name__ == '__main__':
+    options, args = parse_options()
     
-    ampsdir = os.path.split(os.path.realpath(options.ampsname))[0]
-    wavdir = os.path.split(os.path.realpath(options.wavname))[0]
+    if options.indir == None:
+        amps = Amps(options.ampsname)
+        segs = Segs(options.segsname)
+        wav = Wav(options.wavname)
+    else:
+        # TODO for now, hackily support only a single input sweep
+        ampsname = glob(options.indir + "/amps/*.amp")[-1]
+        wavbase = "%s/wav/%s" % (options.indir,
+            os.path.splitext(os.path.basename(ampsname))[0])
+        segsname = wavbase + ".seg"
+        wavname = wavbase + ".wav"
+        amps = Amps(ampsname)
+        segs = Segs(segsname)
+        wav = Wav(wavname)
+    
+    if options.outdir == None:
+        ampsdir = os.path.split(os.path.realpath(options.ampsname))[0]
+        wavdir = os.path.split(os.path.realpath(options.wavname))[0]
+    else:
+        ampsdir = options.outdir + "/amps"
+        wavdir = options.outdir + "/wav"
+        for dir in [ampsdir, wavdir]:
+            if not os.path.isdir(dir):
+                print "creating", dir
+                os.makedirs(dir)
     
     for s, seg in enumerate(segs.segs):
         newamps = "%s/%04d.amp" % (ampsdir, s + 1)
