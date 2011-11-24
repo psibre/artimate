@@ -6,6 +6,11 @@ except ImportError:
 
 DEBUG = True
 
+#temporarily clean out scene
+if DEBUG:
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.object.delete()
+
 # hardcoded args for now:
 posfile = "../../testUtt_test/pos/0012.pos"
 
@@ -76,4 +81,32 @@ for channel in channels:
             fcurve.keyframe_points[fn].co = fn, value
 
 # scale down ema
-bpy.data.objects[emarootname].scale = (0.1, 0.1, 0.1)
+bpy.data.objects[emarootname].scale /= 10
+
+# generate ik target tracking armature with offset
+for channel in channels:
+    # HACK: set 3d cursor to inverse location (properly define later)
+    targetloc = bpy.data.objects[armaturename].location.copy()
+    targetloc.negate()
+    bpy.context.scene.cursor_location = targetloc
+    
+    bpy.ops.object.armature_add()
+    targetname = channel + "Target"
+    bpy.context.active_object.name = targetname
+    coiltarget = bpy.data.objects[channel + "Armature"]
+    
+    # add constraints
+    bpy.ops.object.mode_set(mode='POSE')
+    
+    bpy.ops.pose.constraint_add(type='COPY_LOCATION')
+    locconstraint = bpy.data.objects[targetname].pose.bones["Bone"].constraints["Copy Location"]
+    locconstraint.target = coiltarget
+    locconstraint.subtarget = "Bone"
+    locconstraint.use_offset = True
+    
+    bpy.ops.pose.constraint_add(type='COPY_ROTATION')
+    rotconstraint = bpy.data.objects[targetname].pose.bones["Bone"].constraints["Copy Rotation"]
+    rotconstraint.target = coiltarget
+    rotconstraint.subtarget = "Bone"
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
