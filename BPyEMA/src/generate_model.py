@@ -6,7 +6,7 @@ except ImportError:
 
 DEBUG = True
 ORIGIN = (-5, 0, 4)
-BBONE_SEGMENTS = 4
+BBONE_SEGMENTS = 8
 
 #temporarily clean out scene
 if DEBUG:
@@ -14,6 +14,7 @@ if DEBUG:
         bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete()
+    bpy.context.scene.frame_current = 1
 
 # hardcoded args for now:
 posfile = "../../testUtt_test/pos/0012.pos"
@@ -115,16 +116,6 @@ for channel in channels:
     
     bpy.ops.object.mode_set(mode='OBJECT')
 
-# TODO temporarily hard-coded tongue model armature
-# maybe replace with graphviz dot file (parsed with networkx?)
-
-# armature hierarchy
-#digraph TongueArmature {
-#    Root -> Channel05 -> Channel03;
-#    Root -> Channel08 -> Channel06 -> Channel01 -> Channel02;
-#    Root -> Channel10 -> Channel11;
-#}
-
 # add tongue armature
 bpy.ops.object.armature_add()
 bpy.context.active_object.name = "TongueArmature"
@@ -133,7 +124,7 @@ bpy.context.active_object.name = "TongueArmature"
 armature = bpy.context.active_object.data
 armature.draw_type = 'BBONE'
 
-# enter edit mode to assemble bone hierarchy
+# enter edit mode to assemble armature
 bpy.ops.object.mode_set(mode='EDIT')
 
 # root bone (very short)
@@ -141,19 +132,45 @@ rootbone = bpy.context.active_bone
 rootbone.name = "Root"
 rootbone.tail = (0, 0, 0.1)
 
-# one child bone
-armature.edit_bones.new(name="TBackC")
-bone = armature.edit_bones["TBackC"]
+# utility function to add bone and set all parameters
+def addbone(parentbonename, targetobjectname):
+    armature.edit_bones.new(name=targetobjectname)
+    bone = armature.edit_bones[targetobjectname]
+    
+    # parent to root bone
+    bone.parent = armature.edit_bones[parentbonename]
+    
+    # set number of bezier bone segments
+    bone.bbone_segments = BBONE_SEGMENTS
+    
+    # set head to parent tail
+    bone.head = bone.parent.tail
+    if parentbonename != "Root":
+        bone.use_connect = True
+    
+    # set tail to target
+    target = bpy.data.objects[targetobjectname]
+    bone.tail = target.pose.bones[0].head
 
-# parent to root bone
-bone.parent = rootbone
+# TODO temporarily hard-coded bone hierarchy
+# maybe replace with graphviz dot file (parsed with networkx?)
 
-# set number of bezier bone segments
-bone.bbone_segments = BBONE_SEGMENTS
+# bone hierarchy
+#digraph TongueArmature {
+#    Root -> Channel05 -> Channel03;
+#    Root -> Channel08 -> Channel06 -> Channel01;
+#    Root -> Channel10 -> Channel11;
+#}
 
-# set tail to target
-target = bpy.data.objects["Channel08Target"]
-targetloc = target.pose.bones[0].head
-bone.tail = targetloc
+addbone("Root", "Channel05Target")
+addbone("Channel05Target", "Channel03Target")
 
+addbone("Root", "Channel08Target")
+addbone("Channel08Target", "Channel06Target")
+addbone("Channel06Target", "Channel01Target")
+
+addbone("Root", "Channel10Target")
+addbone("Channel10Target", "Channel11Target")
+
+# finished with tongue armature
 bpy.ops.object.mode_set(mode='OBJECT')
