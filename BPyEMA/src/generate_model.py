@@ -6,10 +6,12 @@ except ImportError:
 
 DEBUG = True
 ORIGIN = (-5, 0, 4)
+BBONE_SEGMENTS = 4
 
 #temporarily clean out scene
 if DEBUG:
-    bpy.ops.object.mode_set(mode='OBJECT')
+    if bpy.context.mode != 'OBJECT':
+        bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete()
 
@@ -81,6 +83,7 @@ for channel in channels:
             fcurve.keyframe_points[fn].interpolation = 'LINEAR'
             value = sweep.getValue(channel, fc, fn)
             fcurve.keyframe_points[fn].co = fn, value
+            # TODO change all this so that coils move on a path?
 
 # scale down ema
 bpy.data.objects[emarootname].scale /= 10
@@ -121,16 +124,36 @@ for channel in channels:
 #    Root -> Channel08 -> Channel06 -> Channel01 -> Channel02;
 #    Root -> Channel10 -> Channel11;
 #}
-tonguearmaturestructure = bpy.context.scene.cursor_location = (-4, 2, 3)
 
+# add tongue armature
 bpy.ops.object.armature_add()
-armaturename = "TongueArmature"
-bpy.context.active_object.name = armaturename
+bpy.context.active_object.name = "TongueArmature"
 
+# set type to bezier bone
+armature = bpy.context.active_object.data
+armature.draw_type = 'BBONE'
+
+# enter edit mode to assemble bone hierarchy
 bpy.ops.object.mode_set(mode='EDIT')
 
+# root bone (very short)
 rootbone = bpy.context.active_bone
 rootbone.name = "Root"
 rootbone.tail = (0, 0, 0.1)
+
+# one child bone
+armature.edit_bones.new(name="TBackC")
+bone = armature.edit_bones["TBackC"]
+
+# parent to root bone
+bone.parent = rootbone
+
+# set number of bezier bone segments
+bone.bbone_segments = BBONE_SEGMENTS
+
+# set tail to target
+target = bpy.data.objects["Channel08Target"]
+targetloc = target.pose.bones[0].head
+bone.tail = targetloc
 
 bpy.ops.object.mode_set(mode='OBJECT')
