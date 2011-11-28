@@ -5,9 +5,11 @@ except ImportError:
     pass
 
 DEBUG = True
+ORIGIN = (-5, 0, 4)
 
 #temporarily clean out scene
 if DEBUG:
+    bpy.ops.object.mode_set(mode='OBJECT')
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.object.delete()
 
@@ -85,9 +87,8 @@ bpy.data.objects[emarootname].scale /= 10
 
 # generate ik target tracking armature with offset
 for channel in channels:
-    # HACK: set 3d cursor to inverse location (properly define later)
-    targetloc = bpy.data.objects[armaturename].location.copy()
-    targetloc.negate()
+    # HACK: set 3d cursor to some location (properly define later)
+    targetloc = ORIGIN
     bpy.context.scene.cursor_location = targetloc
     
     bpy.ops.object.armature_add()
@@ -110,3 +111,26 @@ for channel in channels:
     rotconstraint.subtarget = "Bone"
     
     bpy.ops.object.mode_set(mode='OBJECT')
+
+# TODO temporarily hard-coded tongue model armature
+# maybe replace with graphviz dot file (parsed with networkx?)
+
+# armature hierarchy
+#digraph TongueArmature {
+#    Root -> Channel05 -> Channel03;
+#    Root -> Channel08 -> Channel06 -> Channel01 -> Channel02;
+#    Root -> Channel10 -> Channel11;
+#}
+tonguearmaturestructure = bpy.context.scene.cursor_location = (-4, 2, 3)
+
+bpy.ops.object.armature_add()
+armaturename = "TongueArmature"
+bpy.context.active_object.name = armaturename
+
+bpy.ops.object.mode_set(mode='EDIT')
+
+rootbone = bpy.context.active_bone
+rootbone.name = "Root"
+rootbone.tail = (0, 0, 0.1)
+
+bpy.ops.object.mode_set(mode='OBJECT')
