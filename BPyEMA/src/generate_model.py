@@ -104,25 +104,25 @@ for channel in channels:
     bpy.ops.object.mode_set(mode='POSE')
     
     bpy.ops.pose.constraint_add(type='COPY_LOCATION')
-    locconstraint = bpy.data.objects[targetname].pose.bones["Bone"].constraints["Copy Location"]
+    locconstraint = bpy.data.objects[targetname].pose.bones["Bone"].constraints['Copy Location']
     locconstraint.target = coiltarget
     locconstraint.subtarget = "Bone"
     locconstraint.use_offset = True
     
     bpy.ops.pose.constraint_add(type='COPY_ROTATION')
-    rotconstraint = bpy.data.objects[targetname].pose.bones["Bone"].constraints["Copy Rotation"]
+    rotconstraint = bpy.data.objects[targetname].pose.bones["Bone"].constraints['Copy Rotation']
     rotconstraint.target = coiltarget
     rotconstraint.subtarget = "Bone"
     
     bpy.ops.object.mode_set(mode='OBJECT')
 
-# add tongue armature
+# add tongue rig
 bpy.ops.object.armature_add()
 bpy.context.active_object.name = "TongueArmature"
 
 # set type to bezier bone
-armature = bpy.context.active_object.data
-armature.draw_type = 'BBONE'
+rig = bpy.context.active_object
+rig.data.draw_type = 'BBONE'
 
 # enter edit mode to assemble armature
 bpy.ops.object.mode_set(mode='EDIT')
@@ -134,23 +134,44 @@ rootbone.tail = (0, 0, 0.1)
 
 # utility function to add bone and set all parameters
 def addbone(parentbonename, targetobjectname):
-    armature.edit_bones.new(name=targetobjectname)
-    bone = armature.edit_bones[targetobjectname]
+    # add bone
+    bonename = targetobjectname
+    rig.data.edit_bones.new(name=bonename)
+    editbone = rig.data.edit_bones[bonename]
     
     # parent to root bone
-    bone.parent = armature.edit_bones[parentbonename]
+    editbone.parent = rig.data.edit_bones[parentbonename]
     
     # set number of bezier bone segments
-    bone.bbone_segments = BBONE_SEGMENTS
+    editbone.bbone_segments = BBONE_SEGMENTS
     
     # set head to parent tail
-    bone.head = bone.parent.tail
+    editbone.head = editbone.parent.tail
     if parentbonename != "Root":
-        bone.use_connect = True
+        editbone.use_connect = True
     
     # set tail to target
     target = bpy.data.objects[targetobjectname]
-    bone.tail = target.pose.bones[0].head
+    editbone.tail = target.pose.bones[0].head
+    
+    # setup constraints (must be in pose mode)
+    bpy.ops.object.mode_set(mode='POSE')
+    
+    # ik
+    posebone = rig.pose.bones[bonename]
+    posebone.constraints.new(type='IK')
+    # ik target
+    posebone.constraints['IK'].target = target
+    posebone.constraints['IK'].subtarget = "Bone"
+    # ik chain length goes back up to root
+    posebone.constraints['IK'].chain_count = len(posebone.parent_recursive)
+    # allow full stretching (legacy ik solver)
+    posebone.ik_stretch = 1
+    
+    # volume constraint
+    posebone.constraints.new(type='MAINTAIN_VOLUME')
+    
+    bpy.ops.object.mode_set(mode='EDIT')
 
 # TODO temporarily hard-coded bone hierarchy
 # maybe replace with graphviz dot file (parsed with networkx?)
