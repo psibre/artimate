@@ -5,7 +5,7 @@ except ImportError:
     pass
 
 DEBUG = True
-ORIGIN = (-5, 0, 4)
+ORIGIN = (0, 0, 0)
 BBONE_SEGMENTS = 8
 
 #temporarily clean out scene
@@ -32,40 +32,43 @@ bpy.context.scene.frame_end = numframes
 if DEBUG:
     print("set end frame to", bpy.context.scene.frame_end)
 
-# ensure 3d cursor is at origin
-bpy.context.scene.cursor_location = (0, 0, 0)
-
-# create ema root node
-bpy.ops.object.add()
-emarootname = "EMARoot"
-bpy.context.active_object.name = emarootname
+# create ema root node and link it to scene
+emaroot = bpy.data.objects.new(name="EMARoot", object_data=None)
+bpy.context.scene.objects.link(emaroot)
 
 for channel in channels:
-    # create armature and name it
-    bpy.ops.object.armature_add()
+    # create armature
     armaturename = channel + "Armature"
-    bpy.context.active_object.name = armaturename
+    armaturearm = bpy.data.armatures.new(name=armaturename)
+    
+    # create armature object and link to scene
+    armature = bpy.data.objects.new(name=armaturename, object_data=armaturearm)
+    bpy.context.scene.objects.link(armature)
+    bpy.context.scene.objects.active = armature
+    
+    # add bone
+    bpy.ops.object.mode_set(mode='EDIT')
+    armaturebone = armaturearm.edit_bones.new(name="Bone")
+    armaturebone.tail.z = 1
+    bpy.ops.object.mode_set(mode='OBJECT')
     
     # parent armature to ema root
-    bpy.ops.object.select_name(name=emarootname, extend=True)
-    bpy.ops.object.parent_set()
-
+    armature.parent = emaroot
+    
     # create coil object and name it
     depth = 10
     bpy.ops.mesh.primitive_cone_add(vertices=8, radius=2.5, depth=depth, location=(0, 0, depth / 2))
-    coilname = channel + "Coil"
-    bpy.context.active_object.name = coilname
+    coil = bpy.context.active_object
+    coil.name = channel + "Coil"
     
     # parent coil to armature
-    bpy.ops.object.select_name(name=armaturename, extend=True)
-    bpy.ops.object.parent_set()
+    coil.parent = armature
     
     # transform armature to channel position and rotation
     bpy.data.objects[armaturename].location = sweep.getLoc(channel)
     bpy.data.objects[armaturename].rotation_euler = sweep.getRot(channel)
-
+    
     # add animation to armature
-    armature = bpy.data.objects[armaturename]
     armature.animation_data_create()
     armature.animation_data.action = bpy.data.actions.new(armaturename + "Action")
     fcurves = armature.animation_data.action.fcurves
@@ -84,53 +87,68 @@ for channel in channels:
             fcurve.keyframe_points[fn].interpolation = 'LINEAR'
             value = sweep.getValue(channel, fc, fn)
             fcurve.keyframe_points[fn].co = fn, value
-            # TODO change all this so that coils move on a path?
 
 # scale down ema
-bpy.data.objects[emarootname].scale /= 10
+emaroot.scale /= 10
 
-# generate ik target tracking armature with offset
+# arbitrary origin for tongue and ik targets
+tongueloc = (-5, -3, 1)
+
+# generate ik targets tracking armatures with offset
 for channel in channels:
-    # HACK: set 3d cursor to some location (properly define later)
-    targetloc = ORIGIN
-    bpy.context.scene.cursor_location = targetloc
-    
-    bpy.ops.object.armature_add()
+    # create target armature
     targetname = channel + "Target"
-    bpy.context.active_object.name = targetname
-    coiltarget = bpy.data.objects[channel + "Armature"]
+    targetarm = bpy.data.armatures.new(name=targetname)
+    
+    # create target object and link to scene
+    target = bpy.data.objects.new(name=targetname, object_data=targetarm)
+    bpy.context.scene.objects.link(target)
+    bpy.context.scene.objects.active = target
+    
+    # add bone
+    bpy.ops.object.mode_set(mode='EDIT')
+    editbone = targetarm.edit_bones.new(name="Bone")
+    editbone.head = editbone.tail = tongueloc
+    editbone.tail.z += 1
     
     # add constraints
     bpy.ops.object.mode_set(mode='POSE')
+    posebone = target.pose.bones[0]
+    coiltarget = bpy.data.objects[channel + "Armature"]
     
-    bpy.ops.pose.constraint_add(type='COPY_LOCATION')
-    locconstraint = bpy.data.objects[targetname].pose.bones["Bone"].constraints['Copy Location']
+    locconstraint = posebone.constraints.new(type='COPY_LOCATION')
     locconstraint.target = coiltarget
     locconstraint.subtarget = "Bone"
     locconstraint.use_offset = True
     
-    bpy.ops.pose.constraint_add(type='COPY_ROTATION')
-    rotconstraint = bpy.data.objects[targetname].pose.bones["Bone"].constraints['Copy Rotation']
+    rotconstraint = posebone.constraints.new(type='COPY_ROTATION')
     rotconstraint.target = coiltarget
     rotconstraint.subtarget = "Bone"
     
     bpy.ops.object.mode_set(mode='OBJECT')
 
 # add tongue rig
-bpy.ops.object.armature_add()
-bpy.context.active_object.name = "TongueArmature"
+
+# create armature
+rigname = "TongueArmature"
+rigarm = bpy.data.armatures.new(name=rigname)
+
+# create rig object and link to scene
+rig = bpy.data.objects.new(name=rigname, object_data=rigarm)
+bpy.context.scene.objects.link(rig)
+bpy.context.scene.objects.active = rig
 
 # set type to bezier bone
-rig = bpy.context.active_object
 rig.data.draw_type = 'BBONE'
 
 # enter edit mode to assemble armature
 bpy.ops.object.mode_set(mode='EDIT')
 
 # root bone (very short)
-rootbone = bpy.context.active_bone
-rootbone.name = "Root"
-rootbone.tail = (0, 0, 0.1)
+rootbone = rigarm.edit_bones.new(name="Root")
+rootbone.head = rootbone.tail = tongueloc
+rootbone.tail.z -= 3
+rootbone.head.z = rootbone.tail.z + 0.1
 
 # utility function to add bone and set all parameters
 def addbone(parentbonename, targetobjectname):
@@ -156,22 +174,23 @@ def addbone(parentbonename, targetobjectname):
     
     # setup constraints (must be in pose mode)
     bpy.ops.object.mode_set(mode='POSE')
-    
-    # ik
     posebone = rig.pose.bones[bonename]
-    posebone.constraints.new(type='IK')
-    # ik target
-    posebone.constraints['IK'].target = target
-    posebone.constraints['IK'].subtarget = "Bone"
+    
+    # ik constraint
+    constraint = posebone.constraints.new(type='IK')
+    constraint.target = target
+    constraint.subtarget = "Bone"
     # ik chain length goes back up to root
-    posebone.constraints['IK'].chain_count = len(posebone.parent_recursive)
+    constraint.chain_count = len(posebone.parent_recursive)
     # allow full stretching (legacy ik solver)
     posebone.ik_stretch = 1
     
     # volume constraint
     posebone.constraints.new(type='MAINTAIN_VOLUME')
     
+    # cleanup
     bpy.ops.object.mode_set(mode='EDIT')
+    return
 
 # TODO temporarily hard-coded bone hierarchy
 # maybe replace with graphviz dot file (parsed with networkx?)
