@@ -1,11 +1,14 @@
 import ema
 try:
     import bpy
+    from mathutils import Vector
 except ImportError:
     pass
 
 DEBUG = True
-ORIGIN = (0, 0, 0)
+SCALE = 0.1
+OFFSET = 1
+ORIGIN = Vector((0, 0, 0))
 BBONE_SEGMENTS = 8
 
 #temporarily clean out scene
@@ -64,6 +67,10 @@ for channel in channels:
     # parent coil to armature
     coil.parent = armature
     
+    # DEBUG
+    coil.hide = True
+    armature.show_name = True
+    
     # transform armature to channel position and rotation
     bpy.data.objects[armaturename].location = sweep.getLoc(channel)
     bpy.data.objects[armaturename].rotation_euler = sweep.getRot(channel)
@@ -88,11 +95,15 @@ for channel in channels:
             value = sweep.getValue(channel, fc, fn)
             fcurve.keyframe_points[fn].co = fn, value
 
-# scale down ema
-emaroot.scale /= 10
-
 # arbitrary origin for tongue and ik targets
-tongueloc = (-5, -3, 1)
+a = bpy.data.objects["Channel06Armature"].location
+b = bpy.data.objects["Channel08Armature"].location
+tongueloc = ((2 * b.x - a.x) * SCALE,
+             (2 * b.y - a.y) * SCALE,
+             (2 * b.z - a.z) * SCALE)
+
+# scale down ema root
+emaroot.scale *= SCALE
 
 # generate ik targets tracking armatures with offset
 for channel in channels:
@@ -108,8 +119,8 @@ for channel in channels:
     # add bone
     bpy.ops.object.mode_set(mode='EDIT')
     editbone = targetarm.edit_bones.new(name="Bone")
-    editbone.head = editbone.tail = tongueloc
-    editbone.tail.z += 1
+    editbone.head = editbone.tail = ORIGIN
+    editbone.head.z -= OFFSET
     
     # add constraints
     bpy.ops.object.mode_set(mode='POSE')
@@ -147,8 +158,10 @@ bpy.ops.object.mode_set(mode='EDIT')
 # root bone (very short)
 rootbone = rigarm.edit_bones.new(name="Root")
 rootbone.head = rootbone.tail = tongueloc
-rootbone.tail.z -= 3
-rootbone.head.z = rootbone.tail.z + 0.1
+rootbone.head.x -= OFFSET
+rootbone.tail.x -= OFFSET
+rootbone.head.z -= 2 * OFFSET
+rootbone.tail.z = rootbone.head.z + 0.1
 
 # utility function to add bone and set all parameters
 def addbone(parentbonename, targetobjectname):
@@ -157,15 +170,16 @@ def addbone(parentbonename, targetobjectname):
     rig.data.edit_bones.new(name=bonename)
     editbone = rig.data.edit_bones[bonename]
     
-    # parent to root bone
+    # parent bone
     editbone.parent = rig.data.edit_bones[parentbonename]
     
     # set number of bezier bone segments
     editbone.bbone_segments = BBONE_SEGMENTS
     
-    # set head to parent tail
-    editbone.head = editbone.parent.tail
-    if parentbonename != "Root":
+    # connect to parent
+    if parentbonename == "Root":
+        editbone.head = editbone.parent.head
+    else:
         editbone.use_connect = True
     
     # set tail to target
@@ -182,7 +196,10 @@ def addbone(parentbonename, targetobjectname):
     constraint.subtarget = "Bone"
     # ik chain length goes back up to root
     constraint.chain_count = len(posebone.parent_recursive)
-    # allow full stretching (legacy ik solver)
+    # axis reference
+    constraint.reference_axis = 'TARGET'
+    # TODO consider adding pole targets 
+    # allow full stretching
     posebone.ik_stretch = 1
     
     # volume constraint
@@ -214,3 +231,11 @@ addbone("Channel10Target", "Channel11Target")
 
 # finished with tongue armature
 bpy.ops.object.mode_set(mode='OBJECT')
+
+# more ik config
+rig.pose.ik_solver = 'ITASC'
+# itasc params
+# see also
+# http://wiki.blender.org/index.php/Dev:Source/GameEngine/RobotIKSolver
+# http://www.blender.org/documentation/blender_python_api_2_60_0/bpy.types.Itasc.html
+rig.pose.ik_param.mode = 'SIMULATION'
