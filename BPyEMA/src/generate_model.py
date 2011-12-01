@@ -282,5 +282,11 @@ bpy.ops.object.select_name(name=rigname, extend=True)
 bpy.ops.object.parent_set(type='ARMATURE_AUTO')
 bpy.ops.object.select_name(name=tongue.name)
 # remove root vertex group
-bpy.context.object.vertex_groups.remove(tongue.vertex_groups['Root'])
+bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
+# bake animation
+bpy.ops.object.select_name(name=rigname)
+bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
+
+# export collada
+bpy.ops.wm.collada_export(filepath="../../TongueDemo2/src/main/resources/generate_model.dae")
