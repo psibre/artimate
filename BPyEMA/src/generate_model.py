@@ -260,3 +260,27 @@ rig.pose.ik_solver = 'ITASC'
 # http://wiki.blender.org/index.php/Dev:Source/GameEngine/RobotIKSolver
 # http://www.blender.org/documentation/blender_python_api_2_60_0/bpy.types.Itasc.html
 rig.pose.ik_param.mode = 'SIMULATION'
+
+# import tongue mesh
+bpy.ops.import_mesh.ply(filepath="Tongue.ply")
+tongue = bpy.context.active_object
+
+# transform tongue
+tongue.scale *= SCALE
+tongue.location = tongueloc
+
+# HACK
+tongue.location = (2.9370, 2.2104, -1.7978)
+
+# remove duplicate vertices
+bpy.ops.object.mode_set(mode='EDIT')
+bpy.ops.mesh.remove_doubles(limit=0.0001)
+bpy.ops.object.mode_set(mode='OBJECT')
+
+# parent to tongue rig with automatic vertex groups and weights
+bpy.ops.object.select_name(name=rigname, extend=True)
+bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+bpy.ops.object.select_name(name=tongue.name)
+# remove root vertex group
+bpy.context.object.vertex_groups.remove(tongue.vertex_groups['Root'])
+
