@@ -13,10 +13,15 @@ BBONE_SEGMENTS = 8
 
 #temporarily clean out scene
 if DEBUG:
-    if bpy.context.mode != 'OBJECT':
-        bpy.ops.object.mode_set(mode='OBJECT')
-    bpy.ops.object.select_all(action='SELECT')
-    bpy.ops.object.delete()
+    for object in bpy.data.objects:
+        if object.type in ['MESH', 'ARMATURE', 'EMPTY']:
+            try:
+                bpy.context.scene.objects.unlink(object)
+            except RuntimeError:
+                pass
+            bpy.data.objects.remove(object)
+    for armature in bpy.data.armatures:
+        bpy.data.armatures.remove(armature)
     bpy.context.scene.frame_current = 1
 
 # hardcoded args for now:
