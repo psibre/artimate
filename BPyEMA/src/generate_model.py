@@ -49,6 +49,10 @@ bpy.context.scene.frame_end = numframes
 if DEBUG:
     print("set end frame to", bpy.context.scene.frame_end)
 
+# set framerate to 200 Hz (max fps in blender is 120, so work around this using framerate base)
+bpy.context.scene.render.fps_base = 0.5
+bpy.context.scene.render.fps = 100
+
 # create ema root node and link it to scene
 emaroot = bpy.data.objects.new(name="EMARoot", object_data=None)
 bpy.context.scene.objects.link(emaroot)
