@@ -110,6 +110,18 @@ tongueloc = ((2 * b.x - a.x) * SCALE,
 # scale down ema root
 emaroot.scale *= SCALE
 
+# smooth function curves
+oldcontexttype = bpy.context.area.type
+bpy.context.area.type = 'GRAPH_EDITOR'
+# select armatures
+for channel in channels:
+    bpy.data.objects[channel + "Armature"].select = True
+bpy.ops.graph.smooth()
+# deselect armatures
+for channel in channels:
+    bpy.data.objects[channel + "Armature"].select = False
+bpy.context.area.type = oldcontexttype
+
 # generate ik targets tracking armatures with offset
 for channel in channels:
     # create target armature
