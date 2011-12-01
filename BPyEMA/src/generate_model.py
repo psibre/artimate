@@ -8,8 +8,11 @@ except ImportError:
 DEBUG = True
 SCALE = 0.1
 OFFSET = 1
-ORIGIN = Vector((0, 0, 0))
 BBONE_SEGMENTS = 8
+SMOOTH = True
+EXPORT_COLLADA = False
+
+ORIGIN = Vector((0, 0, 0))
 
 #temporarily clean out scene
 if DEBUG:
@@ -26,6 +29,8 @@ if DEBUG:
         bpy.data.armatures.remove(armature)
     for mesh in bpy.data.meshes:
         bpy.data.meshes.remove(mesh)
+    for action in bpy.data.actions:
+        bpy.data.actions.remove(action)
     bpy.context.scene.frame_current = 1
 
 # hardcoded args for now:
@@ -73,6 +78,9 @@ for channel in channels:
     coil = bpy.context.active_object
     coil.name = channel + "Coil"
     
+    # select none
+    bpy.ops.object.select_all(action='DESELECT')
+    
     # parent coil to armature
     coil.parent = armature
     
@@ -95,6 +103,8 @@ for channel in channels:
     fcurves.new(data_path="rotation_euler", index=0)
     fcurves.new(data_path="rotation_euler", index=1)
     
+    # TODO fix rotation value wrapping
+    
     for fc, fcurve in enumerate(fcurves):
         fcurve.keyframe_points.add(numframes)
         
@@ -115,16 +125,17 @@ tongueloc = ((2 * b.x - a.x) * SCALE,
 emaroot.scale *= SCALE
 
 # smooth function curves
-oldcontexttype = bpy.context.area.type
-bpy.context.area.type = 'GRAPH_EDITOR'
-# select armatures
-for channel in channels:
-    bpy.data.objects[channel + "Armature"].select = True
-bpy.ops.graph.smooth()
-# deselect armatures
-for channel in channels:
-    bpy.data.objects[channel + "Armature"].select = False
-bpy.context.area.type = oldcontexttype
+if SMOOTH:
+    oldcontexttype = bpy.context.area.type
+    bpy.context.area.type = 'GRAPH_EDITOR'
+    # select armatures
+    for channel in channels:
+        bpy.data.objects[channel + "Armature"].select = True
+    bpy.ops.graph.smooth()
+    # deselect armatures
+    for channel in channels:
+        bpy.data.objects[channel + "Armature"].select = False
+    bpy.context.area.type = oldcontexttype
 
 # generate ik targets tracking armatures with offset
 for channel in channels:
@@ -284,9 +295,10 @@ bpy.ops.object.select_name(name=tongue.name)
 # remove root vertex group
 bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
-# bake animation
-bpy.ops.object.select_name(name=rigname)
-bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
-
-# export collada
-bpy.ops.wm.collada_export(filepath="../../TongueDemo2/src/main/resources/generate_model.dae")
+if EXPORT_COLLADA:
+    # bake animation
+    bpy.ops.object.select_name(name=rigname)
+    bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
+    
+    # export collada
+    bpy.ops.wm.collada_export(filepath="../../TongueDemo2/src/main/resources/generate_model.dae")
