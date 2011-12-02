@@ -1,0 +1,13 @@
+# Eclipse
+.project
+.classpath
+.settings
+
+# Mac OS X
+.DS_Store
+
+# Maven
+target
+
+# Blender
+*.blend*
