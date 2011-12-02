@@ -11,11 +11,11 @@ OFFSET = 1
 BBONE_SEGMENTS = 8
 SMOOTH = True
 EXPORT_COLLADA = False
+BATCH = True
 
 ORIGIN = Vector((0, 0, 0))
 
-#temporarily clean out scene
-if DEBUG:
+def cleanup():
     if bpy.context.mode != 'OBJECT':
         bpy.ops.object.mode_set(mode='OBJECT')
     for object in bpy.data.objects:
@@ -32,6 +32,10 @@ if DEBUG:
     for action in bpy.data.actions:
         bpy.data.actions.remove(action)
     bpy.context.scene.frame_current = 1
+
+#temporarily clean out scene
+if DEBUG:
+    cleanup()
 
 # hardcoded args for now:
 posfile = "../../testUtt_test/pos/0012.pos"
@@ -50,8 +54,8 @@ if DEBUG:
     print("set end frame to", bpy.context.scene.frame_end)
 
 # set framerate to 200 Hz (max fps in blender is 120, so work around this using framerate base)
-bpy.context.scene.render.fps_base = 0.5
-bpy.context.scene.render.fps = 100
+bpy.context.scene.render.fps_base = 0.125
+bpy.context.scene.render.fps = 25 # PAL
 
 # create ema root node and link it to scene
 emaroot = bpy.data.objects.new(name="EMARoot", object_data=None)
@@ -129,7 +133,8 @@ tongueloc = ((2 * b.x - a.x) * SCALE,
 emaroot.scale *= SCALE
 
 # smooth function curves
-if SMOOTH:
+# TODO figure out how to do this when running script non-interactively (if BATCH == True)
+if SMOOTH and not BATCH:
     oldcontexttype = bpy.context.area.type
     bpy.context.area.type = 'GRAPH_EDITOR'
     # select armatures
@@ -300,9 +305,19 @@ bpy.ops.object.select_name(name=tongue.name)
 bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
 if EXPORT_COLLADA:
+    daefile = "../../TongueDemo2/src/main/resources/generate_model.dae"
+    if DEBUG:
+        print("exporting to COLLADA file", daefile)
     # bake animation
     bpy.ops.object.select_name(name=rigname)
     bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
     
     # export collada
-    bpy.ops.wm.collada_export(filepath="../../TongueDemo2/src/main/resources/generate_model.dae")
+    bpy.ops.wm.collada_export(filepath=daefile)
+
+print("DONE")
+
+if BATCH:
+    bpy.ops.wm.quit_blender()
+    # this spews much garbage to STDERR, so consider redirecting that to /dev/null
+    # see http://projects.blender.org/tracker/?func=detail&group_id=9&aid=23215&atid=264
