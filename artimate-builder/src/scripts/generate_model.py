@@ -38,7 +38,7 @@ if DEBUG:
     cleanup()
 
 # hardcoded args for now:
-posfile = "../../testUtt_test/pos/0012.pos"
+posfile = "/Users/steiner/projects/workspace/artimate/testUtt_test/pos/0012.pos"
 
 # load sweep from pos file
 if DEBUG:
@@ -282,7 +282,7 @@ rig.pose.ik_solver = 'ITASC'
 rig.pose.ik_param.mode = 'SIMULATION'
 
 # import tongue mesh
-bpy.ops.import_mesh.ply(filepath="Tongue.ply")
+bpy.ops.import_mesh.ply(filepath="/Users/steiner/projects/workspace/artimate/artimate-builder/src/main/resources/Tongue.ply")
 tongue = bpy.context.active_object
 
 # transform tongue
