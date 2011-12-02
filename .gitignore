@@ -11,3 +11,6 @@ target
 
 # Blender
 *.blend*
+
+# python
+*.pyc

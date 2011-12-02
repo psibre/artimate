@@ -1,17 +1,56 @@
-import ema
-try:
-    import bpy
-    from mathutils import Vector
-except ImportError:
-    pass
+#!/usr/bin/env blender --background --python
+
+# BEGIN CLI option parsing
+# (somewhat adapted from $BLENDER/$VERSION/scripts/templates/background_job.py)
+import sys       # to get command line args
+import argparse  # to parse options for us and print a nice help message
+
+# get the args passed to blender after "--", all of which are ignored by
+# blender so scripts may receive their own arguments
+argv = sys.argv
+
+if "--" not in argv:
+    argv = []  # as if no args are passed
+else:
+    argv = argv[argv.index("--") + 1:]  # get all args after "--"
+
+# When --help or no args are given, print this help
+usage_text = "Run blender in background mode with this script:\n\
+blender --background --python %s -- [options]" % __file__
+
+parser = argparse.ArgumentParser(description=usage_text,
+                                 formatter_class=argparse.RawDescriptionHelpFormatter)
+parser.add_argument("-e", "--ema", dest="posfile",
+                    help="EMA sweep to load as animation data (AG500 .pos format)")
+parser.add_argument("--header", dest="header",
+                    help="header file from which to load EMA channel names (header.txt)")
+parser.add_argument("-m", "--mesh", dest="meshfile",
+                    help="This file will be imported as the tongue mesh (Stanford .ply format)")
+parser.add_argument("-c, --collada", dest="daefile",
+                    help="Output COLLADA model file (.dae)")
+parser.add_argument("-s", "--smooth", dest="smooth", action="store_true",
+                    help="Smooth EMA fcurves (not working in batch mode currently)")
+
+args = parser.parse_args(argv)  # In this example we wont use the args
+
+if not argv:
+    parser.print_help()
+    sys.exit()
+
+# END CLI option parsing
 
 DEBUG = True
 SCALE = 0.1
 OFFSET = 1
 BBONE_SEGMENTS = 8
-SMOOTH = True
-EXPORT_COLLADA = False
 BATCH = True
+
+import ema
+try:
+    import bpy
+    from mathutils import Vector
+except ImportError:
+    sys.exit()
 
 ORIGIN = Vector((0, 0, 0))
 
@@ -37,13 +76,14 @@ def cleanup():
 if DEBUG:
     cleanup()
 
-# hardcoded args for now:
-posfile = "/Users/steiner/projects/workspace/artimate/testUtt_test/pos/0012.pos"
-
 # load sweep from pos file
 if DEBUG:
-    print("loading", posfile)
-sweep = ema.Sweep(posfile, ema.generate_header())
+    print("loading", args.posfile)
+if not args.header:
+    header = ema.generate_header()
+else:
+    header = args.header
+sweep = ema.Sweep(args.posfile, header)
 channels = sweep.coils
 
 # set end frame to number of samples in first data channel
@@ -134,7 +174,7 @@ emaroot.scale *= SCALE
 
 # smooth function curves
 # TODO figure out how to do this when running script non-interactively (if BATCH == True)
-if SMOOTH and not BATCH:
+if args.smooth and not BATCH:
     oldcontexttype = bpy.context.area.type
     bpy.context.area.type = 'GRAPH_EDITOR'
     # select armatures
@@ -282,7 +322,8 @@ rig.pose.ik_solver = 'ITASC'
 rig.pose.ik_param.mode = 'SIMULATION'
 
 # import tongue mesh
-bpy.ops.import_mesh.ply(filepath="/Users/steiner/projects/workspace/artimate/artimate-builder/src/main/resources/Tongue.ply")
+print("Loading mesh from file", args.meshfile)
+bpy.ops.import_mesh.ply(filepath=args.meshfile)
 tongue = bpy.context.active_object
 
 # transform tongue
@@ -304,16 +345,15 @@ bpy.ops.object.select_name(name=tongue.name)
 # remove root vertex group
 bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
-if EXPORT_COLLADA:
-    daefile = "../../TongueDemo2/src/main/resources/generate_model.dae"
+if args.daefile:
     if DEBUG:
-        print("exporting to COLLADA file", daefile)
+        print("exporting to COLLADA file", args.daefile)
     # bake animation
     bpy.ops.object.select_name(name=rigname)
     bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
     
     # export collada
-    bpy.ops.wm.collada_export(filepath=daefile)
+    bpy.ops.wm.collada_export(filepath=args.daefile)
 
 print("DONE")
 
