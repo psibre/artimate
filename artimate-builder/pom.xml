@@ -9,7 +9,10 @@
 	<artifactId>artimate-builder</artifactId>
 
 	<properties>
+		<script.directory>${basedir}/src/scripts</script.directory>
 		<blender.path>/Applications/blender.app/Contents/MacOS/blender</blender.path>
+		<!-- TODO hardcoded for now, but can be overriden by -Ddata.directory -->
+		<data.directory>/Users/ingmar/projects/tonguebuilding</data.directory>
 	</properties>
 
 	<build>
@@ -49,10 +52,15 @@
 					</execution>
 				</executions>
 				<configuration>
+					<!-- for some reason the following line has no effect in the blender 
+						thread -->
+					<workingDirectory>${script.directory}</workingDirectory>
 					<executable>${blender.path}</executable>
-					<arguments>
-						<argument>-v</argument>
-					</arguments>
+					<!-- use commandlineArgs, not arguments -->
+					<commandlineArgs>
+						<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
+						<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema ${data.directory}/pos/0012.pos --mesh ${data.directory}/Tongue.ply --collada ${project.build.directory}/Tongue.dae]]>
+					</commandlineArgs>
 				</configuration>
 			</plugin>
 

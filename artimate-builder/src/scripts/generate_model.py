@@ -1,8 +1,12 @@
 #!/usr/bin/env blender --background --python
 
+# workaround for working directory issues and module search path
+# when running this script with blender through mvn exec:exec
+import os, sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
 # BEGIN CLI option parsing
 # (somewhat adapted from $BLENDER/$VERSION/scripts/templates/background_job.py)
-import sys       # to get command line args
 import argparse  # to parse options for us and print a nice help message
 
 # get the args passed to blender after "--", all of which are ignored by
@@ -26,7 +30,7 @@ parser.add_argument("--header", dest="header",
                     help="header file from which to load EMA channel names (header.txt)")
 parser.add_argument("-m", "--mesh", dest="meshfile",
                     help="This file will be imported as the tongue mesh (Stanford .ply format)")
-parser.add_argument("-c, --collada", dest="daefile",
+parser.add_argument("-c", "--collada", dest="daefile",
                     help="Output COLLADA model file (.dae)")
 parser.add_argument("-s", "--smooth", dest="smooth", action="store_true",
                     help="Smooth EMA fcurves (not working in batch mode currently)")
