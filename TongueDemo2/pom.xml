@@ -9,7 +9,6 @@
 	<artifactId>TongueDemo2</artifactId>
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
 		<project.mainclass>fr.loria.parole.tonguedemo2.TongueDemoWrapper</project.mainclass>
 	</properties>
