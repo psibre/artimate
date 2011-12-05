@@ -14,12 +14,6 @@
 	<dependencies>
 
 		<dependency>
-			<groupId>fr.loria.parole</groupId>
-			<artifactId>artimate-builder</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
 			<groupId>com.ardor3d</groupId>
 			<artifactId>ardor3d-lwjgl</artifactId>
 			<version>0.8-SNAPSHOT</version>
@@ -86,7 +80,7 @@
 				<version>1.2.1</version>
 				<configuration>
 					<resourceBundles>
-						<resourceBundle>${project.groupId}:artimate-builder:${project.version}</resourceBundle>
+						<resourceBundle>${project.groupId}:artimate-model:${project.version}</resourceBundle>
 					</resourceBundles>
 				</configuration>
 				<executions>
