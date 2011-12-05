@@ -8,7 +8,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<script.directory>${basedir}/src/scripts</script.directory>
-		<resource.directory>${basedir}/src/main/resources</resource.directory>
+		<generated.resource.directory>${project.build.directory}/generated-resources</generated.resource.directory>
 
 		<blender.path>/Applications/blender.app/Contents/MacOS/blender</blender.path>
 		<!-- TODO hardcoded for now, but can be overriden by -Ddata.directory -->
@@ -19,11 +19,7 @@
 
 		<resources>
 			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<excludes>
-					<exclude>blender-bge-api/</exclude>
-				</excludes>
+				<directory>${generated.resource.directory}</directory>
 			</resource>
 		</resources>
 
@@ -50,7 +46,7 @@
 					<!-- use commandlineArgs, not arguments -->
 					<commandlineArgs>
 						<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
-						<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema ${data.directory}/pos/0012.pos --mesh ${data.directory}/Tongue.ply --collada ${resource.directory}/Tongue.dae]]>
+						<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema ${data.directory}/pos/0012.pos --mesh ${data.directory}/Tongue.ply --collada ${generated.resource.directory}/Tongue.dae]]>
 					</commandlineArgs>
 				</configuration>
 			</plugin>
@@ -66,8 +62,9 @@
 					</execution>
 				</executions>
 				<configuration>
+					<resourcesDirectory>${generated.resource.directory}</resourcesDirectory>
 					<includes>
-						<include>**/*.dae</include>
+						<include>**</include>
 					</includes>
 				</configuration>
 			</plugin>
