@@ -15,3 +15,6 @@ target
 
 # python
 *.pyc
+
+# git
+*.orig

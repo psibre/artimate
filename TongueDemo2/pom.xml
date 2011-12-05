@@ -2,15 +2,22 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.loria.parole</groupId>
-	<artifactId>artimate</artifactId>
+	<artifactId>TongueDemo2</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
-		<project.mainclass>fr.loria.parole.tonguedemo2.TongueDemoWrapper</project.mainclass>
+		<project.mainclass>${project.groupId}.${project.artifactId}.TongueDemoWrapper</project.mainclass>
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>fr.loria.parole</groupId>
+			<artifactId>artimate-builder</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
 
 		<dependency>
 			<groupId>com.ardor3d</groupId>
@@ -75,18 +82,18 @@
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-dependency-plugin</artifactId>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<version>1.2.1</version>
+				<configuration>
+					<resourceBundles>
+						<resourceBundle>${project.groupId}:artimate-builder:${project.version}</resourceBundle>
+					</resourceBundles>
+				</configuration>
 				<executions>
 					<execution>
-						<id>copy</id>
-						<phase>prepare-package</phase>
 						<goals>
-							<goal>copy-dependencies</goal>
+							<goal>process</goal>
 						</goals>
-						<configuration>
-							<excludeArtifactIds>junit</excludeArtifactIds>
-							<outputDirectory>${project.build.directory}/classes</outputDirectory>
-						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -98,7 +105,7 @@
 				<configuration>
 					<archive>
 						<manifest>
-							<mainClass>${project.groupId}.${project.artifactId}.TongueDemoWrapper</mainClass>
+							<mainClass>${project.mainclass}</mainClass>
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 					</archive>

@@ -1,4 +1,4 @@
-package fr.loria.parole.artimate;
+package fr.loria.parole.TongueDemo2;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -278,7 +278,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 		// TODO make this flexible!
 		// initExample("flexiquad.dae", "Cube", "Cube_001-mesh");
-		initExample("Tongue.dae", "TongueMesh", "grp9-mesh[mtl91]");
+		initExample("Tongue.dae", "Tongue", "Tongue-mesh");
 
 		_root.updateGeometricState(0);
 	}
