@@ -1,7 +1,8 @@
-clearinfo
+#!/usr/bin/env praat
+
 form Input directory
-  sentence Input_directory /Users/ingmar/projects/ema/supine_and_upright_noise_and_clear08062011
-  sentence Output_directory /Users/ingmar/projects/tonguebuilding
+  sentence Input_directory /Users/steiner/projects/ema/supine_and_upright_noise_and_clear08062011
+  sentence Output_directory /Users/steiner/projects/tonguebuilding
 endform
 
 output_basename$ = "all"
@@ -10,6 +11,7 @@ assert input_directory$ != output_directory$
 
 # glob *.wav to array
 list = Create Strings as file list... fileList 'input_directory$'/wav/*.wav
+Sort
 wav.size = Get number of strings
 assert wav.size
 for w to wav.size
@@ -17,79 +19,67 @@ for w to wav.size
 endfor
 Remove
 
-# iterate
+# mkdir if it doesn't exist
 createDirectory("'output_directory$'/wav")
-xmin = 0
+
+# iterate
+offset = 0
 for w to wav.size
   wav_in$ = input_directory$ + "/wav/" + wav$[w]
+
+  # memory mapping for wav file
   ls = Open long sound file... 'wav_in$'
   wav_out$ = "'output_directory$'/wav/'output_basename$'.wav"
   if w == 1
+    # first file creates new output wav
     Save as WAV file... 'wav_out$'
+    echo 'wav_in$' > 'wav_out$'
   else
+    # the others append directly
     Append to existing sound file... 'wav_out$'
+    printline 'wav_in$' >> 'wav_out$'
   endif
-  printline 'wav_in$' >> 'wav_out$'
-  xmin += Object_'ls'.xmax
 
-  lab_in$ = wav_in$ - "wav" + "lab"
-  lab_out$ = wav_out$ - "wav" + "lab"
-  delete = 0
-  if ! fileReadable(lab_in$)
-    tg = To TextGrid... dummy
-    it = Extract tier... 1
-    Save as Xwaves label file... 'lab_in$'
-    lab[w] = Read Strings from raw text file... 'lab_in$'
-    select tg
-    plus it
-    delete = 1
-  endif
-  Remove
-
-  if w == 1
-    lab[w] = Read Strings from raw text file... 'lab_in$'
+  # TextGrid handling
+  tg_in$ = wav_in$ - "wav" + "TextGrid"
+  if ! fileReadable(tg_in$)
+    # if there is no TextGrid file, create one for the Sound
+    tg[w] = To TextGrid... prompts
   else
-    tmp = Read Strings from raw text file... 'lab_in$'
-    if delete
-      deleteFile(lab_in$)
-    endif
-    numLines = Get number of strings
-    for line to numLines
-      if index_regex(Object_'tmp'$[line], "^\s*#")
-        line = numLines ;; break
-      endif
-    endfor
-    line -= 1
-    lab = Extract part... line numLines
-    numLines -= line - 1
-    for line to numLines
-      end = extractNumber(Object_'lab'$[line], "")
-      end2 = end + xmin
-      line$ = replace$(Object_'lab'$[line], "'end'", "'end2:6'", 1)
-      Set string... line 'line$'
-    endfor
-    lab[w] = lab
-    select tmp
-    Remove
+    tg[w] = Read from file... 'tg_in$'
   endif
+
+  # adjust time domain
+  Shift times by... offset
+  offset += Object_'ls'.xmax
+
+  # cleanup
+  select ls
+  Remove
 endfor
 
-# append labs
 for w to wav.size
-  plus lab[w]
+  plus tg[w]
 endfor
-lab = Append
-Save as raw text file... 'output_directory$'/wav/'output_basename$'.lab
+tg = Merge
+tg_out$ = "'output_directory$'/wav/'output_basename$'.TextGrid"
+Save as chronological text file... 'tg_out$'
 
-# for debugging, also create TextGrid
-it = Read IntervalTier from Xwaves... 'output_directory$'/wav/'output_basename$'.lab
-Into TextGrid
-Save as text file... 'output_directory$'/wav/'output_basename$'.TextGrid
+# flatten hack
+system perl FlattenChronoTextGrid.pl 'tg_out$'
+printline /dev/null > 'tg_out$'
+
+# extract lab
+tg_flat = Read from file... 'tg_out$'
+Extract tier... 1
+lab_out$ = tg_out$ - "TextGrid" + "lab"
+Save as Xwaves label file... 'lab_out$'
+printline 'tg_out$' > 'lab_out$'
 
 # final cleanup
-plus it
-plus lab
+plus tg
+plus tg_flat
 for w to wav.size
-  plus lab[w]
+  plus tg[w]
 endfor
 Remove
