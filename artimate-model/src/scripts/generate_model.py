@@ -349,6 +349,8 @@ bpy.ops.object.select_name(name=tongue.name)
 # remove root vertex group
 bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
+# TODO save .blend file before baking actions for later inspection and debuggin
+
 if args.daefile:
     if DEBUG:
         print("exporting to COLLADA file", args.daefile)

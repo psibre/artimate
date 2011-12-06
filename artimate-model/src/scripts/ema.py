@@ -24,6 +24,21 @@ class Sweep:
             data[h_item] = arr[h:len(arr):len(self.header)]
         self.size = int(len(arr) / len(self.header))
         return data
+    
+    def save(self, pos_file_name):
+        arr = array('f')
+        for frame in range(self.size):
+            for dimension in self.header:
+                value = self.data[dimension][frame]
+                arr.append(value)
+        pos_file = open(pos_file_name, 'wb')
+        arr.tofile(pos_file)
+        pos_file.close()
+    
+    def extend(self, other):
+        for channel in self.data:
+            self.data[channel].extend(other.data[channel])
+        self.size = len(self.data[channel])
 
     def decimate(self):
         '''not implemented'''
