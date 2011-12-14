@@ -2,7 +2,9 @@ import math
 from array import array
 
 class Sweep:
-    def __init__(self, pos_file_name, header, segmentation=None):
+    def __init__(self, pos_file_name, header=None, segmentation=None):
+        if header == None:
+            header = generate_header()
         self.header = header
         self.data = self.load(pos_file_name)
         self.segmentation = segmentation
@@ -25,15 +27,16 @@ class Sweep:
         self.size = int(len(arr) / len(self.header))
         return data
     
-    def save(self, pos_file_name):
-        arr = array('f')
-        for frame in range(self.size):
-            for dimension in self.header:
-                value = self.data[dimension][frame]
-                arr.append(value)
-        pos_file = open(pos_file_name, 'wb')
-        arr.tofile(pos_file)
-        pos_file.close()
+    def save(self, pos_file):
+        arr = array('f', self.values())
+        try:
+            # append to provided fileobj
+            arr.tofile(pos_file)
+        except AttributeError:
+            # or interpret as file name
+            pos_file = open(pos_file, 'wb')
+            arr.tofile(pos_file)
+            pos_file.close()
     
     def extend(self, other):
         for channel in self.data:
@@ -68,6 +71,12 @@ class Sweep:
     def getValue(self, coil, index, frame=0):
         values = self.getLoc(coil, frame) + self.getRot(coil, frame)
         return values[index]
+    
+    def values(self):
+        for frame in range(self.size):
+            for dimension in self.header:
+                value = self.data[dimension][frame]
+                yield value
 
 def generate_header(num_coils=12):
     # hard-coded for AG500
