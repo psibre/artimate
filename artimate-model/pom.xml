@@ -8,11 +8,13 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<script.directory>${basedir}/src/scripts</script.directory>
-		<generated.resource.directory>${project.build.directory}/generated-resources</generated.resource.directory>
+		<resources.directory>${basedir}/src/main/resources</resources.directory>
+		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
 
 		<blender.path>/Applications/blender.app/Contents/MacOS/blender</blender.path>
-		<!-- TODO hardcoded for now, but can be overriden by -Ddata.directory -->
-		<data.directory>/Users/steiner/projects/tonguebuilding</data.directory>
+
+		<final.pos.file>${generated.resources.directory}/${pos.file}</final.pos.file>
+		<final.dae.file>${generated.resources.directory}/${dae.file}</final.dae.file>
 	</properties>
 
 	<build>
@@ -27,9 +29,29 @@
 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>properties-maven-plugin</artifactId>
+				<version>1.0-alpha-2</version>
+				<executions>
+					<execution>
+						<phase>initialize</phase>
+						<goals>
+							<goal>read-project-properties</goal>
+						</goals>
+						<configuration>
+							<files>
+								<file>${basedir}/build.config</file>
+							</files>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<version>1.2.1</version>
 				<executions>
+
 					<execution>
 						<id>concatenate-pos</id>
 						<phase>generate-resources</phase>
@@ -42,10 +64,11 @@
 							<arguments>
 								<argument>CatPos.py</argument>
 								<argument>--input-directory=${data.directory}</argument>
-								<argument>--output-directory=${generated.resource.directory}</argument>
+								<argument>--output-file=${final.pos.file}</argument>
 							</arguments>
 						</configuration>
 					</execution>
+
 					<execution>
 						<id>blender</id>
 						<phase>generate-resources</phase>
@@ -60,10 +83,11 @@
 							<!-- use commandlineArgs, not arguments -->
 							<commandlineArgs>
 								<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
-								<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema="${data.directory}"/pos/0012.pos --mesh="${data.directory}"/Tongue.ply --collada=${generated.resource.directory}/Tongue.dae]]>
+								<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema="${final.pos.file}" --mesh="${data.directory}"/Tongue.ply --collada="${final.dae.file}"]]>
 							</commandlineArgs>
 						</configuration>
 					</execution>
+
 				</executions>
 			</plugin>
 
@@ -80,7 +104,7 @@
 				<configuration>
 					<resourcesDirectory>${generated.resource.directory}</resourcesDirectory>
 					<includes>
-						<include>**</include>
+						<include>${final.dae.file}</include>
 					</includes>
 				</configuration>
 			</plugin>
@@ -103,6 +127,20 @@
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>org.codehaus.mojo</groupId>
+										<artifactId>properties-maven-plugin</artifactId>
+										<versionRange>[1.0-alpha-2,)</versionRange>
+										<goals>
+											<goal>read-project-properties</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.codehaus.mojo</groupId>
 										<artifactId>exec-maven-plugin</artifactId>
 										<versionRange>[1.2.1,)</versionRange>
 										<goals>
@@ -110,7 +148,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<execute />
+										<ignore />
 									</action>
 								</pluginExecution>
 
@@ -124,7 +162,7 @@
 										</goals>
 									</pluginExecutionFilter>
 									<action>
-										<execute />
+										<ignore />
 									</action>
 								</pluginExecution>
 
