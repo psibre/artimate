@@ -5,29 +5,40 @@ import argparse, glob, os
 
 chunksize = 8192
 
+# parse CLI options
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--input-directory", dest="indir",
                     help="Input directory containing .pos files in a pos subdirectory")
-parser.add_argument("-o", "--output-directory", dest="outdir",
-                    help="Output directory")
+parser.add_argument("-o", "--output-file", dest="outfile",
+                    help="Output file")
 parser.add_argument("-c", "--chunksize", dest="chunksize", type=int, default=chunksize,
                     help="Chunk size for binary I/O (default: %d)" % chunksize)
 args = parser.parse_args()
 
+# glob input files to list, exit if none found
 posfiles = glob.glob("%s/pos/*.pos" % args.indir)
 posfiles.sort()
+if not posfiles:
+    raise Exception("No pos files found in %s/pos" % args.indir)
 
+# output file
+if args.outfile:
+    outfilename = args.outfile
+else:
+    outfilename = "%s/pos/all.pos" % args.indir
+
+# ensure output directory exists
 try:
-    os.makedirs("%s/pos" % args.outdir)
+    outfiledir = os.path.dirname(os.path.abspath(outfilename))
+    os.makedirs(outfiledir)
 except OSError:
     pass
 
-if not args.outdir:
-    args.outdir = args.indir
-outfilename = "%s/pos/all.pos" % args.outdir
+# open output file
 outfile = open(outfilename, 'wb')
 print("Opened %s for writing" % outfilename) 
 
+# append each input file
 for posfile in posfiles:
     # OO handling:
     #ema.Sweep(posfile).save(outfile)
@@ -40,5 +51,6 @@ for posfile in posfiles:
             outfile.write(chunk)
     print("Appended %s" % posfile)
 
+# finish
 outfile.close()
 print("Done")
