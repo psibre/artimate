@@ -32,8 +32,9 @@ parser.add_argument("-m", "--mesh", dest="meshfile",
                     help="This file will be imported as the tongue mesh (Stanford .ply format)")
 parser.add_argument("-c", "--collada", dest="daefile",
                     help="Output COLLADA model file (.dae)")
-parser.add_argument("-s", "--smooth", dest="smooth", action="store_true",
-                    help="Smooth EMA fcurves (not working in batch mode currently)")
+# this is no longer needed when EMA samples are decimated upon load
+#parser.add_argument("-s", "--smooth", dest="smooth", action="store_true",
+#                    help="Smooth EMA fcurves (not working in batch mode currently)")
 
 args = parser.parse_args(argv)  # In this example we wont use the args
 
@@ -88,6 +89,12 @@ if not args.header:
 else:
     header = args.header
 sweep = ema.Sweep(args.posfile, header)
+
+# downsample EMA data
+if DEBUG:
+    print("downsampling EMA data")
+sweep.subsample()
+
 channels = sweep.coils
 
 # set end frame to number of samples in first data channel
@@ -97,9 +104,8 @@ bpy.context.scene.frame_end = numframes
 if DEBUG:
     print("set end frame to", bpy.context.scene.frame_end)
 
-# set framerate to 200 Hz (max fps in blender is 120, so work around this using framerate base)
-bpy.context.scene.render.fps_base = 0.125
-bpy.context.scene.render.fps = 25 # PAL
+# set framerate to 25 Hz (PAL)
+bpy.context.scene.render.fps = 25
 
 # create ema root node and link it to scene
 emaroot = bpy.data.objects.new(name="EMARoot", object_data=None)
@@ -178,17 +184,17 @@ emaroot.scale *= SCALE
 
 # smooth function curves
 # TODO figure out how to do this when running script non-interactively (if BATCH == True)
-if args.smooth and not BATCH:
-    oldcontexttype = bpy.context.area.type
-    bpy.context.area.type = 'GRAPH_EDITOR'
-    # select armatures
-    for channel in channels:
-        bpy.data.objects[channel + "Armature"].select = True
-    bpy.ops.graph.smooth()
-    # deselect armatures
-    for channel in channels:
-        bpy.data.objects[channel + "Armature"].select = False
-    bpy.context.area.type = oldcontexttype
+#if args.smooth and not BATCH:
+#    oldcontexttype = bpy.context.area.type
+#    bpy.context.area.type = 'GRAPH_EDITOR'
+#    # select armatures
+#    for channel in channels:
+#        bpy.data.objects[channel + "Armature"].select = True
+#    bpy.ops.graph.smooth()
+#    # deselect armatures
+#    for channel in channels:
+#        bpy.data.objects[channel + "Armature"].select = False
+#    bpy.context.area.type = oldcontexttype
 
 # generate ik targets tracking armatures with offset
 for channel in channels:

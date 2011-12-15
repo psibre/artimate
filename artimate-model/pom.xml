@@ -21,7 +21,11 @@
 
 		<resources>
 			<resource>
-				<directory>${generated.resource.directory}</directory>
+				<directory>${generated.resources.directory}</directory>
+				<filtering>true</filtering>
+				<excludes>
+					<exclude>**/*.pos</exclude>
+				</excludes>
 			</resource>
 		</resources>
 
@@ -32,7 +36,9 @@
 				<artifactId>properties-maven-plugin</artifactId>
 				<version>1.0-alpha-2</version>
 				<executions>
+
 					<execution>
+						<id>read-config</id>
 						<phase>initialize</phase>
 						<goals>
 							<goal>read-project-properties</goal>
@@ -43,6 +49,19 @@
 							</files>
 						</configuration>
 					</execution>
+
+					<!-- DEBUG: write properties to file -->
+					<execution>
+						<id>write-config-debug</id>
+						<phase>package</phase>
+						<goals>
+							<goal>write-project-properties</goal>
+						</goals>
+						<configuration>
+							<outputFile>${project.build.directory}/build.config</outputFile>
+						</configuration>
+					</execution>
+
 				</executions>
 			</plugin>
 
@@ -99,14 +118,14 @@
 						<goals>
 							<goal>bundle</goal>
 						</goals>
+						<configuration>
+							<resourcesDirectory>${generated.resources.directory}</resourcesDirectory>
+							<includes>
+								<include>**/*.dae</include>
+							</includes>
+						</configuration>
 					</execution>
 				</executions>
-				<configuration>
-					<resourcesDirectory>${generated.resource.directory}</resourcesDirectory>
-					<includes>
-						<include>${final.dae.file}</include>
-					</includes>
-				</configuration>
 			</plugin>
 
 		</plugins>
@@ -131,6 +150,7 @@
 										<versionRange>[1.0-alpha-2,)</versionRange>
 										<goals>
 											<goal>read-project-properties</goal>
+											<goal>write-project-properties</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

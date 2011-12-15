@@ -43,11 +43,11 @@ class Sweep:
             self.data[channel].extend(other.data[channel])
         self.size = len(self.data[channel])
 
-    def decimate(self):
-        '''not implemented'''
+    def subsample(self, step=8):
+        '''reduce the number of samples'''
         for channel in self.data.keys():
-            decimated = decimate(self.data[channel])
-            self.data[channel] = decimated
+            newdata = self.data[channel][::step]
+            self.data[channel] = newdata
 
     def coils(self):
         coils = [channel.split('_')[0]
