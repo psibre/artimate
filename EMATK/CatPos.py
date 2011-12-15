@@ -22,6 +22,8 @@ try:
 except OSError:
     pass
 
+if not args.outdir:
+    args.outdir = args.indir
 outfilename = "%s/pos/all.pos" % args.outdir
 outfile = open(outfilename, 'wb')
 print("Opened %s for writing" % outfilename) 
