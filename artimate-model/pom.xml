@@ -31,24 +31,40 @@
 				<version>1.2.1</version>
 				<executions>
 					<execution>
+						<id>concatenate-pos</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${script.directory}</workingDirectory>
+							<executable>python</executable>
+							<arguments>
+								<argument>CatPos.py</argument>
+								<argument>--input-directory=${data.directory}</argument>
+								<argument>--output-directory=${generated.resource.directory}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+					<execution>
 						<id>blender</id>
 						<phase>generate-resources</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
+						<configuration>
+							<!-- for some reason the following line has no effect in the blender 
+								thread -->
+							<workingDirectory>${script.directory}</workingDirectory>
+							<executable>${blender.path}</executable>
+							<!-- use commandlineArgs, not arguments -->
+							<commandlineArgs>
+								<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
+								<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema="${data.directory}"/pos/0012.pos --mesh="${data.directory}"/Tongue.ply --collada=${generated.resource.directory}/Tongue.dae]]>
+							</commandlineArgs>
+						</configuration>
 					</execution>
 				</executions>
-				<configuration>
-					<!-- for some reason the following line has no effect in the blender 
-						thread -->
-					<workingDirectory>${script.directory}</workingDirectory>
-					<executable>${blender.path}</executable>
-					<!-- use commandlineArgs, not arguments -->
-					<commandlineArgs>
-						<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
-						<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema ${data.directory}/pos/0012.pos --mesh ${data.directory}/Tongue.ply --collada ${generated.resource.directory}/Tongue.dae]]>
-					</commandlineArgs>
-				</configuration>
 			</plugin>
 
 			<plugin>
