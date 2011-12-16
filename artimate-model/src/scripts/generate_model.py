@@ -26,6 +26,8 @@ parser = argparse.ArgumentParser(description=usage_text,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
 parser.add_argument("-e", "--ema", dest="posfile",
                     help="EMA sweep to load as animation data (AG500 .pos format)")
+parser.add_argument("-l", "--lab", dest="labfile",
+                    help="label file to load for animation timeline (XWaves .lab format)")
 parser.add_argument("--header", dest="header",
                     help="header file from which to load EMA channel names (header.txt)")
 parser.add_argument("-m", "--mesh", dest="meshfile",
@@ -50,7 +52,7 @@ OFFSET = 1
 BBONE_SEGMENTS = 8
 BATCH = True
 
-import ema
+import ema, lab
 try:
     import bpy
     from mathutils import Vector
@@ -81,14 +83,19 @@ def cleanup():
 if DEBUG:
     cleanup()
 
-# load sweep from pos file
+# load sweep from pos file (with lab file, if available)
 if DEBUG:
     print("loading", args.posfile)
 if not args.header:
     header = ema.generate_header()
 else:
     header = args.header
-sweep = ema.Sweep(args.posfile, header)
+
+segmentation = None
+if args.labfile:
+    with open(args.labfile) as labfile:
+        segmentation = lab.Segmentation(labfile)
+sweep = ema.Sweep(args.posfile, header, segmentation)
 
 # downsample EMA data
 if DEBUG:
@@ -171,6 +178,13 @@ for channel in channels:
             fcurve.keyframe_points[fn].interpolation = 'LINEAR'
             value = sweep.getValue(channel, fc, fn)
             fcurve.keyframe_points[fn].co = fn, value
+
+# add markers from segmentation
+if sweep.segmentation:
+    for s, segment in enumerate(sweep.segmentation.segments):
+        # add marker and position it
+        bpy.context.scene.timeline_markers.new(name="%d_%s" % (s, segment.label))
+        bpy.context.scene.timeline_markers[s].frame = segment.start * bpy.context.scene.render.fps
 
 # arbitrary origin for tongue and ik targets
 a = bpy.data.objects["Channel06Armature"].location

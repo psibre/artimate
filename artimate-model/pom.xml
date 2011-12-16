@@ -16,6 +16,7 @@
 		<path.to.python>python</path.to.python>
 
 		<final.pos.file>${generated.resources.directory}/${pos.file}</final.pos.file>
+		<final.lab.file>${generated.resources.directory}/${lab.file}</final.lab.file>
 		<final.dae.file>${generated.resources.directory}/${dae.file}</final.dae.file>
 	</properties>
 
@@ -122,7 +123,7 @@
 							<!-- use commandlineArgs, not arguments -->
 							<commandlineArgs>
 								<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
-								<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema="${final.pos.file}" --mesh="${data.directory}"/Tongue.ply --collada="${final.dae.file}"]]>
+								<![CDATA[--background --python ${script.directory}/generate_model.py -- --ema="${final.pos.file}" --lab="${final.lab.file}" --mesh="${data.directory}"/Tongue.ply --collada="${final.dae.file}"]]>
 							</commandlineArgs>
 						</configuration>
 					</execution>

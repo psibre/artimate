@@ -1,9 +1,11 @@
+import re
+
 class Segmentation:
     def __init__(self, lab_file=None):
         try:
             self.segments = self.parse(lab_file)
         except TypeError:
-            self.segments = None
+            self.segments = []
     
     def parse(self, lab_file):
         header = True
