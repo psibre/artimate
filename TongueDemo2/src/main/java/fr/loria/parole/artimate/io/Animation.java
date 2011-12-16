@@ -1,6 +1,7 @@
 package fr.loria.parole.artimate.io;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -19,8 +20,8 @@ public class Animation extends AnimationManager {
 
 	private static final Logger logger = Logger.getLogger(Animation.class.getName());
 
-	private ArrayList<Segment> _segments;
-
+	private HashMap<String, Segment> _segments = new HashMap<String, Segment>();
+	private ArrayList<String> _animationLabels = new ArrayList<String>();
 	private int _animationIndex;
 
 	public Animation(ReadOnlyTimer globalTimer) {
@@ -40,17 +41,16 @@ public class Animation extends AnimationManager {
 		manager.addPose(skinDatas.get(0).getPose());
 
 		try {
-			String labFileName = "flexiquad.lab";
-			XWavesSegmentation labFile = new XWavesSegmentation(labFileName);
-			_segments = labFile.getSegments();
+			loadSegments("all.lab");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		for (Segment segment : _segments) {
-			final AnimationClip clip = new AnimationClip(segment.getLabel());
+		for (String label : _animationLabels) {
+			final AnimationClip clip = new AnimationClip(label);
 
+			Segment segment = _segments.get(label);
 			for (final JointChannel channel : storage.getJointChannels()) {
 				JointChannel subChannel = (JointChannel) channel.getSubchannelByTime(segment.getStart(), segment.getEnd());
 				// add it to a clip
@@ -64,22 +64,37 @@ public class Animation extends AnimationManager {
 			manager.setApplier(new SimpleAnimationApplier());
 
 			// Add our clip as a state in the default animation layer
-			final SteadyState animState = new SteadyState(segment.getLabel());
+			final SteadyState animState = new SteadyState(label);
 			animState.setSourceTree(new ClipSource(clip, manager));
 			manager.getBaseAnimationLayer().addSteadyState(animState);
 		}
 
 		// Set the current animation state on default layer
-		manager.getBaseAnimationLayer().setCurrentState(_segments.get(0).getLabel(), true);
+		manager.getBaseAnimationLayer().setCurrentState(_animationLabels.get(0), true);
+	}
+
+	private void loadSegments(String labFileName) throws Exception {
+		XWavesSegmentation labFile = new XWavesSegmentation(labFileName);
+		ArrayList<Segment> segments = labFile.getSegments();
+		for (int s = 0; s < segments.size(); s++) {
+			Segment segment = segments.get(s);
+			String key = String.format("%d_%s", s, segment.getLabel());
+			if (_segments.containsKey(key)) {
+				logger.warning(String.format("Animation labeled %s already exists, will overwrite!", key));
+			} else {
+				_animationLabels.add(key);
+			}
+			_segments.put(key, segment);
+		}
 	}
 
 	public void cycleAnimation() {
 		_animationIndex++;
-		if (_animationIndex >= _segments.size()) {
+		if (_animationIndex >= _animationLabels.size()) {
 			_animationIndex = 0;
 		}
-		logger.info("Switched to animation " + _segments.get(_animationIndex).getLabel());
-		getBaseAnimationLayer().setCurrentState(_segments.get(_animationIndex).getLabel(), true);
+		logger.info("Switched to animation " + _animationLabels.get(_animationIndex));
+		getBaseAnimationLayer().setCurrentState(_animationLabels.get(_animationIndex), true);
 	}
 
 }
