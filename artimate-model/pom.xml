@@ -11,6 +11,7 @@
 		<resources.directory>${basedir}/src/main/resources</resources.directory>
 		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
 
+		<praat.path>/Applications/Praat.app/Contents/MacOS/praat</praat.path>
 		<blender.path>/Applications/blender.app/Contents/MacOS/blender</blender.path>
 
 		<final.pos.file>${generated.resources.directory}/${pos.file}</final.pos.file>
@@ -25,6 +26,7 @@
 				<filtering>true</filtering>
 				<excludes>
 					<exclude>**/*.pos</exclude>
+					<exclude>**/*.TextGrid</exclude>
 				</excludes>
 			</resource>
 		</resources>
@@ -89,6 +91,23 @@
 					</execution>
 
 					<execution>
+						<id>concatenate-wav-lab</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${script.directory}</workingDirectory>
+							<executable>${praat.path}</executable>
+							<arguments>
+								<argument>CatWavLab.praat</argument>
+								<argument>${data.directory}</argument>
+								<argument>${generated.resources.directory}</argument>
+							</arguments>
+						</configuration>
+					</execution>
+
+					<execution>
 						<id>blender</id>
 						<phase>generate-resources</phase>
 						<goals>
@@ -122,6 +141,8 @@
 							<resourcesDirectory>${generated.resources.directory}</resourcesDirectory>
 							<includes>
 								<include>**/*.dae</include>
+								<include>**/*.wav</include>
+								<include>**/*.lab</include>
 							</includes>
 						</configuration>
 					</execution>
