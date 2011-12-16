@@ -36,7 +36,7 @@ except OSError:
 
 # open output file
 outfile = open(outfilename, 'wb')
-print("Opened %s for writing" % outfilename) 
+print("Created %s" % outfilename) 
 
 # append each input file
 for posfile in posfiles:

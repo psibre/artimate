@@ -1,44 +1,44 @@
 #!/usr/bin/env praat
 
+# arguments
 form Input directory
-  sentence Input_directory /Users/steiner/projects/ema/supine_and_upright_noise_and_clear08062011
-  sentence Output_directory /Users/steiner/projects/tonguebuilding
+  sentence Input_directory
+  sentence Output_directory
 endform
 
-output_basename$ = "all"
-
-assert input_directory$ != output_directory$
-
-# glob *.wav to array
+# glob input files to array, exit if none found
 list = Create Strings as file list... fileList 'input_directory$'/wav/*.wav
 Sort
 wav.size = Get number of strings
-assert wav.size
+if ! wav.size
+  exit No wav files found in 'input_directory$'/wav
+endif
 for w to wav.size
   wav$[w] = Object_'list'$[w]
 endfor
 Remove
 
-# mkdir if it doesn't exist
-createDirectory("'output_directory$'/wav")
+# output files
+output_basename$ = "all"
+wav_out$ = "'output_directory$'/'output_basename$'.wav"
+tg_out$ = "'output_directory$'/'output_basename$'.TextGrid"
 
-# iterate
+# append each input wav file
 offset = 0
 for w to wav.size
-  wav_in$ = input_directory$ + "/wav/" + wav$[w]
+  wav_in$ = "'input_directory$'/wav/" + wav$[w]
 
   # memory mapping for wav file
   ls = Open long sound file... 'wav_in$'
-  wav_out$ = "'output_directory$'/wav/'output_basename$'.wav"
   if w == 1
     # first file creates new output wav
     Save as WAV file... 'wav_out$'
-    echo 'wav_in$' > 'wav_out$'
+    echo Created 'wav_out$'
   else
     # the others append directly
     Append to existing sound file... 'wav_out$'
-    printline 'wav_in$' >> 'wav_out$'
   endif
+  printline Appended 'wav_in$'
 
   # TextGrid handling
   tg_in$ = wav_in$ - "wav" + "TextGrid"
@@ -58,23 +58,23 @@ for w to wav.size
   Remove
 endfor
 
+# merge TextGrids
 for w to wav.size
   plus tg[w]
 endfor
 tg = Merge
-tg_out$ = "'output_directory$'/wav/'output_basename$'.TextGrid"
 Save as chronological text file... 'tg_out$'
 
 # flatten hack
 system perl FlattenChronoTextGrid.pl 'tg_out$'
-printline /dev/null > 'tg_out$'
+printline Created 'tg_out$'
 
 # extract lab
 tg_flat = Read from file... 'tg_out$'
 Extract tier... 1
 lab_out$ = tg_out$ - "TextGrid" + "lab"
 Save as Xwaves label file... 'lab_out$'
-printline 'tg_out$' > 'lab_out$'
+printline Created 'lab_out$'
 
 # final cleanup
 plus tg
@@ -83,3 +83,4 @@ for w to wav.size
   plus tg[w]
 endfor
 Remove
+printline Done

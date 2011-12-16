@@ -11,8 +11,9 @@
 		<resources.directory>${basedir}/src/main/resources</resources.directory>
 		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
 
-		<praat.path>/Applications/Praat.app/Contents/MacOS/praat</praat.path>
-		<blender.path>/Applications/blender.app/Contents/MacOS/blender</blender.path>
+		<path.to.blender>/Applications/blender.app/Contents/MacOS/blender</path.to.blender>
+		<path.to.praat>/Applications/Praat.app/Contents/MacOS/praat</path.to.praat>
+		<path.to.python>python</path.to.python>
 
 		<final.pos.file>${generated.resources.directory}/${pos.file}</final.pos.file>
 		<final.dae.file>${generated.resources.directory}/${dae.file}</final.dae.file>
@@ -23,7 +24,6 @@
 		<resources>
 			<resource>
 				<directory>${generated.resources.directory}</directory>
-				<filtering>true</filtering>
 				<excludes>
 					<exclude>**/*.pos</exclude>
 					<exclude>**/*.TextGrid</exclude>
@@ -81,7 +81,7 @@
 						</goals>
 						<configuration>
 							<workingDirectory>${script.directory}</workingDirectory>
-							<executable>python</executable>
+							<executable>${path.to.python}</executable>
 							<arguments>
 								<argument>CatPos.py</argument>
 								<argument>--input-directory=${data.directory}</argument>
@@ -98,7 +98,7 @@
 						</goals>
 						<configuration>
 							<workingDirectory>${script.directory}</workingDirectory>
-							<executable>${praat.path}</executable>
+							<executable>${path.to.praat}</executable>
 							<arguments>
 								<argument>CatWavLab.praat</argument>
 								<argument>${data.directory}</argument>
@@ -117,7 +117,7 @@
 							<!-- for some reason the following line has no effect in the blender 
 								thread -->
 							<workingDirectory>${script.directory}</workingDirectory>
-							<executable>${blender.path}</executable>
+							<executable>${path.to.blender}</executable>
 							<!-- use commandlineArgs, not arguments -->
 							<commandlineArgs>
 								<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
