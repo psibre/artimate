@@ -37,6 +37,8 @@ parser.add_argument("-c", "--collada", dest="daefile",
 # this is no longer needed when EMA samples are decimated upon load
 #parser.add_argument("-s", "--smooth", dest="smooth", action="store_true",
 #                    help="Smooth EMA fcurves (not working in batch mode currently)")
+parser.add_argument("-b", "--batch", dest="batch", action="store_true",
+                    help="batch mode (run non-interactively)")
 
 args = parser.parse_args(argv)  # In this example we wont use the args
 
@@ -50,7 +52,7 @@ DEBUG = True
 SCALE = 0.1
 OFFSET = 1
 BBONE_SEGMENTS = 8
-BATCH = True
+BATCH = args.batch
 
 import ema, lab
 try:
@@ -369,12 +371,10 @@ bpy.ops.object.select_name(name=tongue.name)
 # remove root vertex group
 bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
-# TODO save .blend file before baking actions for later inspection and debuggin
-if DEBUG:
-    bpy.ops.wm.save_as_mainfile(filepath=args.daefile.replace("dae", "blend"))
-
 if args.daefile:
     if DEBUG:
+        # save .blend file before baking actions for later inspection and debuggin
+        bpy.ops.wm.save_as_mainfile(filepath=args.daefile.replace("dae", "blend"))
         print("exporting to COLLADA file", args.daefile)
     # bake animation
     bpy.ops.object.select_name(name=rigname)
@@ -386,6 +386,7 @@ if args.daefile:
 print("DONE")
 
 if BATCH:
+    cleanup()
     bpy.ops.wm.quit_blender()
     # this spews much garbage to STDERR, so consider redirecting that to /dev/null
     # see http://projects.blender.org/tracker/?func=detail&group_id=9&aid=23215&atid=264
