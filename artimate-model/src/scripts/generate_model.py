@@ -356,6 +356,8 @@ bpy.ops.object.select_name(name=tongue.name)
 bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
 # TODO save .blend file before baking actions for later inspection and debuggin
+if DEBUG:
+    bpy.ops.wm.save_as_mainfile(filepath=args.daefile.replace("dae", "blend"))
 
 if args.daefile:
     if DEBUG:
