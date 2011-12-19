@@ -1,26 +1,25 @@
 package fr.loria.parole.artimate.io;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
 import fr.loria.parole.artimate.segmentation.Segment;
+import fr.loria.parole.artimate.segmentation.Segmentation;
 
 import jregex.Matcher;
 import jregex.Pattern;
 
-public class XWavesSegmentation {
+public class XWavesSegmentation extends Segmentation {
 
 	private final static Pattern LINE_PATTERN = new Pattern("\\s*({end}\\d+(\\.\\d+)?)\\s+\\d+\\s+({label}.*)\\s*");
 
 	private static final Logger logger = Logger.getLogger(XWavesSegmentation.class.getName());
 
-	protected ArrayList<Segment> segments;
-
 	public XWavesSegmentation(String fileName) throws Exception {
+		super();
 		load(fileName);
 	}
 
@@ -32,7 +31,6 @@ public class XWavesSegmentation {
 
 	private void load(InputStream inputStream) throws Exception {
 		List<String> lines = IOUtils.readLines(inputStream);
-		segments = new ArrayList<Segment>(lines.size());
 
 		boolean header = true;
 		float lastEndTime = 0;
@@ -67,13 +65,10 @@ public class XWavesSegmentation {
 			}
 
 			// convert to frame number and append new segment
-			Segment segment = new Segment(lastEndTime, endTime, label);
+			double duration = endTime - lastEndTime;
+			Segment segment = new Segment(duration, label);
 			segments.add(segment);
 			lastEndTime = endTime;
 		}
-	}
-
-	public ArrayList<Segment> getSegments() {
-		return segments;
 	}
 }

@@ -1,7 +1,5 @@
 package fr.loria.parole.artimate.io;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -15,13 +13,13 @@ import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.util.ReadOnlyTimer;
 import fr.loria.parole.artimate.segmentation.Segment;
+import fr.loria.parole.artimate.segmentation.Segmentation;
 
 public class Animation extends AnimationManager {
 
 	private static final Logger logger = Logger.getLogger(Animation.class.getName());
 
-	private HashMap<String, Segment> _segments = new HashMap<String, Segment>();
-	private ArrayList<String> _animationLabels = new ArrayList<String>();
+	private Segmentation _segmentation;
 	private int _animationIndex;
 
 	public Animation(ReadOnlyTimer globalTimer) {
@@ -41,18 +39,25 @@ public class Animation extends AnimationManager {
 		manager.addPose(skinDatas.get(0).getPose());
 
 		try {
-			loadSegments("all.lab");
+			_segmentation = new XWavesSegmentation("all.lab");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		for (String label : _animationLabels) {
-			final AnimationClip clip = new AnimationClip(label);
+		for (int s = 0; s < _segmentation.size(); s++) {
+			Segment segment = _segmentation.get(s);
+			if (findClipInstance(segment.getLabel()) != null) {
+				logger.warning(String.format("Animation labeled \"%s\" already exists, not overwriting!", segment.getLabel()));
+				continue;
+			}
 
-			Segment segment = _segments.get(label);
+			final AnimationClip clip = new AnimationClip(segment.getLabel());
+
 			for (final JointChannel channel : storage.getJointChannels()) {
-				JointChannel subChannel = (JointChannel) channel.getSubchannelByTime(segment.getStart(), segment.getEnd());
+				float start = (float) _segmentation.getStart(s);
+				float end = (float) _segmentation.getEnd(s);
+				JointChannel subChannel = (JointChannel) channel.getSubchannelByTime(start, end);
 				// add it to a clip
 				clip.addChannel(subChannel);
 			}
@@ -64,37 +69,23 @@ public class Animation extends AnimationManager {
 			manager.setApplier(new SimpleAnimationApplier());
 
 			// Add our clip as a state in the default animation layer
-			final SteadyState animState = new SteadyState(label);
+			final SteadyState animState = new SteadyState(segment.getLabel());
 			animState.setSourceTree(new ClipSource(clip, manager));
 			manager.getBaseAnimationLayer().addSteadyState(animState);
 		}
 
 		// Set the current animation state on default layer
-		manager.getBaseAnimationLayer().setCurrentState(_animationLabels.get(0), true);
+		manager.getBaseAnimationLayer().setCurrentState(_segmentation.get(0).getLabel(), true);
 	}
 
-	private void loadSegments(String labFileName) throws Exception {
-		XWavesSegmentation labFile = new XWavesSegmentation(labFileName);
-		ArrayList<Segment> segments = labFile.getSegments();
-		for (int s = 0; s < segments.size(); s++) {
-			Segment segment = segments.get(s);
-			String key = String.format("%d_%s", s, segment.getLabel());
-			if (_segments.containsKey(key)) {
-				logger.warning(String.format("Animation labeled %s already exists, will overwrite!", key));
-			} else {
-				_animationLabels.add(key);
-			}
-			_segments.put(key, segment);
-		}
-	}
 
 	public void cycleAnimation() {
 		_animationIndex++;
-		if (_animationIndex >= _animationLabels.size()) {
+		if (_animationIndex >= _segmentation.size()) {
 			_animationIndex = 0;
 		}
-		logger.info("Switched to animation " + _animationLabels.get(_animationIndex));
-		getBaseAnimationLayer().setCurrentState(_animationLabels.get(_animationIndex), true);
+		logger.info(String.format("Switched to animation \"%s\"", _segmentation.get(_animationIndex).getLabel()));
+		getBaseAnimationLayer().setCurrentState(_segmentation.get(_animationIndex).getLabel(), true);
 	}
 
 }
