@@ -24,7 +24,7 @@ $headerend = $t+3;
 
 # iterate over intervals
 for($i = $headerend; $i < $#lines; $i++) {
-    $lines[$i++] =~ s/([\d\.]+)/$tiers{$tiers[$1]}/;
+    $lines[$i++] =~ s/\d+/$tiers{$tiers[$&]}/;
 }
 
 # hack header
