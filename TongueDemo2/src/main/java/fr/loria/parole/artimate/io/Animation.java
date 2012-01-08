@@ -7,7 +7,10 @@ import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
 import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
+import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
 import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
+import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
+import com.ardor3d.extension.animation.skeletal.state.ImmediateTransitionState;
 import com.ardor3d.extension.animation.skeletal.state.SteadyState;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
@@ -21,9 +24,11 @@ public class Animation extends AnimationManager {
 
 	private Segmentation _segmentation;
 	private int _animationIndex;
+	private AnimationLayer _animation = new AnimationLayer("animation");
 
 	public Animation(ReadOnlyTimer globalTimer) {
 		super(globalTimer);
+		addAnimationLayer(_animation);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -75,9 +80,50 @@ public class Animation extends AnimationManager {
 		}
 
 		// Set the current animation state on default layer
-		manager.getBaseAnimationLayer().setCurrentState(_segmentation.get(0).getLabel(), true);
+		// manager.getBaseAnimationLayer().setCurrentState(_segmentation.get(0).getLabel(), false);
 	}
 
+	public void playAnimationSequence() {
+		SteadyState baseState1 = getBaseAnimationLayer().getSteadyState("foo");
+		ClipSource clipSource1 = (ClipSource) baseState1.getSourceTree();
+		SteadyState baseState2 = getBaseAnimationLayer().getSteadyState("baz");
+		ClipSource clipSource2 = (ClipSource) baseState2.getSourceTree();
+
+		AnimationClip clip1 = clipSource1.getClip();
+		AnimationClip clip2 = clipSource2.getClip();
+		AnimationClipInstance clipInstance1 = getClipInstance(clip1);
+		AnimationClipInstance clipInstance2 = getClipInstance(clip2);
+
+		clipInstance1.setTimeScale(2);
+		clipInstance2.setTimeScale(0.5);
+
+		clipInstance1.setLoopCount(0);
+		clipInstance2.setLoopCount(0);
+
+		SteadyState state1 = new SteadyState("foo1");
+		state1.setSourceTree(clipSource1);
+		SteadyState state2 = new SteadyState("baz1");
+		state2.setSourceTree(clipSource2);
+
+		clearAnimationLayer(_animation);
+
+		_animation.addSteadyState(state1);
+		_animation.addSteadyState(state2);
+
+		state1.setEndTransition(new ImmediateTransitionState("baz1"));
+
+		_animation.setCurrentState(state1, true);
+
+		return;
+	}
+
+	private void clearAnimationLayer(AnimationLayer layer) {
+		_animation.clearCurrentState();
+		for (String stateName : _animation.getSteadyStateNames()) {
+			SteadyState state = _animation.getSteadyState(stateName);
+			_animation.removeSteadyState(state);
+		}
+	}
 
 	public void cycleAnimation() {
 		_animationIndex++;

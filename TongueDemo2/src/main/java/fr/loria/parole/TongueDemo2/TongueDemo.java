@@ -129,6 +129,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			// Make our manager
 			manager = new Animation(_timer);
 			manager.setupAnimations(manager, storage);
+			manager.playAnimationSequence();
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
