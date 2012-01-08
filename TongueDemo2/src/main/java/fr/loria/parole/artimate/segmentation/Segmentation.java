@@ -17,7 +17,33 @@ public class Segmentation {
 		return segments;
 	}
 
-	public Segment getSegment(int i) {
+	public Segment get(int i) {
 		return segments.get(i);
+	}
+
+	public int size() {
+		return segments.size();
+	}
+
+	public double getStart(int s) {
+		double start = 0;
+		for (int i = 0; i < s; i++) {
+			start += segments.get(i).getDuration();
+		}
+		return start;
+	}
+
+	public double getEnd(int s) {
+		double end = getStart(s) + segments.get(s).getDuration();
+		return end;
+	}
+
+	public int indexOf(String label) {
+		for (int i = 0; i < segments.size(); i++) {
+			if (segments.get(i).getLabel().equals(label)) {
+				return i;
+			}
+		}
+		return -1;
 	}
 }
