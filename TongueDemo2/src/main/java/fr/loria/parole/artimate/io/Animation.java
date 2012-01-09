@@ -86,37 +86,48 @@ public class Animation extends AnimationManager {
 	}
 
 	public void playAnimationSequence() {
-		SteadyState baseState1 = getBaseAnimationLayer().getSteadyState("foo");
-		ClipSource clipSource1 = (ClipSource) baseState1.getSourceTree();
-		SteadyState baseState2 = getBaseAnimationLayer().getSteadyState("baz");
-		ClipSource clipSource2 = (ClipSource) baseState2.getSourceTree();
+		// hard-coded animation sequence (for now)
+		String[] animationSequence = new String[] { "foo", "baz", "bar" };
+		double[] timeScales = new double[] { 2.0, 0.5, 2.0 };
 
-		AnimationClip clip1 = clipSource1.getClip();
-		AnimationClip clip2 = clipSource2.getClip();
-		AnimationClipInstance clipInstance1 = getClipInstance(clip1);
-		AnimationClipInstance clipInstance2 = getClipInstance(clip2);
-
-		clipInstance1.setTimeScale(2);
-		clipInstance2.setTimeScale(0.5);
-
-		clipInstance1.setLoopCount(0);
-		clipInstance2.setLoopCount(0);
-
-		SteadyState state1 = new SteadyState("foo1");
-		state1.setSourceTree(clipSource1);
-		SteadyState state2 = new SteadyState("baz1");
-		state2.setSourceTree(clipSource2);
-
+		// clear animation layer
 		clearAnimationLayer(_animation);
 
-		_animation.addSteadyState(state1);
-		_animation.addSteadyState(state2);
+		for (int a = 0; a < animationSequence.length; a++) {
+			// get animation state from base layer
+			String animationName = animationSequence[a];
+			SteadyState baseState = getBaseAnimationLayer().getSteadyState(animationName);
 
-		state1.setEndTransition(new ImmediateTransitionState("baz1"));
+			// get clip source for animation
+			ClipSource clipSource = (ClipSource) baseState.getSourceTree();
 
-		_animation.setCurrentState(state1, true);
+			// get clip from clip source
+			AnimationClip clip = clipSource.getClip();
 
-		return;
+			// get clip instance for clip, which allows us to...
+			AnimationClipInstance clipInstance = getClipInstance(clip);
+			// ...set the time scale...
+			clipInstance.setTimeScale(timeScales[a]);
+			// ...and loop count
+			clipInstance.setLoopCount(0);
+
+			// create new state using this clip source
+			SteadyState state = new SteadyState(animationName);
+			state.setSourceTree(clipSource);
+
+			// add state to animation layer
+			_animation.addSteadyState(state);
+
+			// add end transition so that state jumps to next in sequence at end (except for last)
+			if (a < animationSequence.length - 1) {
+				String nextAnimationName = animationSequence[a + 1];
+				state.setEndTransition(new ImmediateTransitionState(nextAnimationName));
+			}
+		}
+
+		// play animation layer by setting current to first state
+		SteadyState firstAnimation = _animation.getSteadyState(animationSequence[0]);
+		_animation.setCurrentState(firstAnimation, true);
 	}
 
 	private void clearAnimationLayer(AnimationLayer layer) {
