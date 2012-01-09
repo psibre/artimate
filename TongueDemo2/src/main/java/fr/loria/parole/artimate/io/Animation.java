@@ -87,17 +87,13 @@ public class Animation extends AnimationManager {
 		// manager.getBaseAnimationLayer().setCurrentState(_segmentation.get(0).getLabel(), false);
 	}
 
-	public void playAnimationSequence() {
-		// hard-coded animation sequence (for now)
-		String[] animationSequence = new String[] { "foo", "foo" };
-		double[] timeScales = new double[] { 2.0, 0.2 };
-
+	public void synthesize(UnitSequence unitSequence) {
 		// create sequence of states
 		ArrayList<SteadyState> stateSequence = new ArrayList<SteadyState>();
 
-		for (int a = 0; a < animationSequence.length; a++) {
+		for (int u = 0; u < unitSequence.size(); u++) {
 			// get animation state from base layer
-			String animationName = animationSequence[a];
+			String animationName = unitSequence.get(u).getLabel();
 			SteadyState baseState = getBaseAnimationLayer().getSteadyState(animationName);
 
 			// get clip source and clip from base layer
@@ -114,20 +110,23 @@ public class Animation extends AnimationManager {
 			// get clip instance for clip, which allows us to...
 			AnimationClipInstance clipInstance = getClipInstance(clip);
 			// ...set the time scale...
-			clipInstance.setTimeScale(timeScales[a]);
+			double requestedDuration = unitSequence.get(u).getDuration();
+			float baseDuration = baseClip.getMaxTimeIndex();
+			double timeScale = requestedDuration / baseDuration;
+			clipInstance.setTimeScale(timeScale);
 			// ...and loop count
 			clipInstance.setLoopCount(0);
 
 			// create new state using this clip source
-			SteadyState state = new SteadyState(generateUnitKey(animationName, a));
+			SteadyState state = new SteadyState(generateUnitKey(animationName, u));
 			state.setSourceTree(clipSource);
 
 			// add state to sequence
 			stateSequence.add(state);
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
-			if (a < animationSequence.length - 1) {
-				String nextAnimationName = generateUnitKey(animationSequence[a + 1], a + 1);
+			if (u < unitSequence.size() - 1) {
+				String nextAnimationName = generateUnitKey(unitSequence.get(u + 1).getLabel(), u + 1);
 				state.setEndTransition(new ImmediateTransitionState(nextAnimationName));
 			}
 		}

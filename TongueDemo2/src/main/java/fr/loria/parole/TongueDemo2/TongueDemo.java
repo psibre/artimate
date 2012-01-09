@@ -62,6 +62,7 @@ import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
+import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 import fr.loria.parole.artimate.io.Animation;
 
 /**
@@ -129,7 +130,13 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			// Make our manager
 			manager = new Animation(_timer);
 			manager.setupAnimations(manager, storage);
-			manager.playAnimationSequence();
+			try {
+				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
+				manager.synthesize(testsegmentation);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		} catch (final IOException ex) {
 			ex.printStackTrace();
 		}
