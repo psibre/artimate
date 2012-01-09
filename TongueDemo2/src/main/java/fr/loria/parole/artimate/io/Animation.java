@@ -15,14 +15,16 @@ import com.ardor3d.extension.animation.skeletal.state.SteadyState;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.util.ReadOnlyTimer;
-import fr.loria.parole.artimate.segmentation.Segment;
-import fr.loria.parole.artimate.segmentation.Segmentation;
+
+import fr.loria.parole.artimate.data.Unit;
+import fr.loria.parole.artimate.data.UnitSequence;
+import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 
 public class Animation extends AnimationManager {
 
 	private static final Logger logger = Logger.getLogger(Animation.class.getName());
 
-	private Segmentation _segmentation;
+	private UnitSequence _segmentation;
 	private int _animationIndex;
 	private AnimationLayer _animation = new AnimationLayer("animation");
 
@@ -51,7 +53,7 @@ public class Animation extends AnimationManager {
 		}
 
 		for (int s = 0; s < _segmentation.size(); s++) {
-			Segment segment = _segmentation.get(s);
+			Unit segment = _segmentation.get(s);
 			if (findClipInstance(segment.getLabel()) != null) {
 				logger.warning(String.format("Animation labeled \"%s\" already exists, not overwriting!", segment.getLabel()));
 				continue;

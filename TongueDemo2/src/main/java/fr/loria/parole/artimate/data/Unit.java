@@ -1,14 +1,14 @@
-package fr.loria.parole.artimate.segmentation;
+package fr.loria.parole.artimate.data;
 
-public class Segment {
+public class Unit {
 	protected double duration;
 	protected String label;
 
-	public Segment(double duration) {
+	public Unit(double duration) {
 		this(duration, "");
 	}
 
-	public Segment(double duration, String label) {
+	public Unit(double duration, String label) {
 		this.duration = duration;
 		this.label = label;
 	}

@@ -1,4 +1,4 @@
-package fr.loria.parole.artimate.io;
+package fr.loria.parole.artimate.data.io;
 
 import java.io.InputStream;
 import java.util.List;
@@ -6,13 +6,13 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 
-import fr.loria.parole.artimate.segmentation.Segment;
-import fr.loria.parole.artimate.segmentation.Segmentation;
+import fr.loria.parole.artimate.data.Unit;
+import fr.loria.parole.artimate.data.UnitSequence;
 
 import jregex.Matcher;
 import jregex.Pattern;
 
-public class XWavesSegmentation extends Segmentation {
+public class XWavesSegmentation extends UnitSequence {
 
 	private final static Pattern LINE_PATTERN = new Pattern("\\s*({end}\\d+(\\.\\d+)?)\\s+\\d+\\s+({label}.*)\\s*");
 
@@ -61,13 +61,13 @@ public class XWavesSegmentation extends Segmentation {
 				throw new Exception("File not well-formed, could not parse end time: " + end);
 			}
 			if (endTime < lastEndTime) {
-				throw new Exception("Segment end times are not in ascending order!");
+				throw new Exception("Unit end times are not in ascending order!");
 			}
 
 			// convert to frame number and append new segment
 			double duration = endTime - lastEndTime;
-			Segment segment = new Segment(duration, label);
-			segments.add(segment);
+			Unit segment = new Unit(duration, label);
+			units.add(segment);
 			lastEndTime = endTime;
 		}
 	}
