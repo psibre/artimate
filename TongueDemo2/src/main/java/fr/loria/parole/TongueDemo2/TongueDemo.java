@@ -216,8 +216,9 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		// add Orbit handler - set it up to control the main camera
 		control = new OrbitCamControl(_canvas.getCanvasRenderer().getCamera(), new Mesh());
 		control.setupMouseTriggers(_logicalLayer, true);
-		control.setInvertedX(true);
+		// adjust world up to match that of model (like blender)
 		control.setInvertedY(true);
+		control.setWorldUpVec(new Vector3(0, 0, 1));
 		control.setSphereCoords(15, 0, 0);
 	}
 
