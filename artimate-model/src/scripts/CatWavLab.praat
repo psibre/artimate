@@ -44,9 +44,10 @@ for w to wav.size
   tg_in$ = wav_in$ - "wav" + "TextGrid"
   if ! fileReadable(tg_in$)
     # if there is no TextGrid file, create one for the Sound
-    tg[w] = To TextGrid... prompts
+    tg[w] = To TextGrid... "phones prompts"
   else
     tg[w] = Read from file... 'tg_in$'
+    call ensurePromptTier
   endif
 
   # adjust time domain
@@ -84,3 +85,17 @@ for w to wav.size
 endfor
 Remove
 printline Done
+
+procedure ensurePromptTier
+  .numTiers = Get number of tiers
+  .hasPromptTier = 0
+  for .t to .numTiers
+    .tier$ = Get tier name... .t
+    if .tier$ == "prompts"
+      .hasPromptTier = 1
+    endif
+  endfor
+  if not .hasPromptTier
+    Insert interval tier... .numTiers+1 prompts
+  endif
+endproc
