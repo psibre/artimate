@@ -2,6 +2,7 @@ package fr.loria.parole.artimate.io;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
@@ -36,7 +37,7 @@ public class Animation extends AnimationManager {
 		// TODO Auto-generated constructor stub
 	}
 
-	public void setupAnimations(Animation manager, final ColladaStorage storage) {
+	public void setupAnimations(ColladaStorage storage) {
 		// Check if there is any animationdata in the file
 		if (storage.getJointChannels().isEmpty() || storage.getSkins().isEmpty()) {
 			logger.warning("No animations found!");
@@ -45,7 +46,7 @@ public class Animation extends AnimationManager {
 
 		List<SkinData> skinDatas = storage.getSkins();
 
-		manager.addPose(skinDatas.get(0).getPose());
+		addPose(skinDatas.get(0).getPose());
 
 		try {
 			_segmentation = new XWavesSegmentation("all.lab");
@@ -72,15 +73,15 @@ public class Animation extends AnimationManager {
 			}
 
 			// Set some clip instance specific data - repeat, time scaling
-			manager.getClipInstance(clip).setLoopCount(Integer.MAX_VALUE);
+			getClipInstance(clip).setLoopCount(Integer.MAX_VALUE);
 
 			// Add our "applier logic".
-			manager.setApplier(new SimpleAnimationApplier());
+			setApplier(new SimpleAnimationApplier());
 
 			// Add our clip as a state in the default animation layer
 			final SteadyState animState = new SteadyState(segment.getLabel());
-			animState.setSourceTree(new ClipSource(clip, manager));
-			manager.getBaseAnimationLayer().addSteadyState(animState);
+			animState.setSourceTree(new ClipSource(clip, this));
+			getBaseAnimationLayer().addSteadyState(animState);
 		}
 
 		// Set the current animation state on default layer
@@ -123,6 +124,10 @@ public class Animation extends AnimationManager {
 
 			// add state to sequence
 			stateSequence.add(state);
+			logger.info(String
+					.format(Locale.US,
+							"Added unit [%s] to animation timeline\n\tsource duration:\t%f\n\ttarget duration:\t%f\n\tscaling factor: \t%f",
+							animationName, baseDuration, requestedDuration, timeScale));
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
 			if (u < unitSequence.size() - 1) {

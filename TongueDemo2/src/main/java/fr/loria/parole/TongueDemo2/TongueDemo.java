@@ -111,7 +111,6 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 	/** Our orbiter control. */
 	private OrbitCamControl control;
-	private ColladaStorage storage;
 	private Animation manager;
 
 	private boolean _showSkeleton = false;
@@ -121,7 +120,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 		// Load the collada scene
 		try {
-			storage = new ColladaImporter().load(modelFileName);
+			ColladaStorage storage = new ColladaImporter().load(modelFileName);
 			Node cube = (Node) storage.getScene().getChild(targetNodeName);
 			Node geom = (Node) cube.getChild("geometry");
 			SkinnedMesh mesh = (SkinnedMesh) geom.getChild(targetMeshName);
@@ -129,7 +128,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			_root.attachChild(storage.getScene());
 			// Make our manager
 			manager = new Animation(_timer);
-			manager.setupAnimations(manager, storage);
+			manager.setupAnimations(storage);
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
 				manager.synthesize(testsegmentation);
