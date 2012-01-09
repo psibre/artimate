@@ -1,11 +1,13 @@
 package fr.loria.parole.artimate.io;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
 import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier;
+import com.ardor3d.extension.animation.skeletal.clip.AbstractAnimationChannel;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
 import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
@@ -87,22 +89,27 @@ public class Animation extends AnimationManager {
 
 	public void playAnimationSequence() {
 		// hard-coded animation sequence (for now)
-		String[] animationSequence = new String[] { "foo", "baz", "bar" };
-		double[] timeScales = new double[] { 2.0, 0.5, 2.0 };
+		String[] animationSequence = new String[] { "foo", "foo" };
+		double[] timeScales = new double[] { 2.0, 0.2 };
 
-		// clear animation layer
-		clearAnimationLayer(_animation);
+		// create sequence of states
+		ArrayList<SteadyState> stateSequence = new ArrayList<SteadyState>();
 
 		for (int a = 0; a < animationSequence.length; a++) {
 			// get animation state from base layer
 			String animationName = animationSequence[a];
 			SteadyState baseState = getBaseAnimationLayer().getSteadyState(animationName);
 
-			// get clip source for animation
-			ClipSource clipSource = (ClipSource) baseState.getSourceTree();
+			// get clip source and clip from base layer
+			ClipSource baseClipSource = (ClipSource) baseState.getSourceTree();
+			AnimationClip baseClip = baseClipSource.getClip();
 
-			// get clip from clip source
-			AnimationClip clip = clipSource.getClip();
+			// create new clip and clip source
+			AnimationClip clip = new AnimationClip(animationName);
+			for (AbstractAnimationChannel channel : baseClip.getChannels()) {
+				clip.addChannel(channel);
+			}
+			ClipSource clipSource = new ClipSource(clip, this);
 
 			// get clip instance for clip, which allows us to...
 			AnimationClipInstance clipInstance = getClipInstance(clip);
@@ -112,22 +119,31 @@ public class Animation extends AnimationManager {
 			clipInstance.setLoopCount(0);
 
 			// create new state using this clip source
-			SteadyState state = new SteadyState(animationName);
+			SteadyState state = new SteadyState(generateUnitKey(animationName, a));
 			state.setSourceTree(clipSource);
 
-			// add state to animation layer
-			_animation.addSteadyState(state);
+			// add state to sequence
+			stateSequence.add(state);
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
 			if (a < animationSequence.length - 1) {
-				String nextAnimationName = animationSequence[a + 1];
+				String nextAnimationName = generateUnitKey(animationSequence[a + 1], a + 1);
 				state.setEndTransition(new ImmediateTransitionState(nextAnimationName));
 			}
 		}
 
+		// clear animation layer and add states
+		clearAnimationLayer(_animation);
+		for (SteadyState state : stateSequence) {
+			_animation.addSteadyState(state);
+		}
+
 		// play animation layer by setting current to first state
-		SteadyState firstAnimation = _animation.getSteadyState(animationSequence[0]);
-		_animation.setCurrentState(firstAnimation, true);
+		_animation.setCurrentState(stateSequence.get(0), true);
+	}
+
+	private String generateUnitKey(String unitName, int index) {
+		return String.format("%d_%s", index, unitName);
 	}
 
 	private void clearAnimationLayer(AnimationLayer layer) {
