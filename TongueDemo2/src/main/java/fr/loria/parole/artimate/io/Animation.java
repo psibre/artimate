@@ -72,9 +72,6 @@ public class Animation extends AnimationManager {
 				clip.addChannel(subChannel);
 			}
 
-			// Set some clip instance specific data - repeat, time scaling
-			getClipInstance(clip).setLoopCount(Integer.MAX_VALUE);
-
 			// Add our "applier logic".
 			setApplier(new SimpleAnimationApplier());
 
@@ -110,13 +107,11 @@ public class Animation extends AnimationManager {
 
 			// get clip instance for clip, which allows us to...
 			AnimationClipInstance clipInstance = getClipInstance(clip);
-			// ...set the time scale...
+			// ...set the time scale
 			double requestedDuration = unitSequence.get(u).getDuration();
 			float baseDuration = baseClip.getMaxTimeIndex();
 			double timeScale = requestedDuration / baseDuration;
 			clipInstance.setTimeScale(timeScale);
-			// ...and loop count
-			clipInstance.setLoopCount(0);
 
 			// create new state using this clip source
 			SteadyState state = new SteadyState(generateUnitKey(animationName, u));
@@ -124,10 +119,9 @@ public class Animation extends AnimationManager {
 
 			// add state to sequence
 			stateSequence.add(state);
-			logger.info(String
-					.format(Locale.US,
-							"Added unit [%s] to animation timeline\n\tsource duration:\t%f\n\ttarget duration:\t%f\n\tscaling factor: \t%f",
-							animationName, baseDuration, requestedDuration, timeScale));
+			logger.info(String.format(Locale.US, "Added unit [%s] to animation timeline\n" + "\tsource duration:\t%f\n"
+					+ "\ttarget duration:\t%f\n" + "\tscaling factor: \t%f", animationName, baseDuration, requestedDuration,
+					timeScale));
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
 			if (u < unitSequence.size() - 1) {
