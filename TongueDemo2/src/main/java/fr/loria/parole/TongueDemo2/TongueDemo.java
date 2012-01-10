@@ -153,12 +153,6 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			}
 		}));
 
-		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.A), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-				manager.cycleAnimation();
-			}
-		}));
-
 		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.T), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
 				_wireframeState.setEnabled(!_wireframeState.isEnabled());

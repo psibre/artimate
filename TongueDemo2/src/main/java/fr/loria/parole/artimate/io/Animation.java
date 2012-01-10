@@ -28,7 +28,6 @@ public class Animation extends AnimationManager {
 	private static final Logger logger = Logger.getLogger(Animation.class.getName());
 
 	private UnitSequence _segmentation;
-	private int _animationIndex;
 	private AnimationLayer _animation = new AnimationLayer("animation");
 
 	public Animation(ReadOnlyTimer globalTimer) {
@@ -146,15 +145,6 @@ public class Animation extends AnimationManager {
 			SteadyState state = _animation.getSteadyState(stateName);
 			_animation.removeSteadyState(state);
 		}
-	}
-
-	public void cycleAnimation() {
-		_animationIndex++;
-		if (_animationIndex >= _segmentation.size()) {
-			_animationIndex = 0;
-		}
-		logger.info(String.format("Switched to animation \"%s\"", _segmentation.get(_animationIndex).getLabel()));
-		getBaseAnimationLayer().setCurrentState(_segmentation.get(_animationIndex).getLabel(), true);
 	}
 
 }
