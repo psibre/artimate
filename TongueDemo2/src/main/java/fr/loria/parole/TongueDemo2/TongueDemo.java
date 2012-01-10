@@ -62,8 +62,8 @@ import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
+import fr.loria.parole.artimate.Animation;
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
-import fr.loria.parole.artimate.io.Animation;
 
 /**
  * Borrowing heavily from <a href=

@@ -1,4 +1,4 @@
-package fr.loria.parole.artimate.io;
+package fr.loria.parole.artimate;
 
 import java.util.ArrayList;
 import java.util.List;
