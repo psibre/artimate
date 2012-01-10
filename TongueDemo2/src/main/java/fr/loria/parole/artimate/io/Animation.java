@@ -55,8 +55,7 @@ public class Animation extends AnimationManager {
 			e.printStackTrace();
 		}
 
-		for (int s = 0; s < _segmentation.size(); s++) {
-			Unit segment = _segmentation.get(s);
+		for (Unit segment : _segmentation.getUnits()) {
 			if (findClipInstance(segment.getLabel()) != null) {
 				logger.warning(String.format("Animation labeled \"%s\" already exists, not overwriting!", segment.getLabel()));
 				continue;
@@ -65,8 +64,8 @@ public class Animation extends AnimationManager {
 			final AnimationClip clip = new AnimationClip(segment.getLabel());
 
 			for (final JointChannel channel : storage.getJointChannels()) {
-				float start = (float) _segmentation.getStart(s);
-				float end = (float) _segmentation.getEnd(s);
+				float start = (float) segment.getStart();
+				float end = (float) segment.getEnd();
 				JointChannel subChannel = (JointChannel) channel.getSubchannelByTime(start, end);
 				// add it to a clip
 				clip.addChannel(subChannel);
@@ -80,9 +79,6 @@ public class Animation extends AnimationManager {
 			animState.setSourceTree(new ClipSource(clip, this));
 			getBaseAnimationLayer().addSteadyState(animState);
 		}
-
-		// Set the current animation state on default layer
-		// manager.getBaseAnimationLayer().setCurrentState(_segmentation.get(0).getLabel(), false);
 	}
 
 	public void synthesize(UnitSequence unitSequence) {

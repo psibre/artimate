@@ -65,8 +65,7 @@ public class XWavesSegmentation extends UnitSequence {
 			}
 
 			// convert to frame number and append new segment
-			double duration = endTime - lastEndTime;
-			Unit segment = new Unit(duration, label);
+			Unit segment = new Unit(lastEndTime, endTime, label);
 			units.add(segment);
 			lastEndTime = endTime;
 		}
