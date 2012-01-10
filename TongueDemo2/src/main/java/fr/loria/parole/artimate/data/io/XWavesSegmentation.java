@@ -1,10 +1,11 @@
 package fr.loria.parole.artimate.data.io;
 
-import java.io.InputStream;
+import java.net.URL;
 import java.util.List;
 import java.util.logging.Logger;
 
-import org.apache.commons.io.IOUtils;
+import com.google.common.base.Charsets;
+import com.google.common.io.Resources;
 
 import fr.loria.parole.artimate.data.Unit;
 import fr.loria.parole.artimate.data.UnitSequence;
@@ -24,13 +25,8 @@ public class XWavesSegmentation extends UnitSequence {
 	}
 
 	public void load(String fileName) throws Exception {
-		InputStream fileStream = getClass().getResourceAsStream("/" + fileName);
-		load(fileStream);
-		logger.info("Loaded Xwaves lab file " + fileName);
-	}
-
-	private void load(InputStream inputStream) throws Exception {
-		List<String> lines = IOUtils.readLines(inputStream);
+		URL url = getClass().getResource("/" + fileName);
+		List<String> lines = Resources.readLines(url, Charsets.UTF_8);
 
 		boolean header = true;
 		float lastEndTime = 0;
@@ -69,5 +65,6 @@ public class XWavesSegmentation extends UnitSequence {
 			units.add(segment);
 			lastEndTime = endTime;
 		}
+		logger.info("Loaded Xwaves lab file " + fileName);
 	}
 }
