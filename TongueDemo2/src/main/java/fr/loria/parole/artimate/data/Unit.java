@@ -2,6 +2,8 @@ package fr.loria.parole.artimate.data;
 
 import java.util.EnumMap;
 
+import com.google.common.base.Objects;
+
 public class Unit {
 	protected EnumMap<Features, Object> features = new EnumMap<Features, Object>(Features.class);
 
@@ -29,15 +31,9 @@ public class Unit {
 	}
 
 	public double getDuration() {
-		double duration;
-		if (features.containsKey(Features.DURATION)) {
-			duration = (Double) features.get(Features.DURATION);
-		} else {
-			double start = getStart();
-			double end = getEnd();
-			duration = end - start;
-			setDuration(duration);
-		}
+		double start = getStart();
+		double end = getEnd();
+		double duration = end - start;
 		return duration;
 	}
 
@@ -59,15 +55,17 @@ public class Unit {
 		features.put(Features.END, end);
 	}
 
-	protected void setDuration(double duration) {
-		features.put(Features.DURATION, duration);
-	}
-
 	protected void setLabel(String label) {
 		features.put(Features.LABEL, label);
 	}
 
 	public void setAnimation(Object value) {
 		features.put(Features.ANIMATION, value);
+	}
+
+	@Override
+	public String toString() {
+		String id = Objects.toStringHelper(this).addValue(features).toString();
+		return id;
 	}
 }

@@ -82,16 +82,17 @@ public class Animation extends AnimationManager {
 		ArrayList<SteadyState> stateSequence = new ArrayList<SteadyState>();
 
 		for (int u = 0; u < unitSequence.size(); u++) {
+			Unit unit = unitSequence.get(u);
+			String animationID = unit.toString();
 			// get animation state from base layer
-			String animationName = unitSequence.get(u).getLabel();
-			SteadyState baseState = (SteadyState) unitDB.getUnitList(animationName).get(0).getAnimation();
+			SteadyState baseState = (SteadyState) unitDB.getUnitList(unit.getLabel()).get(0).getAnimation();
 
 			// get clip source and clip from base layer
 			ClipSource baseClipSource = (ClipSource) baseState.getSourceTree();
 			AnimationClip baseClip = baseClipSource.getClip();
 
 			// create new clip and clip source
-			AnimationClip clip = new AnimationClip(animationName);
+			AnimationClip clip = new AnimationClip(animationID);
 			for (AbstractAnimationChannel channel : baseClip.getChannels()) {
 				clip.addChannel(channel);
 			}
@@ -106,19 +107,19 @@ public class Animation extends AnimationManager {
 			clipInstance.setTimeScale(timeScale);
 
 			// create new state using this clip source
-			SteadyState state = new SteadyState(generateUnitKey(animationName, u));
+			SteadyState state = new SteadyState(unit.toString());
 			state.setSourceTree(clipSource);
 
 			// add state to sequence
 			stateSequence.add(state);
 			logger.info(String.format(Locale.US, "Added unit [%s] to animation timeline\n" + "\tsource duration:\t%f\n"
-					+ "\ttarget duration:\t%f\n" + "\tscaling factor: \t%f", animationName, baseDuration, requestedDuration,
+					+ "\ttarget duration:\t%f\n" + "\tscaling factor: \t%f", animationID, baseDuration, requestedDuration,
 					timeScale));
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
 			if (u < unitSequence.size() - 1) {
-				String nextAnimationName = generateUnitKey(unitSequence.get(u + 1).getLabel(), u + 1);
-				state.setEndTransition(new ImmediateTransitionState(nextAnimationName));
+				String nextAnimationID = unitSequence.get(u + 1).toString();
+				state.setEndTransition(new ImmediateTransitionState(nextAnimationID));
 			}
 		}
 
@@ -130,10 +131,6 @@ public class Animation extends AnimationManager {
 
 		// play animation layer by setting current to first state
 		_animation.setCurrentState(stateSequence.get(0), true);
-	}
-
-	private String generateUnitKey(String unitName, int index) {
-		return String.format("%d_%s", index, unitName);
 	}
 
 	private void clearAnimationLayer(AnimationLayer layer) {
