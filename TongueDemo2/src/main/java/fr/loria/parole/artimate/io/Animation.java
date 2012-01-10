@@ -20,6 +20,7 @@ import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.util.ReadOnlyTimer;
 
 import fr.loria.parole.artimate.data.Unit;
+import fr.loria.parole.artimate.data.UnitDB;
 import fr.loria.parole.artimate.data.UnitSequence;
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 
@@ -27,13 +28,15 @@ public class Animation extends AnimationManager {
 
 	private static final Logger logger = Logger.getLogger(Animation.class.getName());
 
-	private UnitSequence _segmentation;
 	private AnimationLayer _animation = new AnimationLayer("animation");
+
+	private UnitDB unitDB;
 
 	public Animation(ReadOnlyTimer globalTimer) {
 		super(globalTimer);
 		addAnimationLayer(_animation);
-		// TODO Auto-generated constructor stub
+		// Add our "applier logic".
+		setApplier(new SimpleAnimationApplier());
 	}
 
 	public void setupAnimations(ColladaStorage storage) {
@@ -47,19 +50,15 @@ public class Animation extends AnimationManager {
 
 		addPose(skinDatas.get(0).getPose());
 
+		XWavesSegmentation segmentation = null;
 		try {
-			_segmentation = new XWavesSegmentation("all.lab");
+			segmentation = new XWavesSegmentation("all.lab");
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
-		for (Unit segment : _segmentation.getUnits()) {
-			if (findClipInstance(segment.getLabel()) != null) {
-				logger.warning(String.format("Animation labeled \"%s\" already exists, not overwriting!", segment.getLabel()));
-				continue;
-			}
-
+		for (Unit segment : segmentation.getUnits()) {
 			final AnimationClip clip = new AnimationClip(segment.getLabel());
 
 			for (final JointChannel channel : storage.getJointChannels()) {
@@ -70,14 +69,12 @@ public class Animation extends AnimationManager {
 				clip.addChannel(subChannel);
 			}
 
-			// Add our "applier logic".
-			setApplier(new SimpleAnimationApplier());
-
-			// Add our clip as a state in the default animation layer
+			// Add the state directly to the unit in the DB
 			final SteadyState animState = new SteadyState(segment.getLabel());
 			animState.setSourceTree(new ClipSource(clip, this));
-			getBaseAnimationLayer().addSteadyState(animState);
+			segment.setAnimation(animState);
 		}
+		unitDB = new UnitDB(segmentation);
 	}
 
 	public void synthesize(UnitSequence unitSequence) {
@@ -87,7 +84,7 @@ public class Animation extends AnimationManager {
 		for (int u = 0; u < unitSequence.size(); u++) {
 			// get animation state from base layer
 			String animationName = unitSequence.get(u).getLabel();
-			SteadyState baseState = getBaseAnimationLayer().getSteadyState(animationName);
+			SteadyState baseState = (SteadyState) unitDB.getUnitList(animationName).get(0).getAnimation();
 
 			// get clip source and clip from base layer
 			ClipSource baseClipSource = (ClipSource) baseState.getSourceTree();

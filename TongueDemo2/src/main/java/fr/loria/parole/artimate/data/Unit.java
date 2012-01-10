@@ -46,6 +46,11 @@ public class Unit {
 		return label;
 	}
 
+	public Object getAnimation() {
+		Object animation = features.get(Features.ANIMATION);
+		return animation;
+	}
+
 	protected void setStart(double start) {
 		features.put(Features.START, start);
 	}
@@ -60,5 +65,9 @@ public class Unit {
 
 	protected void setLabel(String label) {
 		features.put(Features.LABEL, label);
+	}
+
+	public void setAnimation(Object value) {
+		features.put(Features.ANIMATION, value);
 	}
 }
