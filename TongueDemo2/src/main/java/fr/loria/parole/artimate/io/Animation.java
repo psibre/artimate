@@ -2,6 +2,7 @@ package fr.loria.parole.artimate.io;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 import java.util.logging.Logger;
 
@@ -58,7 +59,7 @@ public class Animation extends AnimationManager {
 			e.printStackTrace();
 		}
 
-		for (Unit segment : segmentation.getUnits()) {
+		for (Unit segment : segmentation) {
 			final AnimationClip clip = new AnimationClip(segment.getLabel());
 
 			for (final JointChannel channel : storage.getJointChannels()) {
@@ -81,8 +82,9 @@ public class Animation extends AnimationManager {
 		// create sequence of states
 		ArrayList<SteadyState> stateSequence = new ArrayList<SteadyState>();
 
-		for (int u = 0; u < unitSequence.size(); u++) {
-			Unit unit = unitSequence.get(u);
+		ListIterator<Unit> units = unitSequence.iterator();
+		while (units.hasNext()) {
+			Unit unit = units.next();
 			String animationID = unit.toString();
 			// get animation state from base layer
 			SteadyState baseState = (SteadyState) unitDB.getUnitList(unit.getLabel()).get(0).getAnimation();
@@ -101,7 +103,7 @@ public class Animation extends AnimationManager {
 			// get clip instance for clip, which allows us to...
 			AnimationClipInstance clipInstance = getClipInstance(clip);
 			// ...set the time scale
-			double requestedDuration = unitSequence.get(u).getDuration();
+			double requestedDuration = unit.getDuration();
 			float baseDuration = baseClip.getMaxTimeIndex();
 			double timeScale = requestedDuration / baseDuration;
 			clipInstance.setTimeScale(timeScale);
@@ -117,8 +119,9 @@ public class Animation extends AnimationManager {
 					timeScale));
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
-			if (u < unitSequence.size() - 1) {
-				String nextAnimationID = unitSequence.get(u + 1).toString();
+			if (units.hasNext()) {
+				Unit nextUnit = unitSequence.get(units.nextIndex());
+				String nextAnimationID = nextUnit.toString();
 				state.setEndTransition(new ImmediateTransitionState(nextAnimationID));
 			}
 		}

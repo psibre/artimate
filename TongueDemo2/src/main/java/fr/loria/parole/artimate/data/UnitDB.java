@@ -1,6 +1,5 @@
 package fr.loria.parole.artimate.data;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.google.common.collect.ImmutableListMultimap;
@@ -13,8 +12,7 @@ public class UnitDB {
 
 	public UnitDB(UnitSequence timeline) {
 		Builder<String, Unit> builder = new ImmutableListMultimap.Builder<String, Unit>();
-		ArrayList<Unit> timelineUnits = timeline.getUnits();
-		for (Unit unit : timelineUnits) {
+		for (Unit unit : timeline) {
 			builder.put(unit.getLabel(), unit);
 		}
 		units = builder.build();

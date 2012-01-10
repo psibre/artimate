@@ -1,8 +1,9 @@
 package fr.loria.parole.artimate.data;
 
 import java.util.ArrayList;
+import java.util.ListIterator;
 
-public class UnitSequence {
+public class UnitSequence implements Iterable<Unit> {
 	protected ArrayList<Unit> units;
 
 	public UnitSequence() {
@@ -13,15 +14,17 @@ public class UnitSequence {
 		this.units = units;
 	}
 
-	public ArrayList<Unit> getUnits() {
-		return units;
-	}
-
 	public Unit get(int i) {
 		return units.get(i);
 	}
 
 	public int size() {
 		return units.size();
+	}
+
+	@Override
+	public ListIterator<Unit> iterator() {
+		ListIterator<Unit> iterator = units.listIterator();
+		return iterator;
 	}
 }
