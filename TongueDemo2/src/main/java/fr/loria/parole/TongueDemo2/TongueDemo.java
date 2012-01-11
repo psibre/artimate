@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
+import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
@@ -111,7 +112,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 	/** Our orbiter control. */
 	private OrbitCamControl control;
-	private Animation manager;
+	private AnimationManager manager;
 
 	private boolean _showSkeleton = false;
 
@@ -127,11 +128,12 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			control.setLookAtSpatial(mesh);
 			_root.attachChild(storage.getScene());
 			// Make our manager
-			manager = new Animation(_timer);
-			manager.setupAnimations(storage);
+			manager = new AnimationManager(_timer);
+			Animation animation = new Animation(manager);
+			animation.setupAnimations(storage);
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
-				manager.synthesize(testsegmentation);
+				animation.synthesize(testsegmentation);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

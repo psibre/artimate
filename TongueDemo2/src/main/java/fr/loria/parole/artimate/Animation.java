@@ -18,26 +18,24 @@ import com.ardor3d.extension.animation.skeletal.state.ImmediateTransitionState;
 import com.ardor3d.extension.animation.skeletal.state.SteadyState;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
-import com.ardor3d.util.ReadOnlyTimer;
 
 import fr.loria.parole.artimate.data.Unit;
 import fr.loria.parole.artimate.data.UnitDB;
 import fr.loria.parole.artimate.data.UnitSequence;
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 
-public class Animation extends AnimationManager {
+public class Animation {
 
 	private static final Logger logger = Logger.getLogger(Animation.class.getName());
 
-	private AnimationLayer _animation = new AnimationLayer("animation");
-
 	private UnitDB unitDB;
 
-	public Animation(ReadOnlyTimer globalTimer) {
-		super(globalTimer);
-		addAnimationLayer(_animation);
+	private AnimationManager manager;
+
+	public Animation(AnimationManager manager) {
+		this.manager = manager;
 		// Add our "applier logic".
-		setApplier(new SimpleAnimationApplier());
+		manager.setApplier(new SimpleAnimationApplier());
 	}
 
 	public void setupAnimations(ColladaStorage storage) {
@@ -49,7 +47,7 @@ public class Animation extends AnimationManager {
 
 		List<SkinData> skinDatas = storage.getSkins();
 
-		addPose(skinDatas.get(0).getPose());
+		manager.addPose(skinDatas.get(0).getPose());
 
 		XWavesSegmentation segmentation = null;
 		try {
@@ -72,7 +70,7 @@ public class Animation extends AnimationManager {
 
 			// Add the state directly to the unit in the DB
 			final SteadyState animState = new SteadyState(segment.getLabel());
-			animState.setSourceTree(new ClipSource(clip, this));
+			animState.setSourceTree(new ClipSource(clip, manager));
 			segment.setAnimation(animState);
 		}
 		unitDB = new UnitDB(segmentation);
@@ -98,10 +96,10 @@ public class Animation extends AnimationManager {
 			for (AbstractAnimationChannel channel : baseClip.getChannels()) {
 				clip.addChannel(channel);
 			}
-			ClipSource clipSource = new ClipSource(clip, this);
+			ClipSource clipSource = new ClipSource(clip, manager);
 
 			// get clip instance for clip, which allows us to...
-			AnimationClipInstance clipInstance = getClipInstance(clip);
+			AnimationClipInstance clipInstance = manager.getClipInstance(clip);
 			// ...set the time scale
 			double requestedDuration = unit.getDuration();
 			float baseDuration = baseClip.getMaxTimeIndex();
@@ -127,20 +125,31 @@ public class Animation extends AnimationManager {
 		}
 
 		// clear animation layer and add states
-		clearAnimationLayer(_animation);
+		AnimationLayer layer = getAnimationLayer();
+		clearAnimationLayer(layer);
 		for (SteadyState state : stateSequence) {
-			_animation.addSteadyState(state);
+			layer.addSteadyState(state);
 		}
 
 		// play animation layer by setting current to first state
-		_animation.setCurrentState(stateSequence.get(0), true);
+		layer.setCurrentState(stateSequence.get(0), true);
+	}
+
+	private AnimationLayer getAnimationLayer() {
+		String layerName = "-ANIMATION_LAYER-";
+		AnimationLayer layer = manager.findAnimationLayer(layerName);
+		if (layer == null) {
+			layer = new AnimationLayer(layerName);
+			manager.addAnimationLayer(layer);
+		}
+		return layer;
 	}
 
 	private void clearAnimationLayer(AnimationLayer layer) {
-		_animation.clearCurrentState();
-		for (String stateName : _animation.getSteadyStateNames()) {
-			SteadyState state = _animation.getSteadyState(stateName);
-			_animation.removeSteadyState(state);
+		layer.clearCurrentState();
+		for (String stateName : layer.getSteadyStateNames()) {
+			SteadyState state = layer.getSteadyState(stateName);
+			layer.removeSteadyState(state);
 		}
 	}
 
