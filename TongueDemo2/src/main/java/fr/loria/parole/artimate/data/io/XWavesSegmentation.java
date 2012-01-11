@@ -31,6 +31,7 @@ public class XWavesSegmentation extends UnitSequence {
 		boolean header = true;
 		float lastEndTime = 0;
 		Matcher matcher = LINE_PATTERN.matcher();
+		int index = 0;
 		for (String line : lines) {
 			// end of header?
 			if (line.trim().equals("#")) {
@@ -62,6 +63,7 @@ public class XWavesSegmentation extends UnitSequence {
 
 			// convert to frame number and append new segment
 			Unit segment = new Unit(lastEndTime, endTime, label);
+			segment.setIndex(index++);
 			units.add(segment);
 			lastEndTime = endTime;
 		}

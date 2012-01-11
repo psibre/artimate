@@ -133,7 +133,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			animation.setupAnimations(storage);
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
-				animation.synthesize(testsegmentation);
+				animation.playSequence(testsegmentation);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

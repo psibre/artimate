@@ -69,18 +69,18 @@ public class Animation {
 			}
 
 			// Add the state directly to the unit in the DB
-			final SteadyState animState = new SteadyState(segment.getLabel());
+			final SteadyState animState = new SteadyState(Integer.toString(segment.getIndex()));
 			animState.setSourceTree(new ClipSource(clip, manager));
 			segment.setAnimation(animState);
 		}
 		unitDB = new UnitDB(segmentation);
 	}
 
-	public void synthesize(UnitSequence unitSequence) {
+	public void playSequence(UnitSequence targets) {
 		// create sequence of states
 		ArrayList<SteadyState> stateSequence = new ArrayList<SteadyState>();
 
-		ListIterator<Unit> units = unitSequence.iterator();
+		ListIterator<Unit> units = targets.iterator();
 		while (units.hasNext()) {
 			Unit unit = units.next();
 			String animationID = unit.toString();
@@ -107,7 +107,7 @@ public class Animation {
 			clipInstance.setTimeScale(timeScale);
 
 			// create new state using this clip source
-			SteadyState state = new SteadyState(unit.toString());
+			SteadyState state = new SteadyState(Integer.toString(unit.getIndex()));
 			state.setSourceTree(clipSource);
 
 			// add state to sequence
@@ -118,8 +118,8 @@ public class Animation {
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
 			if (units.hasNext()) {
-				Unit nextUnit = unitSequence.get(units.nextIndex());
-				String nextAnimationID = nextUnit.toString();
+				Unit nextUnit = targets.get(units.nextIndex());
+				String nextAnimationID = Integer.toString(nextUnit.getIndex());
 				state.setEndTransition(new ImmediateTransitionState(nextAnimationID));
 			}
 		}

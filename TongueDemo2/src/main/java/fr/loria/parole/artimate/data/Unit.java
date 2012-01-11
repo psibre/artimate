@@ -42,6 +42,11 @@ public class Unit {
 		return label;
 	}
 
+	public int getIndex() {
+		int index = (Integer) features.get(Features.INDEX);
+		return index;
+	}
+
 	public Object getAnimation() {
 		Object animation = features.get(Features.ANIMATION);
 		return animation;
@@ -57,6 +62,10 @@ public class Unit {
 
 	protected void setLabel(String label) {
 		features.put(Features.LABEL, label);
+	}
+
+	public void setIndex(int index) {
+		features.put(Features.INDEX, index);
 	}
 
 	public void setAnimation(Object value) {
