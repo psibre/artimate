@@ -3,7 +3,6 @@ package fr.loria.parole.artimate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Locale;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
@@ -83,38 +82,10 @@ public class Animation {
 		ListIterator<Unit> units = targets.iterator();
 		while (units.hasNext()) {
 			Unit unit = units.next();
-			String animationID = unit.toString();
-			// get animation state from base layer
-			SteadyState baseState = (SteadyState) unitDB.getUnitList(unit.getLabel()).get(0).getAnimation();
 
-			// get clip source and clip from base layer
-			ClipSource baseClipSource = (ClipSource) baseState.getSourceTree();
-			AnimationClip baseClip = baseClipSource.getClip();
-
-			// create new clip and clip source
-			AnimationClip clip = new AnimationClip(animationID);
-			for (AbstractAnimationChannel channel : baseClip.getChannels()) {
-				clip.addChannel(channel);
-			}
-			ClipSource clipSource = new ClipSource(clip, manager);
-
-			// get clip instance for clip, which allows us to...
-			AnimationClipInstance clipInstance = manager.getClipInstance(clip);
-			// ...set the time scale
-			double requestedDuration = unit.getDuration();
-			float baseDuration = baseClip.getMaxTimeIndex();
-			double timeScale = requestedDuration / baseDuration;
-			clipInstance.setTimeScale(timeScale);
-
-			// create new state using this clip source
-			SteadyState state = new SteadyState(Integer.toString(unit.getIndex()));
-			state.setSourceTree(clipSource);
-
+			SteadyState state = copyAnimation(unit);
 			// add state to sequence
 			stateSequence.add(state);
-			logger.info(String.format(Locale.US, "Added unit [%s] to animation timeline\n" + "\tsource duration:\t%f\n"
-					+ "\ttarget duration:\t%f\n" + "\tscaling factor: \t%f", animationID, baseDuration, requestedDuration,
-					timeScale));
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
 			if (units.hasNext()) {
@@ -133,6 +104,36 @@ public class Animation {
 
 		// play animation layer by setting current to first state
 		layer.setCurrentState(stateSequence.get(0), true);
+	}
+
+	private SteadyState copyAnimation(Unit unit) {
+		// get animation state from base layer
+		SteadyState baseState = (SteadyState) unitDB.getUnitList(unit.getLabel()).get(0).getAnimation();
+
+		// get clip source and clip from base layer
+		ClipSource oldClipSource = (ClipSource) baseState.getSourceTree();
+		AnimationClip oldClip = oldClipSource.getClip();
+
+		// create new clip and clip source
+		AnimationClip newClip = new AnimationClip(Integer.toString(unit.getIndex()));
+		for (AbstractAnimationChannel channel : oldClip.getChannels()) {
+			newClip.addChannel(channel);
+		}
+		ClipSource newClipSource = new ClipSource(newClip, manager);
+
+		// get clip instance for clip, which allows us to...
+		AnimationClipInstance newClipInstance = manager.getClipInstance(newClip);
+		// ...set the time scale
+		double requestedDuration = unit.getDuration();
+		float baseDuration = oldClip.getMaxTimeIndex();
+		double timeScale = requestedDuration / baseDuration;
+		newClipInstance.setTimeScale(timeScale);
+
+		// create new state using this clip source
+		SteadyState state = new SteadyState(Integer.toString(unit.getIndex()));
+		state.setSourceTree(newClipSource);
+
+		return state;
 	}
 
 	private AnimationLayer getAnimationLayer() {
