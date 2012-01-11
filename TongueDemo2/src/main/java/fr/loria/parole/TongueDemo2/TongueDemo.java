@@ -122,11 +122,11 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		// Load the collada scene
 		try {
 			ColladaStorage storage = new ColladaImporter().load(modelFileName);
-			Node cube = (Node) storage.getScene().getChild(targetNodeName);
-			Node geom = (Node) cube.getChild("geometry");
+			Node targetNode = (Node) storage.getScene().getChild(targetNodeName);
+			Node geom = (Node) targetNode.getChild("geometry");
 			SkinnedMesh mesh = (SkinnedMesh) geom.getChild(targetMeshName);
 			control.setLookAtSpatial(mesh);
-			_root.attachChild(storage.getScene());
+			_root.attachChild(targetNode);
 			// Make our manager
 			manager = new AnimationManager(_timer);
 			Animation animation = new Animation(manager);
