@@ -120,6 +120,9 @@ bpy.context.scene.render.fps = 25
 emaroot = bpy.data.objects.new(name="EMARoot", object_data=None)
 bpy.context.scene.objects.link(emaroot)
 
+# create dummy material
+material = bpy.data.materials.new(name="MyMaterial")
+
 for channel in channels:
     # create armature
     armaturename = channel + "Armature"
@@ -144,6 +147,10 @@ for channel in channels:
     bpy.ops.mesh.primitive_cone_add(vertices=8, radius=2.5, depth=depth, location=(0, 0, depth / 2))
     coil = bpy.context.active_object
     coil.name = channel + "Coil"
+    
+    # assign material
+    bpy.ops.object.material_slot_add()
+    coil.material_slots[0].material = material
     
     # select none
     bpy.ops.object.select_all(action='DESELECT')
@@ -351,6 +358,14 @@ rig.pose.ik_param.mode = 'SIMULATION'
 print("Loading mesh from file", args.meshfile)
 bpy.ops.import_mesh.ply(filepath=args.meshfile)
 tongue = bpy.context.active_object
+
+# create and assign tongue material
+bpy.ops.object.material_slot_add()
+pink = bpy.data.materials.new(name="pink")
+# a kind of pink
+pink.diffuse_color = (0.8, 0.075, 0.6)
+pink.emit = 0.1
+tongue.material_slots[0].material = pink
 
 # transform tongue
 tongue.scale *= SCALE
