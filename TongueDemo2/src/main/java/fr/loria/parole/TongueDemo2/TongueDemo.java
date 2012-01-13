@@ -116,6 +116,8 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 	private boolean _showSkeleton = false;
 
+	private Animation animation;
+
 	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
 		_canvas.setTitle("OrbitCam TongueDemo");
 
@@ -129,7 +131,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			_root.attachChild(targetNode);
 			// Make our manager
 			manager = new AnimationManager(_timer);
-			Animation animation = new Animation(manager);
+			animation = new Animation(manager);
 			animation.setupAnimations(storage);
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
@@ -152,6 +154,18 @@ public class TongueDemo implements Runnable, Updater, Scene {
 		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.ESCAPE), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
 				_exit = true;
+			}
+		}));
+
+		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.A), new TriggerAction() {
+			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
+				try {
+					XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
+					animation.playSequence(testsegmentation);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}));
 

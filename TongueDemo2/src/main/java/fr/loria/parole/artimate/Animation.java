@@ -95,9 +95,8 @@ public class Animation {
 			}
 		}
 
-		// clear animation layer and add states
-		AnimationLayer layer = getAnimationLayer();
-		clearAnimationLayer(layer);
+		// reset animation layer and add states
+		AnimationLayer layer = resetAnimationLayer();
 		for (SteadyState state : stateSequence) {
 			layer.addSteadyState(state);
 		}
@@ -136,22 +135,15 @@ public class Animation {
 		return state;
 	}
 
-	private AnimationLayer getAnimationLayer() {
+	private AnimationLayer resetAnimationLayer() {
 		String layerName = "-ANIMATION_LAYER-";
+		// remove layer if it exists
 		AnimationLayer layer = manager.findAnimationLayer(layerName);
-		if (layer == null) {
-			layer = new AnimationLayer(layerName);
-			manager.addAnimationLayer(layer);
-		}
+		manager.removeAnimationLayer(layer);
+		// create new layer
+		layer = new AnimationLayer(layerName);
+		manager.addAnimationLayer(layer);
 		return layer;
-	}
-
-	private void clearAnimationLayer(AnimationLayer layer) {
-		layer.clearCurrentState();
-		for (String stateName : layer.getSteadyStateNames()) {
-			SteadyState state = layer.getSteadyState(stateName);
-			layer.removeSteadyState(state);
-		}
 	}
 
 }
