@@ -23,15 +23,15 @@ import fr.loria.parole.artimate.data.UnitDB;
 import fr.loria.parole.artimate.data.UnitSequence;
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 
-public class Animation {
+public class Artimate {
 
-	private static final Logger logger = Logger.getLogger(Animation.class.getName());
+	private static final Logger logger = Logger.getLogger(Artimate.class.getName());
 
 	private UnitDB unitDB;
 
 	private AnimationManager manager;
 
-	public Animation(AnimationManager manager) {
+	public Artimate(AnimationManager manager) {
 		this.manager = manager;
 		// Add our "applier logic".
 		manager.setApplier(new SimpleAnimationApplier());

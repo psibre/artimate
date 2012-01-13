@@ -63,7 +63,7 @@ import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
-import fr.loria.parole.artimate.Animation;
+import fr.loria.parole.artimate.Artimate;
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 
 /**
@@ -116,7 +116,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 
 	private boolean _showSkeleton = false;
 
-	private Animation animation;
+	private Artimate animation;
 
 	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
 		_canvas.setTitle("OrbitCam TongueDemo");
@@ -131,7 +131,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 			_root.attachChild(targetNode);
 			// Make our manager
 			manager = new AnimationManager(_timer);
-			animation = new Animation(manager);
+			animation = new Artimate(manager);
 			animation.setupAnimations(storage);
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
