@@ -1,4 +1,4 @@
-package fr.loria.parole.TongueDemo2;
+package fr.loria.parole.artimate.demo;
 
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -76,9 +76,9 @@ import fr.loria.parole.artimate.data.io.XWavesSegmentation;
  * @author steiner
  * 
  */
-public class TongueDemo implements Runnable, Updater, Scene {
+public class DemoApp implements Runnable, Updater, Scene {
 
-	private static final Logger logger = Logger.getLogger(TongueDemo.class.getName());
+	private static final Logger logger = Logger.getLogger(DemoApp.class.getName());
 
 	/** If true (the default) we will call System.exit on end of demo. */
 	public static boolean QUIT_VM_ON_EXIT = true;
@@ -119,7 +119,7 @@ public class TongueDemo implements Runnable, Updater, Scene {
 	private Artimate animation;
 
 	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
-		_canvas.setTitle("OrbitCam TongueDemo");
+		_canvas.setTitle("OrbitCam DemoApp");
 
 		// Load the collada scene
 		try {
@@ -391,14 +391,14 @@ public class TongueDemo implements Runnable, Updater, Scene {
 	}
 
 	public static void main(final String[] args) {
-		start(TongueDemo.class);
+		start(DemoApp.class);
 	}
 
-	public static void start(final Class<? extends TongueDemo> demoClazz) {
+	public static void start(final Class<? extends DemoApp> demoClazz) {
 		// TODO make this configurable
 		final DisplaySettings settings = new DisplaySettings(800, 600, 24, -1, 0, 8, 0, 0, false, false);
 
-		TongueDemo demo;
+		DemoApp demo;
 		try {
 			demo = demoClazz.newInstance();
 			demo._settings = settings;
