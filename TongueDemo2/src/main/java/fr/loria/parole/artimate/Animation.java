@@ -107,7 +107,12 @@ public class Animation {
 
 	private SteadyState copyAnimation(Unit unit) {
 		// get animation state from base layer
-		SteadyState baseState = (SteadyState) unitDB.getUnitList(unit.getLabel()).get(0).getAnimation();
+		List<Unit> baseUnits = unitDB.getUnitList(unit.getLabel());
+		if (baseUnits.isEmpty()) {
+			// TODO hacky fallback to silence unit (which for now is assumed to exist)
+			baseUnits = unitDB.getUnitList("");
+		}
+		SteadyState baseState = (SteadyState) baseUnits.get(0).getAnimation();
 
 		// get clip source and clip from base layer
 		ClipSource oldClipSource = (ClipSource) baseState.getSourceTree();
