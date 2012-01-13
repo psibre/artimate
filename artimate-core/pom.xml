@@ -2,45 +2,25 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>fr.loria.parole</groupId>
-	<artifactId>artimate-demo</artifactId>
+	<artifactId>artimate-core</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
-		<project.mainclass>${project.groupId}.artimate.demo.DemoAppWrapper</project.mainclass>
 	</properties>
 
 	<dependencies>
 
 		<dependency>
-			<groupId>fr.loria.parole</groupId>
-			<artifactId>artimate-core</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>net.sourceforge.jregex</groupId>
+			<artifactId>jregex</artifactId>
+			<version>1.2_01</version>
 		</dependency>
 
 		<dependency>
-			<groupId>com.ardor3d</groupId>
-			<artifactId>ardor3d-lwjgl</artifactId>
-			<version>0.8-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.ardor3d</groupId>
-			<artifactId>ardor3d-core</artifactId>
-			<version>0.8-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.ardor3d</groupId>
-			<artifactId>ardor3d-collada</artifactId>
-			<version>0.8-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.ardor3d</groupId>
-			<artifactId>ardor3d-awt</artifactId>
-			<version>0.8-SNAPSHOT</version>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>11.0</version>
 		</dependency>
 
 	</dependencies>
@@ -66,24 +46,6 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-remote-resources-plugin</artifactId>
-				<version>1.2.1</version>
-				<configuration>
-					<resourceBundles>
-						<resourceBundle>${project.groupId}:artimate-model:${project.version}</resourceBundle>
-					</resourceBundles>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>process</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 
 			<plugin>
