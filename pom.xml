@@ -7,7 +7,7 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>artimate-model</module>
+		<module>artimate-model-archetype</module>
 		<module>artimate-core</module>
 		<module>artimate-demo</module>
 	</modules>
