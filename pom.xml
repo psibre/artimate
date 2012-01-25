@@ -13,7 +13,7 @@
 	</organization>
 
 	<modules>
-		<module>artimate-model-archetype</module>
+		<module>artimate-model</module>
 		<module>artimate-core</module>
 	</modules>
 
