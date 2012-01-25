@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <project name="Artimate Core">
-	<body>
 
-		<menu name="Artimate Core"  inherit="top">
+	<body>
+		<menu ref="parent" />
+		<menu name="Artimate Core" inherit="top">
 			<item name="Introduction" href="index.html" />
 		</menu>
-
+		<menu ref="reports" />
 	</body>
+
 </project>
