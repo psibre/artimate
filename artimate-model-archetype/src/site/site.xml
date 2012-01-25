@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Artimate Model">
+	<body>
+
+		<menu name="Artimate">
+			<item name="Introduction" href="index.html" />
+		</menu>
+
+	</body>
+</project>

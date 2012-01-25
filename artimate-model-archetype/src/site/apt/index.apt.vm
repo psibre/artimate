@@ -1,0 +1,28 @@
+Usage:
+
+ Once <<artimate>> is installed, go to your staging directory and generate the <model> project from the ${project.artifactId} archetype.
+ This can be done interactively, restricting archetype search to your local catalog, i.e.
+ 
++--
+$ mvn archetype:generate -DarchetypeCatalog=local
++--
+
+ or better yet, looking only for archetypes with "artimate" in their name:
+
++--
+$ mvn archetype:generate -Dfilter=artimate
++--
+
+ The quickest way is to run the generate command in batch mode (<<<-B>>> option) using a command like
+
++--
+$ mvn archetype:generate -B \
+    -DarchetypeGroupId=${project.groupId} \
+    -DarchetypeArtifactId=${project.artifactId} \
+    -DarchetypeVersion=${project.version} \
+    -DgroupId=my.group \
+    -DartifactId=tongue-model-test \
+    -Dversion=1.0
++--
+
+ where <<<my.group>>>, <<<tongue-model-test>>>, and <<<1.0>>> should of course be customized.
