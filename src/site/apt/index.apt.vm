@@ -2,4 +2,21 @@
  ${project.name}
  ---
 
-This is the PARENT
+Installation
+
+  Artimate is installed by running Maven in the project source directory:
+  
++--
+$ mvn install
+
+[...]
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Artimate .......................................... SUCCESS [1.264s]
+[INFO] Artimate Model Compiler ........................... SUCCESS [1.694s]
+[INFO] Artimate Core ..................................... SUCCESS [0.975s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
++--

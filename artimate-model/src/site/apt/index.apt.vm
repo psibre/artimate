@@ -2,9 +2,13 @@
  ${project.name}
  ---
 
-Usage:
+  The ${project.name} generates a Maven project in a <staging directory> of your choice,
+  which in turn is then built to compile the model.
 
- Once <<Artimate>> is installed, go to your staging directory and generate the <model> project from the ${project.artifactId} archetype.
+Generating the compiler project
+
+ Once <<Artimate>> is installed, go to a directory where the staging directory should be created
+ and generate the <model project> from the ${project.artifactId} archetype.
  This can be done interactively, restricting archetype search to your local catalog, i.e.
  
 +--
@@ -30,3 +34,59 @@ $ mvn archetype:generate -B \
 +--
 
  where <<<my.group>>>, <<<tongue-model-test>>>, and <<<1.0>>> should of course be customized.
+
+Prerequisites
+
+  The following third-party programs must be available on your system.
+  For each, the path to the main program executable must be configured as a <property> for ${project.name} to work.
+  This can be done either on the command line, using <<<-Dpath.to.program=/path/on/my/system/program>>>,
+  or by editing the file <<<build.config>>> in your staging directory.
+
+* Python
+ 
+  {{{http://python.org/}Python home page}}
+
+  Property: <<<path.to.python>>>
+
+* Praat
+ 
+  {{{http://praat.org/}Praat home page}}
+  
+  Property: <<<path.to.praat>>>
+  
+  <<Note:>> Make sure that Praat is configured to write text files in UTF-8 encoding.
+  
+* Perl
+ 
+  {{{http://www.perl.org/}Perl home page}}
+
+* Blender
+ 
+  {{{http://www.blender.org/}Blender home page}}
+  
+  Property: <<<path.to.blender>>>
+  
+  <<Note:>> At least version 2.6 is required.
+  
+Providing the data
+
+  The model compiler needs to know where to find the raw source data for the model,
+  in the form of EMA data and a tongue mesh file.
+  
+  Property: <<<data.directory>>>
+
+Compiling the model
+
+  Once all software and data are available and the corresponding properties are defined correctly,
+  go to the staging directory and run the command
+  
++--
+$ mvn install
++--
+
+  Alternatively, if you only want to compile and package the model without installing it into your local Maven repository,
+  run the command
+
++--
+$ mvn package
++--
