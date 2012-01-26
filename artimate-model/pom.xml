@@ -3,46 +3,20 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>fr.loria.parole</groupId>
-	<artifactId>artimate-model</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<parent>
+		<groupId>fr.loria.parole</groupId>
+		<artifactId>artimate</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
 	<packaging>jar</packaging>
 
+	<artifactId>artimate-model</artifactId>
 	<name>artimate-model</name>
-
-	<organization>
-		<name>INRIA</name>
-		<url>http://artimate.gforge.inria.fr/artimate-model/</url>
-	</organization>
-
-	<developers>
-		<developer>
-			<name>Ingmar Steiner</name>
-			<email>ingmar.steiner@inria.fr</email>
-			<organization>INRIA</organization>
-			<organizationUrl>http://www.inria.fr</organizationUrl>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
 
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.2</version>
 				<configuration>
 					<archive>
 						<addMavenDescriptor>false</addMavenDescriptor>
@@ -51,7 +25,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-archetype-plugin</artifactId>
 				<executions>
 					<execution>
@@ -63,61 +36,6 @@
 				</executions>
 			</plugin>
 		</plugins>
-
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<artifactId>maven-archetype-plugin</artifactId>
-					<version>2.2</version>
-				</plugin>
-			</plugins>
-		</pluginManagement>
 	</build>
 
-	<reporting>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8</version>
-			</plugin>
-		</plugins>
-	</reporting>
-
-	<profiles>
-		<profile>
-			<id>maven-3</id>
-			<activation>
-				<file>
-					<!-- This employs that the basedir expression is only recognized by 
-						Maven 3.x (see MNG-2363) -->
-					<exists>${basedir}</exists>
-				</file>
-			</activation>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-site-plugin</artifactId>
-							<version>3.0-beta-3</version>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-				<plugins>
-					<plugin>
-						<artifactId>maven-site-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-descriptor</id>
-								<goals>
-									<goal>attach-descriptor</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>

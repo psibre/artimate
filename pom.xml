@@ -26,9 +26,8 @@
 	</developers>
 
 	<modules>
-		<module>artimate-core</module>
 		<module>artimate-model</module>
-		<!-- <module>artimate-demo</module> -->
+		<module>artimate-core</module>
 	</modules>
 
 	<properties>
@@ -36,16 +35,6 @@
 	</properties>
 
 	<build>
-
-		<resources>
-			<resource>
-				<directory>${project.resource.directory}</directory>
-				<filtering>true</filtering>
-				<excludes>
-					<exclude>*.blend*</exclude>
-				</excludes>
-			</resource>
-		</resources>
 
 		<plugins>
 			<plugin>
@@ -59,6 +48,11 @@
 
 		<pluginManagement>
 			<plugins>
+
+				<plugin>
+					<artifactId>maven-archetype-plugin</artifactId>
+					<version>2.2</version>
+				</plugin>
 
 				<plugin>
 					<artifactId>maven-compiler-plugin</artifactId>
