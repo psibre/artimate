@@ -1,1 +1,5 @@
+ ---
+ ${project.name}
+ ---
+
 This is the PARENT

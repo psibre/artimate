@@ -11,7 +11,7 @@
 	<packaging>jar</packaging>
 
 	<artifactId>artimate-model</artifactId>
-	<name>artimate-model</name>
+	<name>Artimate Model Compiler</name>
 
 	<build>
 		<plugins>

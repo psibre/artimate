@@ -2,6 +2,7 @@
 <project name="Artimate Model">
 
 	<body>
+		<menu ref="parent" />
 		<menu name="Artimate">
 			<item name="Introduction" href="index.html" />
 		</menu>

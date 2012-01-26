@@ -7,7 +7,9 @@
 		<artifactId>artimate</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
+	
 	<artifactId>artimate-core</artifactId>
+	<name>Artimate Core</name>
 
 	<dependencies>
 

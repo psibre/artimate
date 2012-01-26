@@ -6,10 +6,13 @@
 	<artifactId>artimate</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
+	
+	<name>Artimate</name>
+	<url>http://artimate.gforge.inria.fr/</url>
 
 	<organization>
 		<name>INRIA</name>
-		<url>http://artimate.gforge.inria.fr/</url>
+		<url>http://www.inria.fr/</url>
 	</organization>
 
 	<developers>
@@ -24,6 +27,14 @@
 			</roles>
 		</developer>
 	</developers>
+
+	<distributionManagement>
+		<site>
+			<id>gforge</id>
+			<url>http://artimate.gforge.inria.fr/</url>
+		</site>
+		<downloadUrl>https://gforge.inria.fr/projects/artimate/</downloadUrl>
+	</distributionManagement>
 
 	<modules>
 		<module>artimate-model</module>
@@ -43,6 +54,18 @@
 					<source>1.6</source>
 					<target>1.6</target>
 				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-site-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>attach-descriptor</id>
+						<goals>
+							<goal>attach-descriptor</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 
@@ -72,6 +95,11 @@
 				<plugin>
 					<artifactId>maven-remote-resources-plugin</artifactId>
 					<version>1.2.1</version>
+				</plugin>
+
+				<plugin>
+					<artifactId>maven-site-plugin</artifactId>
+					<version>3.0</version>
 				</plugin>
 
 				<plugin>
@@ -173,42 +201,5 @@
 			</plugin>
 		</plugins>
 	</reporting>
-
-	<profiles>
-		<profile>
-			<id>maven-3</id>
-			<activation>
-				<file>
-					<!-- This employs that the basedir expression is only recognized by 
-						Maven 3.x (see MNG-2363) -->
-					<exists>${basedir}</exists>
-				</file>
-			</activation>
-			<build>
-				<pluginManagement>
-					<plugins>
-						<plugin>
-							<groupId>org.apache.maven.plugins</groupId>
-							<artifactId>maven-site-plugin</artifactId>
-							<version>3.0-beta-3</version>
-						</plugin>
-					</plugins>
-				</pluginManagement>
-				<plugins>
-					<plugin>
-						<artifactId>maven-site-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-descriptor</id>
-								<goals>
-									<goal>attach-descriptor</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>
