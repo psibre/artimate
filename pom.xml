@@ -64,9 +64,6 @@
 						<version>2.2</version>
 					</dependency>
 				</dependencies>
-				<configuration>
-					<stagingSiteURL>${project.distributionManagement.site.url}</stagingSiteURL>
-				</configuration>
 				<executions>
 					<execution>
 						<id>attach-descriptor</id>
