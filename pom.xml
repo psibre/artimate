@@ -64,6 +64,9 @@
 						<version>2.2</version>
 					</dependency>
 				</dependencies>
+				<configuration>
+					<stagingSiteURL>${project.distributionManagement.site.url}/site</stagingSiteURL>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-descriptor</id>
@@ -91,11 +94,6 @@
 				<plugin>
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>2.3.1</version>
-				</plugin>
-
-				<plugin>
-					<artifactId>maven-project-info-reports-plugin</artifactId>
-					<version>2.4</version>
 				</plugin>
 
 				<plugin>
@@ -201,9 +199,20 @@
 	<reporting>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.8</version>
+				<artifactId>maven-project-info-reports-plugin</artifactId>
+				<version>2.4</version>
+				<reportSets>
+					<reportSet>
+						<reports>
+							<report>index</report>
+							<report>summary</report>
+							<report>project-team</report>
+							<report>license</report>
+							<report>dependencies</report>
+							<report>plugins</report>
+						</reports>
+					</reportSet>
+				</reportSets>
 			</plugin>
 		</plugins>
 	</reporting>

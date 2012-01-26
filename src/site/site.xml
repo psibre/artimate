@@ -2,9 +2,6 @@
 <project name="Artimate">
 
 	<body>
-		<menu name="Artimate">
-			<item name="Introduction" href="index.html" />
-		</menu>
 		<menu ref="modules" />
 		<menu ref="reports" />
 	</body>
