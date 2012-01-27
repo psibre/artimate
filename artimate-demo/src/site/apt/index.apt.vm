@@ -1,0 +1,104 @@
+ ---
+ ${project.name}
+ ---
+
+  A demo app to illustrate possible use of Artimate for audiovisual TTS synthesis.
+
+Prerequisites
+
+  The ${project.name} depends on the {{{http://www.ardor3d.com/}Ardor3D}} game engine, specifically version <<0.8-SNAPSHOT r1751>> or higher.
+  To meet this requirement, it must be downloaded from the third-party subversion repository {{http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/}},
+  compiled from source and installed.
+  Fortunately, Maven makes this very easy with a <single command> (and a little patience):
+
++--
+$ mvn scm:bootstrap \
+  -Dproject.basedir=ardor3d \
+  -DconnectionUrl=scm:svn:http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk \
+  -Dgoals=install
+[INFO] Scanning for projects...
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Maven Stub Project (No POM) 1
+[INFO] ------------------------------------------------------------------------
+
+[...]
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Ardor 3D 0.8-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+
+[...]
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Ardor 3D .......................................... SUCCESS [0.304s]
+[INFO] Ardor 3D Core ..................................... SUCCESS [14.845s]
+[INFO] Ardor 3D JOGL ..................................... SUCCESS [1.526s]
+[INFO] Ardor 3D LWJGL .................................... SUCCESS [2.394s]
+[INFO] Ardor 3D SWT ...................................... SUCCESS [1.852s]
+[INFO] Ardor 3D AWT ...................................... SUCCESS [1.685s]
+[INFO] Ardor 3D Extras Package ........................... SUCCESS [0.949s]
+[INFO] Ardor 3D Effects .................................. SUCCESS [1.294s]
+[INFO] Ardor 3D Skinning and Animation System ............ SUCCESS [0.891s]
+[INFO] Ardor 3D Collada Importer ......................... SUCCESS [0.839s]
+[INFO] Ardor 3D UI ....................................... SUCCESS [1.854s]
+[INFO] Ardor 3D Terrain .................................. SUCCESS [1.317s]
+[INFO] Ardor 3D Examples ................................. SUCCESS [15.148s]
+[INFO] Archetype - ardor3d-archetype ..................... SUCCESS [1.069s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 47.152s
+[INFO] Finished at: Fri Jan 27 13:20:51 CET 2012
+[INFO] Final Memory: 19M/81M
+[INFO] ------------------------------------------------------------------------
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 3:21.998s
+[INFO] Finished at: Fri Jan 27 13:20:51 CET 2012
+[INFO] Final Memory: 5M/81M
+[INFO] ------------------------------------------------------------------------
++--
+
+  Of course it is also possible to manually checkout the sources and separately run Maven:
+
++--
+$ svn co http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk ardor3d
+
+[...]
+
+Checked out revision 1751.
+$ cd ardor3d
+$ mvn install
+
+[...]
+
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Ardor 3D .......................................... SUCCESS [0.304s]
+[INFO] Ardor 3D Core ..................................... SUCCESS [14.845s]
+[INFO] Ardor 3D JOGL ..................................... SUCCESS [1.526s]
+[INFO] Ardor 3D LWJGL .................................... SUCCESS [2.394s]
+[INFO] Ardor 3D SWT ...................................... SUCCESS [1.852s]
+[INFO] Ardor 3D AWT ...................................... SUCCESS [1.685s]
+[INFO] Ardor 3D Extras Package ........................... SUCCESS [0.949s]
+[INFO] Ardor 3D Effects .................................. SUCCESS [1.294s]
+[INFO] Ardor 3D Skinning and Animation System ............ SUCCESS [0.891s]
+[INFO] Ardor 3D Collada Importer ......................... SUCCESS [0.839s]
+[INFO] Ardor 3D UI ....................................... SUCCESS [1.854s]
+[INFO] Ardor 3D Terrain .................................. SUCCESS [1.317s]
+[INFO] Ardor 3D Examples ................................. SUCCESS [15.148s]
+[INFO] Archetype - ardor3d-archetype ..................... SUCCESS [1.069s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
++--
+
+  <<Note:>> In both cases, {{{http://subversion.apache.org/}Subversion}} must be installed.
+  
+  Alternatively, and especially under Windows, you may prefer to checkout and install Ardor3d using the IDE of your choice, e.g. {{{http://netbeans.org/}NetBeans}}.
+  The URL to the Ardor3d Subversion repository is of course the same as above.
