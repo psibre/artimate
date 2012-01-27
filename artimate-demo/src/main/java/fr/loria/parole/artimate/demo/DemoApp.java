@@ -9,7 +9,6 @@ import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
-import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -97,11 +96,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 				ardor3d._frameHandler.updateFrame();
 				Thread.yield();
 			}
-			// grab the graphics context so cleanup will work out.
-			final CanvasRenderer cr = ardor3d._canvas.getCanvasRenderer();
-			cr.makeCurrentContext();
-			quit(cr.getRenderer());
-			cr.releaseCurrentContext();
+			ardor3d.quit();
 			if (QUIT_VM_ON_EXIT) {
 				System.exit(0);
 			}
@@ -241,11 +236,6 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 	public PickResults doPick(final Ray3 pickRay) {
 		return null;
-	}
-
-	protected void quit(final Renderer renderer) {
-		ContextGarbageCollector.doFinalCleanup(renderer);
-		ardor3d._canvas.close();
 	}
 
 	public static void main(final String[] args) {

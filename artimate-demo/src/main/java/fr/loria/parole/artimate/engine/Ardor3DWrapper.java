@@ -1,6 +1,7 @@
 package fr.loria.parole.artimate.engine;
 
 import com.ardor3d.framework.Canvas;
+import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
 import com.ardor3d.framework.FrameHandler;
 import com.ardor3d.framework.Scene;
@@ -32,6 +33,7 @@ import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
+import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.Timer;
 
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
@@ -41,7 +43,7 @@ public class Ardor3DWrapper {
 
 	public final LogicalLayer _logicalLayer = new LogicalLayer();
 	public volatile boolean _exit = false;
-	public MouseManager _mouseManager = new LwjglMouseManager();
+	private MouseManager _mouseManager = new LwjglMouseManager();
 	public boolean _showNormals = false;
 	public WireframeState _wireframeState;
 	public boolean _showSkeleton = false;
@@ -156,6 +158,15 @@ public class Ardor3DWrapper {
 		_control.setInvertedY(true);
 		_control.setWorldUpVec(new Vector3(0, 0, 1));
 		_control.setSphereCoords(15, 0, 0);
+	}
+
+	public void quit() {
+		// grab the graphics context so cleanup will work out.
+		final CanvasRenderer cr = _canvas.getCanvasRenderer();
+		cr.makeCurrentContext();
+		ContextGarbageCollector.doFinalCleanup(cr.getRenderer());
+		_canvas.close();
+		cr.releaseCurrentContext();
 	}
 
 }
