@@ -116,7 +116,7 @@
 							<!-- use commandlineArgs, not arguments -->
 							<commandlineArgs>
 								<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
-								<![CDATA[--background --python ${script.directory}/generate_model.py -- --batch --ema="${final.pos.file}" --lab="${final.lab.file}" --mesh="${data.directory}"/Tongue.ply --collada="${final.dae.file}"]]>
+								<![CDATA[--background --python ${script.directory}/generate_model.py -- --batch --ema="${final.pos.file}" --lab="${final.lab.file}" --mesh="${data.directory}"/"${mesh.file}" --collada="${final.dae.file}"]]>
 							</commandlineArgs>
 						</configuration>
 					</execution>

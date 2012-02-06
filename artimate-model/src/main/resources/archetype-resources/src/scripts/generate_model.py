@@ -356,8 +356,11 @@ rig.pose.ik_param.mode = 'SIMULATION'
 
 # import tongue mesh
 print("Loading mesh from file", args.meshfile)
+# TODO the following command does not deselect other objects... although this doesn't seem to matter.
 bpy.ops.import_mesh.ply(filepath=args.meshfile)
 tongue = bpy.context.active_object
+tongue.name = "Tongue"
+tongue.data.name = "Tongue"
 
 # create and assign tongue material
 bpy.ops.object.material_slot_add()
