@@ -88,7 +88,7 @@ public class Artimate extends Synthesizer {
 		// ...set the time scale
 		double requestedDuration = unit.getDuration();
 		float baseDuration = oldClip.getMaxTimeIndex();
-		double timeScale = requestedDuration / baseDuration;
+		double timeScale = baseDuration / requestedDuration;
 		newClipInstance.setTimeScale(timeScale);
 
 		// create new state using this clip source
