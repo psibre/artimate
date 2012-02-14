@@ -35,6 +35,7 @@ import com.ardor3d.scenegraph.Mesh;
 import com.ardor3d.scenegraph.Node;
 import com.ardor3d.scenegraph.event.DirtyType;
 import com.ardor3d.util.ContextGarbageCollector;
+import com.ardor3d.util.ReadOnlyTimer;
 import com.ardor3d.util.Timer;
 
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
@@ -162,6 +163,15 @@ public class Ardor3DWrapper {
 		_control.setInvertedY(true);
 		_control.setWorldUpVec(new Vector3(0, 0, 1));
 		_control.setSphereCoords(15, 0, 0);
+	}
+
+	public void update(final ReadOnlyTimer timer) {
+		// update orbiter
+		_control.update(timer.getTimePerFrame());
+
+		if (animation != null) {
+			animation.update();
+		}
 	}
 
 	public void quit() {

@@ -166,7 +166,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 				.execute();
 
 		/** Call simpleUpdate in any derived classes of ExampleBase. */
-		updateExample(timer);
+		ardor3d.update(timer);
 
 		/** Update controllers/render states/transforms/bounds for rootNode. */
 		ardor3d._root.updateGeometricState(timer.getTimePerFrame(), true);
@@ -176,15 +176,6 @@ public class DemoApp implements Runnable, Updater, Scene {
 		// check and execute any input triggers, if we are concerned with input
 		if (ardor3d._logicalLayer != null) {
 			ardor3d._logicalLayer.checkTriggers(timer.getTimePerFrame());
-		}
-	}
-
-	protected void updateExample(final ReadOnlyTimer timer) {
-		// update orbiter
-		ardor3d._control.update(timer.getTimePerFrame());
-
-		if (manager != null) {
-			manager.update();
 		}
 	}
 
