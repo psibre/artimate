@@ -35,7 +35,7 @@
 				<excludes>
 					<exclude>**/*.pos</exclude>
 					<exclude>**/*.TextGrid</exclude>
-					<exclude>**/*.blend</exclude>
+					<exclude>**/*.blend*</exclude>
 				</excludes>
 			</resource>
 		</resources>
