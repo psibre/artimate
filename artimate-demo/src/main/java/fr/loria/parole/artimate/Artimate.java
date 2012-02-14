@@ -11,68 +11,26 @@ import com.ardor3d.extension.animation.skeletal.blendtree.SimpleAnimationApplier
 import com.ardor3d.extension.animation.skeletal.clip.AbstractAnimationChannel;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
-import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
 import com.ardor3d.extension.animation.skeletal.state.ImmediateTransitionState;
 import com.ardor3d.extension.animation.skeletal.state.SteadyState;
-import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
-import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 
 import fr.loria.parole.artimate.data.Unit;
 import fr.loria.parole.artimate.data.UnitDB;
 import fr.loria.parole.artimate.data.UnitSequence;
-import fr.loria.parole.artimate.data.io.XWavesSegmentation;
+import fr.loria.parole.artimate.synthesis.Synthesizer;
 
-public class Artimate {
+public class Artimate extends Synthesizer {
 
 	private static final Logger logger = Logger.getLogger(Artimate.class.getName());
 
-	private UnitDB unitDB;
-
 	private AnimationManager manager;
 
-	public Artimate(AnimationManager manager) {
+	public Artimate(UnitDB unitDB, AnimationManager manager) {
+		super(unitDB);
 		this.manager = manager;
 		// Add our "applier logic".
 		manager.setApplier(new SimpleAnimationApplier());
-	}
-
-	public void setupAnimations(ColladaStorage storage) {
-		// Check if there is any animationdata in the file
-		if (storage.getJointChannels().isEmpty() || storage.getSkins().isEmpty()) {
-			logger.warning("No animations found!");
-			return;
-		}
-
-		List<SkinData> skinDatas = storage.getSkins();
-
-		manager.addPose(skinDatas.get(0).getPose());
-
-		XWavesSegmentation segmentation = null;
-		try {
-			segmentation = new XWavesSegmentation("all.lab");
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		for (Unit segment : segmentation) {
-			final AnimationClip clip = new AnimationClip(segment.getLabel());
-
-			for (final JointChannel channel : storage.getJointChannels()) {
-				float start = (float) segment.getStart();
-				float end = (float) segment.getEnd();
-				JointChannel subChannel = (JointChannel) channel.getSubchannelByTime(start, end);
-				// add it to a clip
-				clip.addChannel(subChannel);
-			}
-
-			// Add the state directly to the unit in the DB
-			final SteadyState animState = new SteadyState(Integer.toString(segment.getIndex()));
-			animState.setSourceTree(new ClipSource(clip, manager));
-			segment.setAnimation(animState);
-		}
-		unitDB = new UnitDB(segmentation);
 	}
 
 	public void playSequence(UnitSequence targets) {
@@ -107,10 +65,10 @@ public class Artimate {
 
 	private SteadyState copyAnimation(Unit unit) {
 		// get animation state from base layer
-		List<Unit> baseUnits = unitDB.getUnitList(unit.getLabel());
+		List<Unit> baseUnits = db.getUnitList(unit.getLabel());
 		if (baseUnits.isEmpty()) {
 			// TODO hacky fallback to silence unit (which for now is assumed to exist)
-			baseUnits = unitDB.getUnitList("");
+			baseUnits = db.getUnitList("");
 		}
 		SteadyState baseState = (SteadyState) baseUnits.get(0).getAnimation();
 

@@ -5,10 +5,7 @@ import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
-import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
-import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
-import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -24,7 +21,6 @@ import com.ardor3d.renderer.queue.RenderBucketType;
 import com.ardor3d.renderer.state.LightState;
 import com.ardor3d.renderer.state.WireframeState;
 import com.ardor3d.renderer.state.ZBufferState;
-import com.ardor3d.scenegraph.Node;
 import com.ardor3d.util.Constants;
 import com.ardor3d.util.ContextGarbageCollector;
 import com.ardor3d.util.GameTaskQueue;
@@ -35,6 +31,7 @@ import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
 import fr.loria.parole.artimate.Artimate;
+import fr.loria.parole.artimate.data.io.ColladaTextGridModel;
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 import fr.loria.parole.artimate.engine.Ardor3DWrapper;
 
@@ -59,26 +56,24 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 	private AnimationManager manager;
 
-	public Artimate animation;
+	public Artimate synthesizer;
 
 	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
 		ardor3d._canvas.setTitle("OrbitCam DemoApp");
 
 		// Load the collada scene
 		try {
-			ColladaStorage storage = new ColladaImporter().load(modelFileName);
-			Node targetNode = (Node) storage.getScene().getChild(targetNodeName);
-			Node geom = (Node) targetNode.getChild("geometry");
-			SkinnedMesh mesh = (SkinnedMesh) geom.getChild(targetMeshName);
-			ardor3d._control.setLookAtSpatial(mesh);
-			ardor3d._root.attachChild(targetNode);
-			// Make our manager
-			manager = new AnimationManager(ardor3d._timer);
-			animation = new Artimate(manager);
-			animation.setupAnimations(storage);
+			ColladaTextGridModel model = new ColladaTextGridModel(ardor3d.animation, modelFileName, targetNodeName,
+					targetMeshName);
+			synthesizer = new Artimate(model.getUnitDB(), ardor3d.animation);
+
+			ardor3d._control.setLookAtSpatial(model.getMesh());
+			ardor3d._root.attachChild(model.getTargetNode());
+
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
-				animation.playSequence(testsegmentation);
+				// TODO temporarily disabled!
+				 synthesizer.playSequence(testsegmentation);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

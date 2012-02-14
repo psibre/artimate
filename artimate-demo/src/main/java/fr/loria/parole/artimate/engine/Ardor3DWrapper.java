@@ -1,5 +1,6 @@
 package fr.loria.parole.artimate.engine;
 
+import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.framework.Canvas;
 import com.ardor3d.framework.CanvasRenderer;
 import com.ardor3d.framework.DisplaySettings;
@@ -58,6 +59,9 @@ public class Ardor3DWrapper {
 	/** Our orbiter _control. */
 	public OrbitCamControl _control;
 
+	// animation
+	public AnimationManager animation = new AnimationManager(_timer);
+
 	public Ardor3DWrapper(Scene scene) {
 		// TODO make this configurable
 		DisplaySettings settings = new DisplaySettings(800, 600, 24, -1, 0, 8, 0, 0, false, false);
@@ -89,7 +93,7 @@ public class Ardor3DWrapper {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
 				try {
 					XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
-					demoApp.animation.playSequence(testsegmentation);
+					demoApp.synthesizer.playSequence(testsegmentation);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

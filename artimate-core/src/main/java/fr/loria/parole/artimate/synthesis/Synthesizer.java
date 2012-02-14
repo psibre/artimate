@@ -5,8 +5,8 @@ import fr.loria.parole.artimate.data.UnitSequence;
 
 public class Synthesizer {
 
-	UnitDB db;
-	Selector selector;
+	protected UnitDB db;
+	protected Selector selector;
 
 	public Synthesizer(UnitDB db) {
 		this(db, new Selector());
