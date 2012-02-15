@@ -1,7 +1,5 @@
 package fr.loria.parole.artimate;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.logging.Logger;
 
@@ -14,6 +12,8 @@ import com.ardor3d.extension.animation.skeletal.clip.AnimationClipInstance;
 import com.ardor3d.extension.animation.skeletal.layer.AnimationLayer;
 import com.ardor3d.extension.animation.skeletal.state.ImmediateTransitionState;
 import com.ardor3d.extension.animation.skeletal.state.SteadyState;
+import com.google.common.collect.Iterators;
+import com.google.common.collect.PeekingIterator;
 
 import fr.loria.parole.artimate.data.Unit;
 import fr.loria.parole.artimate.data.UnitDB;
@@ -33,69 +33,68 @@ public class Artimate extends Synthesizer {
 		manager.setApplier(new SimpleAnimationApplier());
 	}
 
-	public void playSequence(UnitSequence targets) {
-		// create sequence of states
-		ArrayList<SteadyState> stateSequence = new ArrayList<SteadyState>();
+	public void synthesizeSequence(UnitSequence targets) {
+		// get candidates from UnitDB
+		UnitSequence candidates = synthesize(targets);
 
-		ListIterator<Unit> units = targets.iterator();
-		while (units.hasNext()) {
-			Unit unit = units.next();
+		// reset animation layer
+		AnimationLayer layer = resetAnimationLayer();
 
-			SteadyState state = copyAnimation(unit);
-			// add state to sequence
-			stateSequence.add(state);
+		// create iterators
+		assert targets.size() == candidates.size();
+		PeekingIterator<Unit> targetIterator = Iterators.peekingIterator(targets.iterator());
+		ListIterator<Unit> candidateIterator = candidates.iterator();
+
+		// interleaved iteration over targets, candidates
+		while (targetIterator.hasNext() && candidateIterator.hasNext()) {
+			Unit target = targetIterator.next();
+			Unit candidate = candidateIterator.next();
+
+			copyAnimation(candidate, target);
+			SteadyState state = (SteadyState) target.getAnimation();
 
 			// add end transition so that state jumps to next in sequence at end (except for last)
-			if (units.hasNext()) {
-				Unit nextUnit = targets.get(units.nextIndex());
-				String nextAnimationID = Integer.toString(nextUnit.getIndex());
-				state.setEndTransition(new ImmediateTransitionState(nextAnimationID));
+			if (targetIterator.hasNext()) {
+				Unit nextUnit = targetIterator.peek();
+				String nextAnimationName = ((SteadyState) nextUnit.getAnimation()).getName();
+				state.setEndTransition(new ImmediateTransitionState(nextAnimationName));
 			}
-		}
-
-		// reset animation layer and add states
-		AnimationLayer layer = resetAnimationLayer();
-		for (SteadyState state : stateSequence) {
 			layer.addSteadyState(state);
 		}
 
 		// play animation layer by setting current to first state
-		layer.setCurrentState(stateSequence.get(0), true);
+		layer.setCurrentState((SteadyState) candidates.get(0).getAnimation(), true);
 	}
 
-	private SteadyState copyAnimation(Unit unit) {
-		// get animation state from base layer
-		List<Unit> baseUnits = db.getUnitList(unit.getLabel());
-		if (baseUnits.isEmpty()) {
-			// TODO hacky fallback to silence unit (which for now is assumed to exist)
-			baseUnits = db.getUnitList("");
-		}
-		SteadyState baseState = (SteadyState) baseUnits.get(0).getAnimation();
+	private void copyAnimation(Unit source, Unit target) {
+		SteadyState sourceState = (SteadyState) source.getAnimation();
 
 		// get clip source and clip from base layer
-		ClipSource oldClipSource = (ClipSource) baseState.getSourceTree();
-		AnimationClip oldClip = oldClipSource.getClip();
+		ClipSource sourceClipSource = (ClipSource) sourceState.getSourceTree();
+		AnimationClip sourceClip = sourceClipSource.getClip();
 
 		// create new clip and clip source
-		AnimationClip newClip = new AnimationClip(Integer.toString(unit.getIndex()));
-		for (AbstractAnimationChannel channel : oldClip.getChannels()) {
-			newClip.addChannel(channel);
+		String targetName = Integer.toString(target.getIndex());
+		AnimationClip targetClip = new AnimationClip(targetName);
+		for (AbstractAnimationChannel channel : sourceClip.getChannels()) {
+			targetClip.addChannel(channel);
 		}
-		ClipSource newClipSource = new ClipSource(newClip, manager);
+		ClipSource targetClipSource = new ClipSource(targetClip, manager);
 
 		// get clip instance for clip, which allows us to...
-		AnimationClipInstance newClipInstance = manager.getClipInstance(newClip);
+		AnimationClipInstance targetClipInstance = manager.getClipInstance(targetClip);
 		// ...set the time scale
-		double requestedDuration = unit.getDuration();
-		float baseDuration = oldClip.getMaxTimeIndex();
-		double timeScale = baseDuration / requestedDuration;
-		newClipInstance.setTimeScale(timeScale);
+		double targetDuration = target.getDuration();
+		double sourceDuration = source.getDuration();
+		double timeScale = sourceDuration / targetDuration;
+		targetClipInstance.setTimeScale(timeScale);
 
 		// create new state using this clip source
-		SteadyState state = new SteadyState(Integer.toString(unit.getIndex()));
-		state.setSourceTree(newClipSource);
+		SteadyState state = new SteadyState(targetName);
+		state.setSourceTree(targetClipSource);
 
-		return state;
+		// assign state to target
+		target.setAnimation(state);
 	}
 
 	private AnimationLayer resetAnimationLayer() {

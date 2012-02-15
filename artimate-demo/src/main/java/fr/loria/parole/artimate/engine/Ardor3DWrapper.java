@@ -94,7 +94,7 @@ public class Ardor3DWrapper {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
 				try {
 					XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
-					demoApp.synthesizer.playSequence(testsegmentation);
+					demoApp.synthesizer.synthesizeSequence(testsegmentation);
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

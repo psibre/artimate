@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.extension.animation.skeletal.AnimationManager;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
@@ -54,8 +53,6 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 	public Ardor3DWrapper ardor3d;
 
-	private AnimationManager manager;
-
 	public Artimate synthesizer;
 
 	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
@@ -72,8 +69,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
-				// TODO temporarily disabled!
-				 synthesizer.playSequence(testsegmentation);
+				synthesizer.synthesizeSequence(testsegmentation);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
