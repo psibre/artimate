@@ -53,7 +53,7 @@ import fr.loria.parole.artimate.data.UnitSequence;
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 import fr.loria.parole.artimate.demo.DemoApp;
 
-public class Ardor3DWrapper {
+public class Ardor3DWrapper implements GameEngineWrapper {
 
 	public final LogicalLayer _logicalLayer = new LogicalLayer();
 	public volatile boolean _exit = false;
@@ -199,11 +199,12 @@ public class Ardor3DWrapper {
 	}
 
 	/**
-	 * Deep copies Animation from source Unit to Target unit. As a side effect, copies the
+	 * Deep copies Animation from source Unit to Target unit.
 	 * 
 	 * @param source
 	 * @param target
 	 */
+	@Override
 	public void copyAnimation(Unit source, Unit target) {
 		SteadyState sourceState = (SteadyState) source.getAnimation();
 
@@ -235,6 +236,7 @@ public class Ardor3DWrapper {
 		target.setAnimation(state);
 	}
 
+	@Override
 	public void playAnimation(UnitSequence units) {
 		final String layerName = "-ANIMATION_LAYER-";
 		// remove layer if it exists
