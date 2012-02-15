@@ -57,7 +57,7 @@ public class Ardor3DWrapper implements GameEngineWrapper {
 
 	public final LogicalLayer _logicalLayer = new LogicalLayer();
 	public volatile boolean _exit = false;
-	private MouseManager _mouseManager = new LwjglMouseManager();
+	public MouseManager _mouseManager = new LwjglMouseManager();
 	public boolean _showNormals = false;
 	public WireframeState _wireframeState;
 	public boolean _showSkeleton = false;
@@ -66,7 +66,7 @@ public class Ardor3DWrapper implements GameEngineWrapper {
 	public LwjglCanvas _canvas;
 	public final Timer _timer = new Timer();
 	public final FrameHandler _frameHandler = new FrameHandler(_timer);
-	private PhysicalLayer _physicalLayer;
+	public PhysicalLayer _physicalLayer;
 	public LightState _lightState;
 	public ScreenShotImageExporter _screenShotExp = new ScreenShotImageExporter();
 	/** Our orbiter _control. */

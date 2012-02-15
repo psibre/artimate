@@ -5,6 +5,21 @@ import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
 import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
+import com.ardor3d.extension.ui.UIButton;
+import com.ardor3d.extension.ui.UIFrame;
+import com.ardor3d.extension.ui.UIHud;
+import com.ardor3d.extension.ui.UILabel;
+import com.ardor3d.extension.ui.UIPanel;
+import com.ardor3d.extension.ui.UIScrollPanel;
+import com.ardor3d.extension.ui.UITabbedPane;
+import com.ardor3d.extension.ui.UITextArea;
+import com.ardor3d.extension.ui.UITextField;
+import com.ardor3d.extension.ui.UITabbedPane.TabPlacement;
+import com.ardor3d.extension.ui.event.ActionEvent;
+import com.ardor3d.extension.ui.event.ActionListener;
+import com.ardor3d.extension.ui.layout.BorderLayout;
+import com.ardor3d.extension.ui.layout.BorderLayoutData;
+import com.ardor3d.extension.ui.util.Alignment;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -37,9 +52,11 @@ import fr.loria.parole.artimate.synthesis.AnimationSynthesizer;
 /**
  * Borrowing heavily from <a href=
  * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/basic/OrbitCamExample.java?rev=1393"
- * >OrbitCamExample</a> and <a href=
+ * >OrbitCamExample</a>, <a href=
  * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/pipeline/SimpleColladaExample.java?rev=1557"
- * >SimpleColladaExample</a>
+ * >SimpleColladaExample</a> and <a href=
+ * "http://ardorlabs.trac.cvsdude.com/Ardor3Dv1/browser/trunk/ardor3d-examples/src/main/java/com/ardor3d/example/ui/SimpleUIExample.java?rev=1557"
+ * >SimpleUIExample</a>
  * 
  * @author steiner
  * 
@@ -55,8 +72,33 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 	public AnimationSynthesizer synthesizer;
 
+	private UIFrame frame;
+
+	private UIHud hud;
+
 	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
 		ardor3d._canvas.setTitle("OrbitCam DemoApp");
+
+		// make new console panel
+		final UIPanel panel = makeConsolePanel();
+		final UITabbedPane pane = new UITabbedPane(TabPlacement.NORTH);
+		pane.add(panel, "console");
+		frame = new UIFrame("UI Sample");
+		frame.setContentPanel(pane);
+
+		frame.updateMinimumSizeFromContents();
+		frame.layout();
+		frame.pack();
+
+		frame.setUseStandin(true);
+		frame.setOpacity(1f);
+		frame.setLocationRelativeTo(ardor3d._canvas.getCanvasRenderer().getCamera());
+		frame.setName("sample");
+
+		hud = new UIHud();
+		hud.add(frame);
+		hud.setupInput(ardor3d._canvas, ardor3d._physicalLayer, ardor3d._logicalLayer);
+		hud.setMouseManager(ardor3d._mouseManager);
 
 		// Load the collada scene
 		try {
@@ -166,6 +208,8 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 		/** Update controllers/render states/transforms/bounds for rootNode. */
 		ardor3d._root.updateGeometricState(timer.getTimePerFrame(), true);
+
+		hud.updateGeometricState(timer.getTimePerFrame());
 	}
 
 	protected void updateLogicalLayer(final ReadOnlyTimer timer) {
@@ -173,6 +217,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 		if (ardor3d._logicalLayer != null) {
 			ardor3d._logicalLayer.checkTriggers(timer.getTimePerFrame());
 		}
+		hud.getLogicalLayer().checkTriggers(timer.getTimePerFrame());
 	}
 
 	@MainThread
@@ -204,6 +249,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 	protected void renderDemo(final Renderer renderer) {
 		ardor3d._root.onDraw(renderer);
+		renderer.draw(hud);
 	}
 
 	protected void renderDebug(final Renderer renderer) {
@@ -218,6 +264,48 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 	public PickResults doPick(final Ray3 pickRay) {
 		return null;
+	}
+
+	private UIPanel makeConsolePanel() {
+		final UIPanel chatPanel = new UIPanel(new BorderLayout());
+		final UIPanel bottomPanel = new UIPanel(new BorderLayout());
+		bottomPanel.setLayoutData(BorderLayoutData.SOUTH);
+		final UILabel dirLabel = new UILabel("Sample chat.  Try using markup like [b]text[/b]:");
+		dirLabel.setLayoutData(BorderLayoutData.NORTH);
+		final UITextArea historyArea = new UITextArea();
+		historyArea.setStyledText(true);
+		historyArea.setAlignment(Alignment.BOTTOM_LEFT);
+		historyArea.setEditable(false);
+		final UIScrollPanel scrollArea = new UIScrollPanel(historyArea);
+		scrollArea.setLayoutData(BorderLayoutData.CENTER);
+		final UITextField chatField = new UITextField();
+		chatField.setLayoutData(BorderLayoutData.CENTER);
+		final UIButton chatButton = new UIButton("SAY");
+		chatButton.setLayoutData(BorderLayoutData.EAST);
+
+		final ActionListener actionListener = new ActionListener() {
+			public void actionPerformed(final ActionEvent event) {
+				applyChat(historyArea, chatField);
+			}
+		};
+		chatButton.addActionListener(actionListener);
+		chatField.addActionListener(actionListener);
+
+		bottomPanel.add(chatField);
+		bottomPanel.add(chatButton);
+
+		chatPanel.add(dirLabel);
+		chatPanel.add(scrollArea);
+		chatPanel.add(bottomPanel);
+		return chatPanel;
+	}
+
+	private void applyChat(final UITextArea historyArea, final UITextField chatField) {
+		final String text = chatField.getText();
+		if (text.length() > 0) {
+			historyArea.setText(historyArea.getText() + "\n" + text);
+			chatField.setText("");
+		}
 	}
 
 	public static void main(final String[] args) {
