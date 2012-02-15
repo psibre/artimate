@@ -29,10 +29,10 @@ import com.ardor3d.util.geom.Debugger;
 import com.ardor3d.util.screen.ScreenExporter;
 import com.ardor3d.util.stat.StatCollector;
 
-import fr.loria.parole.artimate.Artimate;
 import fr.loria.parole.artimate.data.io.ColladaTextGridModel;
 import fr.loria.parole.artimate.data.io.XWavesSegmentation;
 import fr.loria.parole.artimate.engine.Ardor3DWrapper;
+import fr.loria.parole.artimate.synthesis.AnimationSynthesizer;
 
 /**
  * Borrowing heavily from <a href=
@@ -53,7 +53,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 	public Ardor3DWrapper ardor3d;
 
-	public Artimate synthesizer;
+	public AnimationSynthesizer synthesizer;
 
 	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
 		ardor3d._canvas.setTitle("OrbitCam DemoApp");
@@ -62,7 +62,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 		try {
 			ColladaTextGridModel model = new ColladaTextGridModel(ardor3d.animation, modelFileName, targetNodeName,
 					targetMeshName);
-			synthesizer = new Artimate(model.getUnitDB(), ardor3d);
+			synthesizer = new AnimationSynthesizer(model.getUnitDB(), ardor3d);
 
 			ardor3d._control.setLookAtSpatial(model.getMesh());
 			ardor3d._root.attachChild(model.getTargetNode());

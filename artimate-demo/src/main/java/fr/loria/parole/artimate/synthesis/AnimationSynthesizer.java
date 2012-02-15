@@ -1,4 +1,4 @@
-package fr.loria.parole.artimate;
+package fr.loria.parole.artimate.synthesis;
 
 import java.util.ListIterator;
 import java.util.logging.Logger;
@@ -12,13 +12,13 @@ import fr.loria.parole.artimate.data.UnitSequence;
 import fr.loria.parole.artimate.engine.Ardor3DWrapper;
 import fr.loria.parole.artimate.synthesis.Synthesizer;
 
-public class Artimate extends Synthesizer {
+public class AnimationSynthesizer extends Synthesizer {
 
-	private static final Logger logger = Logger.getLogger(Artimate.class.getName());
+	private static final Logger logger = Logger.getLogger(AnimationSynthesizer.class.getName());
 
 	private Ardor3DWrapper engine;
 
-	public Artimate(UnitDB unitDB, Ardor3DWrapper engine) {
+	public AnimationSynthesizer(UnitDB unitDB, Ardor3DWrapper engine) {
 		super(unitDB);
 		this.engine = engine;
 	}
