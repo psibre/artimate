@@ -62,14 +62,14 @@ public class DemoApp implements Runnable, Updater, Scene {
 		try {
 			ColladaTextGridModel model = new ColladaTextGridModel(ardor3d.animation, modelFileName, targetNodeName,
 					targetMeshName);
-			synthesizer = new Artimate(model.getUnitDB(), ardor3d.animation);
+			synthesizer = new Artimate(model.getUnitDB(), ardor3d);
 
 			ardor3d._control.setLookAtSpatial(model.getMesh());
 			ardor3d._root.attachChild(model.getTargetNode());
 
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
-				synthesizer.synthesizeSequence(testsegmentation);
+				synthesizer.synthesizeAnimation(testsegmentation);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
