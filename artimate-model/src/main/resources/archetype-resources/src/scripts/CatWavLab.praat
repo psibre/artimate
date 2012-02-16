@@ -7,11 +7,11 @@ form Input directory
 endform
 
 # glob input files to array, exit if none found
-list = Create Strings as file list... fileList 'input_directory$'/wav/*.wav
+list = Create Strings as file list... fileList 'input_directory$'/*.wav
 Sort
 wav.size = Get number of strings
 if ! wav.size
-  exit No wav files found in 'input_directory$'/wav
+  exit No wav files found in 'input_directory$'
 endif
 for w to wav.size
   wav$[w] = Object_'list'$[w]
@@ -26,7 +26,7 @@ tg_out$ = "'output_directory$'/'output_basename$'.TextGrid"
 # append each input wav file
 offset = 0
 for w to wav.size
-  wav_in$ = "'input_directory$'/wav/" + wav$[w]
+  wav_in$ = "'input_directory$'/" + wav$[w]
 
   # memory mapping for wav file
   ls = Open long sound file... 'wav_in$'

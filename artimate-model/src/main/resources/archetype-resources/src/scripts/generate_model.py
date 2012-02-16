@@ -1,9 +1,7 @@
 #!/usr/bin/env blender --background --python
 
-# workaround for working directory issues and module search path
-# when running this script with blender through mvn exec:exec
 import os, sys
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append("${script.directory}")
 
 # BEGIN CLI option parsing
 # (somewhat adapted from $BLENDER/$VERSION/scripts/templates/background_job.py)
@@ -42,11 +40,18 @@ parser.add_argument("-b", "--batch", dest="batch", action="store_true",
 
 args = parser.parse_args(argv)  # In this example we wont use the args
 
-if not argv:
-    parser.print_help()
-    sys.exit()
+#if not argv:
+#    parser.print_help()
+#    sys.exit()
 
 # END CLI option parsing
+
+# OVERRIDE!
+# assign arguments directly, powered by maven resource filtering
+args.posfile = "${generated.pos.file}"
+args.labfile = "${generated.lab.file}"
+args.meshfile = "${copied.mesh.file}"
+args.daefile = "${generated.dae.file}"
 
 DEBUG = True
 SCALE = 0.1
@@ -406,5 +411,3 @@ print("DONE")
 if BATCH:
     cleanup()
     bpy.ops.wm.quit_blender()
-    # this spews much garbage to STDERR, so consider redirecting that to /dev/null
-    # see http://projects.blender.org/tracker/?func=detail&group_id=9&aid=23215&atid=264

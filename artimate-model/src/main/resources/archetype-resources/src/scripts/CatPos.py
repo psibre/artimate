@@ -8,7 +8,7 @@ chunksize = 8192
 # parse CLI options
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--input-directory", dest="indir",
-                    help="Input directory containing .pos files in a pos subdirectory")
+                    help="Input directory containing .pos files")
 parser.add_argument("-o", "--output-file", dest="outfile",
                     help="Output file")
 parser.add_argument("-c", "--chunksize", dest="chunksize", type=int, default=chunksize,
@@ -16,10 +16,10 @@ parser.add_argument("-c", "--chunksize", dest="chunksize", type=int, default=chu
 args = parser.parse_args()
 
 # glob input files to list, exit if none found
-posfiles = glob.glob("%s/pos/*.pos" % args.indir)
+posfiles = glob.glob("%s/*.pos" % args.indir)
 posfiles.sort()
 if not posfiles:
-    raise Exception("No pos files found in %s/pos" % args.indir)
+    raise Exception("No pos files found in %s" % args.indir)
 
 # output file
 if args.outfile:

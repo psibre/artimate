@@ -14,17 +14,19 @@
 	<packaging>jar</packaging>
 
 	<properties>
-		<script.directory>${basedir}/src/scripts</script.directory>
-		<resources.directory>${basedir}/src/main/resources</resources.directory>
-		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
+		<script.directory>${project.build.directory}/scripts</script.directory>
 
 		<path.to.blender>/Applications/blender.app/Contents/MacOS/blender</path.to.blender>
 		<path.to.praat>/Applications/Praat.app/Contents/MacOS/praat</path.to.praat>
 		<path.to.python>python</path.to.python>
 
-		<final.pos.file>${generated.resources.directory}/${pos.file}</final.pos.file>
-		<final.lab.file>${generated.resources.directory}/${lab.file}</final.lab.file>
-		<final.dae.file>${generated.resources.directory}/${dae.file}</final.dae.file>
+		<copied.resources.directory>${project.build.directory}/raw-resources</copied.resources.directory>
+		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
+
+		<copied.mesh.file>${copied.resources.directory}/${mesh.file}</copied.mesh.file>
+		<generated.pos.file>${generated.resources.directory}/${pos.file}</generated.pos.file>
+		<generated.lab.file>${generated.resources.directory}/${lab.file}</generated.lab.file>
+		<generated.dae.file>${generated.resources.directory}/${dae.file}</generated.dae.file>
 	</properties>
 
 	<build>
@@ -64,6 +66,59 @@
 			</plugin>
 
 			<plugin>
+				<artifactId>maven-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${copied.resources.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${data.directory}/pos</directory>
+									<includes>
+										<include>*.pos</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${data.directory}/wav</directory>
+									<includes>
+										<include>*.wav</include>
+										<include>*.TextGrid</include>
+									</includes>
+								</resource>
+								<resource>
+									<directory>${data.directory}</directory>
+									<includes>
+										<include>*.ply</include>
+									</includes>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>copy-scripts</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${script.directory}</outputDirectory>
+							<resources>
+								<resource>
+									<directory>${basedir}/src/scripts</directory>
+									<filtering>true</filtering>
+								</resource>
+							</resources>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<executions>
@@ -79,8 +134,8 @@
 							<executable>${path.to.python}</executable>
 							<arguments>
 								<argument>CatPos.py</argument>
-								<argument>--input-directory=${data.directory}</argument>
-								<argument>--output-file=${final.pos.file}</argument>
+								<argument>--input-directory=${copied.resources.directory}</argument>
+								<argument>--output-file=${generated.pos.file}</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -96,7 +151,7 @@
 							<executable>${path.to.praat}</executable>
 							<arguments>
 								<argument>CatWavLab.praat</argument>
-								<argument>${data.directory}</argument>
+								<argument>${copied.resources.directory}</argument>
 								<argument>${generated.resources.directory}</argument>
 							</arguments>
 						</configuration>
@@ -109,15 +164,13 @@
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<!-- for some reason the following line has no effect in the blender 
-								thread -->
 							<workingDirectory>${script.directory}</workingDirectory>
 							<executable>${path.to.blender}</executable>
-							<!-- use commandlineArgs, not arguments -->
-							<commandlineArgs>
-								<!-- wrap in CDATA section to prevent line wrapping in Eclipse -->
-								<![CDATA[--background --python ${script.directory}/generate_model.py -- --batch --ema="${final.pos.file}" --lab="${final.lab.file}" --mesh="${data.directory}"/"${mesh.file}" --collada="${final.dae.file}"]]>
-							</commandlineArgs>
+							<arguments>
+								<argument>--background</argument>
+								<argument>--python</argument>
+								<argument>${script.directory}/generate_model.py</argument>
+							</arguments>
 						</configuration>
 					</execution>
 
