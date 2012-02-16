@@ -48,6 +48,7 @@ class Sweep:
         for channel in self.data.keys():
             newdata = self.data[channel][::step]
             self.data[channel] = newdata
+        self.size = len(self.data[channel])
 
     def coils(self):
         coils = [channel.split('_')[0]

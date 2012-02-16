@@ -59,7 +59,14 @@ OFFSET = 1
 BBONE_SEGMENTS = 8
 BATCH = args.batch
 
-import ema, lab
+# force reload of dependencies
+from imp import reload
+try:
+    reload(ema)
+    reload(lab)
+except NameError:
+    import ema, lab
+
 try:
     import bpy
     from mathutils import Vector
