@@ -2,16 +2,21 @@ import math
 from array import array
 
 class Sweep:
-    def __init__(self, pos_file_name, header=None, segmentation=None):
+    def __init__(self, pos_file_name=None, header=None, segmentation=None):
         if header == None:
             header = generate_header()
         self.header = header
-        self.data = self.load(pos_file_name)
+        if pos_file_name != None:
+            self.data = self.load(pos_file_name)
+            try:
+                print("loaded %d segments" % len(segmentation.segments))
+            except AttributeError:
+                pass
+        else:
+            self.data = {}
+            for channel in self.header:
+                self.data[channel] = array('f')
         self.segmentation = segmentation
-        try:
-            print("loaded %d segments" % len(segmentation.segments))
-        except AttributeError:
-            pass
 
     def load(self, pos_file_name):
         arr = array('f')
@@ -24,7 +29,6 @@ class Sweep:
         data = {}
         for h, h_item in enumerate(self.header):
             data[h_item] = arr[h:len(arr):len(self.header)]
-        self.size = int(len(arr) / len(self.header))
         return data
     
     def save(self, pos_file):
@@ -41,14 +45,20 @@ class Sweep:
     def extend(self, other):
         for channel in self.data:
             self.data[channel].extend(other.data[channel])
-        self.size = len(self.data[channel])
 
     def subsample(self, step=8):
         '''reduce the number of samples'''
         for channel in self.data.keys():
             newdata = self.data[channel][::step]
             self.data[channel] = newdata
-        self.size = len(self.data[channel])
+    
+    def size(self):
+        try:
+            channel = next(iter(self.data.keys()))
+            return len(self.data[channel])
+        except AttributeError:
+            return 0
+    size = property(size)
 
     def coils(self):
         coils = [channel.split('_')[0]
