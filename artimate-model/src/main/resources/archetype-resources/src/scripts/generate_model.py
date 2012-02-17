@@ -135,7 +135,7 @@ bpy.context.scene.objects.link(emaroot)
 # create dummy material
 material = bpy.data.materials.new(name="MyMaterial")
 
-for channel in channels:
+for channel in channels[::-1]:
     # create armature
     armaturename = channel + "Armature"
     armaturearm = bpy.data.armatures.new(name=armaturename)
@@ -435,7 +435,7 @@ def generate_testsweeps():
             coilname = channel + "Armature"
             coil = bpy.data.objects[coilname]
             x, y, z = coil.location
-            phi, theta, psi = coil.rotation_euler            
+            phi, theta, psi = coil.rotation_euler
             
             coilsweep.appendFrame(channel, x, y, z, phi, theta)
 
