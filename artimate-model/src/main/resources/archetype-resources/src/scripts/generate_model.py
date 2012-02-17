@@ -401,6 +401,76 @@ bpy.ops.object.select_name(name=tongue.name)
 # remove root vertex group
 bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
+def generate_testsweeps():
+    # setup test variables
+    testdir = "${generated.test.resources.directory}"
+    if not os.path.exists(testdir):
+        os.makedirs(testdir)
+    coilposfile = "%s/coils.pos" % testdir
+    iktargetposfile = "%s/ik_targets.pos" % testdir
+    tongueposfile = "%s/tongue.pos" % testdir
+    
+    # initialize test sweeps
+    coilsweep = ema.Sweep()
+    iktargetsweep = ema.Sweep()
+    tonguesweep = ema.Sweep()
+    
+    # tongue armature
+    # rig = bpy.data.objects["TongueArmature"] # already defined above
+    rigbones = rig.pose.bones["Root"].children_recursive
+
+    # iterate over all animation frames in timeline
+    for frame in range(bpy.context.scene.frame_start, bpy.context.scene.frame_end + 1):
+        bpy.context.scene.frame_set(frame)
+        
+        # iterate over EMA channels
+        for channel in channels:
+            # process tongue armature bones
+            #rigbonename = channel
+            #for bone in rigbones:
+            #    x, y, z = bone.tail
+            #    print(frame, x, y, z)
+            
+            # actual EMA coil
+            coilname = channel + "Armature"
+            coil = bpy.data.objects[coilname]
+            x, y, z = coil.location
+            phi, theta, psi = coil.rotation_euler            
+            
+            coilsweep.appendFrame(channel, x, y, z, phi, theta)
+
+            # get IK target armature
+            targetname = channel + "Target"
+            target = bpy.data.objects[targetname].pose.bones["Bone"]
+            x, y, z = target.head / SCALE
+            # location and rotation are actually zero; head and tail are set by constraints
+            phi, theta, psi = target.constraints["Copy Rotation"].target.rotation_euler 
+            
+            iktargetsweep.appendFrame(channel, x, y, z, phi, theta)
+            
+            # tongue armature
+            bone = None
+            for rigbone in rigbones:
+                if rigbone.name == targetname:
+                    bone = rigbone
+                    break
+            if bone != None:
+                x, y, z = bone.tail / SCALE
+                tonguesweep.appendFrame(channel, x, y, z)
+            else:
+                tonguesweep.appendFrame(channel)
+                
+    # upsample back to 200 Hz and save test sweeps
+    coilsweep.upsample()
+    coilsweep.save(coilposfile)
+    print("Saved EMA coil positions to", coilposfile)
+    iktargetsweep.upsample()
+    iktargetsweep.save(iktargetposfile)
+    print("Saved IK target positions to", iktargetposfile)
+    tonguesweep.upsample()
+    tonguesweep.save(tongueposfile)
+    print("Saved tongue armature bone positions to", tongueposfile)
+
 if args.daefile:
     if DEBUG:
         # save .blend file before baking actions for later inspection and debuggin
@@ -412,6 +482,10 @@ if args.daefile:
     
     # export collada
     bpy.ops.wm.collada_export(filepath=args.daefile)
+
+    # dump generated animation data to ema sweeps
+    if DEBUG:
+        generate_testsweeps()
 
 print("DONE")
 

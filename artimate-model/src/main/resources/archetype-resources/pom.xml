@@ -22,6 +22,7 @@
 
 		<copied.resources.directory>${project.build.directory}/raw-resources</copied.resources.directory>
 		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
+		<generated.test.resources.directory>${project.build.directory}/test-generated-resources</generated.test.resources.directory>
 
 		<copied.mesh.file>${copied.resources.directory}/${mesh.file}</copied.mesh.file>
 		<generated.pos.file>${generated.resources.directory}/${pos.file}</generated.pos.file>

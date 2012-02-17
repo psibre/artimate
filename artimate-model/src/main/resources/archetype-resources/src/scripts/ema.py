@@ -52,6 +52,14 @@ class Sweep:
             newdata = self.data[channel][::step]
             self.data[channel] = newdata
     
+    def upsample(self, rep=8):
+        '''repeat each sample rep times'''
+        for channel in self.data.keys():
+            newdata = array('f')
+            for sample in self.data[channel]:
+                newdata.extend([sample] * rep)
+            self.data[channel] = newdata
+    
     def size(self):
         try:
             channel = next(iter(self.data.keys()))
@@ -78,6 +86,10 @@ class Sweep:
         phi_rad = math.radians(phi_deg)
         theta_rad = math.radians(theta_deg)
         return phi_rad, theta_rad, 0
+    
+    def getRMSE(self, coil, frame=0):
+        rmse = self.data[coil + "_RMS"][frame]
+        return rmse
 
     def getValue(self, coil, index, frame=0):
         values = self.getLoc(coil, frame) + self.getRot(coil, frame)
@@ -88,6 +100,15 @@ class Sweep:
             for dimension in self.header:
                 value = self.data[dimension][frame]
                 yield value
+    
+    def appendFrame(self, channel, x=0, y=0, z=0, phi=0, theta=0, rms=0, extra=0):
+        self.data[channel + "_X"].append(x)
+        self.data[channel + "_Y"].append(y)
+        self.data[channel + "_Z"].append(z)
+        self.data[channel + "_phi"].append(phi)
+        self.data[channel + "_theta"].append(theta)
+        self.data[channel + "_RMS"].append(rms)
+        self.data[channel + "_Extra"].append(extra)
 
 def generate_header(num_coils=12):
     # hard-coded for AG500
