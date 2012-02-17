@@ -26,18 +26,18 @@ public class ColladaTextGridModel {
 	private Node targetNode;
 	private SkinnedMesh mesh;
 
-	public ColladaTextGridModel(AnimationManager manager, String modelFileName, String targetNodeName, String targetMeshName)
+	public ColladaTextGridModel(AnimationManager manager, String modelFileName, String targetNodeName, String targetMaterialName)
 			throws IOException {
 		ColladaStorage storage = new ColladaImporter().load(modelFileName);
 		targetNode = (Node) storage.getScene().getChild(targetNodeName);
-		Node geom = (Node) targetNode.getChild("geometry");
-		mesh = (SkinnedMesh) geom.getChild(targetMeshName);
+		Node geom = (Node) targetNode.getChild(targetNodeName);
+		mesh = (SkinnedMesh) geom.getChild(String.format("%s[%s]", targetNodeName, targetMaterialName));
 
 		this.manager = manager;
 		setupAnimations(storage);
 	}
 
-	public void setupAnimations(ColladaStorage storage) {
+	private void setupAnimations(ColladaStorage storage) {
 		// Check if there is any animationdata in the file
 		if (storage.getJointChannels().isEmpty() || storage.getSkins().isEmpty()) {
 			logger.warning("No animations found!");

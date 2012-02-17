@@ -395,9 +395,11 @@ bpy.ops.mesh.remove_doubles(limit=0.0001)
 bpy.ops.object.mode_set(mode='OBJECT')
 
 # parent to tongue rig with automatic vertex groups and weights
-bpy.ops.object.select_name(name=rigname, extend=True)
+rig.select = True
+bpy.context.scene.objects.active = rig
 bpy.ops.object.parent_set(type='ARMATURE_AUTO')
-bpy.ops.object.select_name(name=tongue.name)
+rig.select = False
+bpy.context.scene.objects.active = tongue
 # remove root vertex group
 bpy.context.object.vertex_groups.remove(tongue.vertex_groups["Root"])
 
@@ -477,7 +479,9 @@ if args.daefile:
         bpy.ops.wm.save_as_mainfile(filepath=args.daefile.replace("dae", "blend"))
         print("exporting to COLLADA file", args.daefile)
     # bake animation
-    bpy.ops.object.select_name(name=rigname)
+    tongue.select = False
+    rig.select = True
+    bpy.context.scene.objects.active = rig
     bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
     
     # export collada

@@ -181,7 +181,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 		// TODO make this flexible!
 		// initExample("flexiquad.dae", "Cube", "Cube_001-mesh");
-		initExample("Tongue.dae", "Tongue", "Tongue-mesh[pink1]");
+		initExample("Tongue.dae", "Tongue", "pink1");
 
 		ardor3d._root.updateGeometricState(0);
 	}
