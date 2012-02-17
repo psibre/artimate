@@ -374,6 +374,11 @@ tongue = bpy.context.active_object
 tongue.name = "Tongue"
 tongue.data.name = "Tongue"
 
+# remesh
+bpy.ops.object.modifier_add(type='REMESH')
+tongue.modifiers["Remesh"].mode = 'SMOOTH'
+bpy.ops.object.modifier_apply(modifier="Remesh")
+
 # create and assign tongue material
 bpy.ops.object.material_slot_add()
 pink = bpy.data.materials.new(name="pink")
