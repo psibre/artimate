@@ -39,18 +39,18 @@ def load_sweep(posfile, headerfile, labfile):
     sweep = ema.Sweep(posfile, header, labfile)
     return sweep
 
-def process_sweep(sweep):
+def process_sweep():
     before = sweep.size
     sweep.subsample()
     after = sweep.size
     logging.debug("downsampled from %d to %d frames" % (before, after))
 
-def create_coils(sweep):
+def create_coils():
     # create dummy material
     material = bpy.data.materials.new(name="DUMMY")
     
     # create coil objects
-    for coilname in sweep.coils:
+    for coilname in sweep.coils[::-1]:
         # create armature
         armaturename = coilname + "Armature"
         armaturearm = bpy.data.armatures.new(name=armaturename)
@@ -90,7 +90,7 @@ def animate_coils():
     logging.debug("Setting up animation for %d frames" % sweep.size)
     start = time.time()
 
-    for coilname in sweep.coils[::-1]:
+    for coilname in sweep.coils:
             # get armature
             armaturename = coilname + "Armature"
             armature = bpy.data.objects[armaturename]
@@ -101,7 +101,8 @@ def animate_coils():
             
             # add animation to armature
             armature.animation_data_create()
-            armature.animation_data.action = bpy.data.actions.new(armaturename + "Action")
+            action = bpy.data.actions.new(armaturename + "Action")
+            armature.animation_data.action = action
             fcurves = armature.animation_data.action.fcurves
             
             fcurves.new(data_path="location", index=0)
@@ -109,7 +110,6 @@ def animate_coils():
             fcurves.new(data_path="location", index=2)
             fcurves.new(data_path="rotation_euler", index=0)
             fcurves.new(data_path="rotation_euler", index=1)
-            
             # TODO fix rotation value wrapping
             
             for fc, fcurve in enumerate(fcurves):
@@ -120,8 +120,43 @@ def animate_coils():
                     fcurve.keyframe_points[fn].interpolation = 'LINEAR'
                     value = sweep.getValue(coilname, fc, fn)
                     if fc < 3:
+                        # convert mm to cm for x, y, z
                         value /= 10
                     fcurve.keyframe_points[fn].co = fn, value
+    
+    finish = time.time()
+    processingtime = finish - start
+    logging.debug("Finished in %.3f s" % processingtime)
+
+def clean_animation_data(rmse_threshold=20):
+    logging.debug("Cleaning animation by interpolating through frames with RMSE higher than %.1f" % rmse_threshold)
+    start = time.time()
+
+    for coilname in sweep.coils:
+        # get action
+        actionname = coilname + "ArmatureAction"
+        action = bpy.data.actions[actionname]
+        
+        for fc in range(3):
+            # because we pop them from the stack of fcurves, the next one is always the first
+            fcurve = action.fcurves[0] 
+            # pythonically store fcurve data in dict for all keyframes where RMSE is beneath threshold
+            kfpoints = {}
+            for fn in range(sweep.size):
+                rmse = sweep.getRMSE(coilname, fn)
+                if rmse < rmse_threshold:
+                    kfpoint = fcurve.keyframe_points[fn]
+                    kfpoints[kfpoint.co[0]] = kfpoint.co[1]
+            
+            # replace fcurve data
+            action.fcurves.remove(fcurve)
+            fcurve = action.fcurves.new(data_path="location", index=fc)
+            fcurve.keyframe_points.add(len(kfpoints))
+            for kf, fn in enumerate(sorted(kfpoints)):
+                fcurve.keyframe_points[kf].interpolation = 'LINEAR'
+                value = kfpoints[fn]
+                fcurve.keyframe_points[kf].co = (fn, value)
+    
     finish = time.time()
     processingtime = finish - start
     logging.debug("Finished in %.3f s" % processingtime)
@@ -132,7 +167,8 @@ def save_model(blendfile):
 
 if __name__ == '__main__':
     sweep = load_sweep("${generated.pos.file}", "${copied.header.file}", "${generated.lab.file}")
-    process_sweep(sweep)
-    create_coils(sweep)
+    process_sweep()
+    create_coils()
     animate_coils()
+    clean_animation_data()
     save_model("${generated.blend.file}")
