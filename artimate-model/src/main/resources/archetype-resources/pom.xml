@@ -22,12 +22,15 @@
 
 		<copied.resources.directory>${project.build.directory}/copied-resources</copied.resources.directory>
 		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
-		<generated.test.resources.directory>${project.build.directory}/test-generated-resources</generated.test.resources.directory>
+		<test.resources.directory>${project.build.directory}/test-generated-resources</test.resources.directory>
 
-		<copied.mesh.file>${copied.resources.directory}/${mesh.file}</copied.mesh.file>
+		<copied.model.file>${copied.resources.directory}/${model.file}</copied.model.file>
 		<generated.pos.file>${generated.resources.directory}/${pos.file}</generated.pos.file>
+		<copied.header.file>${copied.resources.directory}/headers.txt</copied.header.file>
 		<generated.lab.file>${generated.resources.directory}/${lab.file}</generated.lab.file>
 		<generated.dae.file>${generated.resources.directory}/${dae.file}</generated.dae.file>
+
+		<blender.log.level>info</blender.log.level>
 	</properties>
 
 	<build>
@@ -122,8 +125,7 @@
 								<resource>
 									<directory>${data.directory}</directory>
 									<includes>
-										<include>*.ply</include>
-										<include>*.blend</include>
+										<include>${model.file}</include>
 									</includes>
 								</resource>
 							</resources>
@@ -199,9 +201,10 @@
 							<workingDirectory>${script.directory}</workingDirectory>
 							<executable>${path.to.blender}</executable>
 							<arguments>
+								<argument>${copied.model.file}</argument>
 								<argument>--background</argument>
 								<argument>--python</argument>
-								<argument>${script.directory}/generate_model.py</argument>
+								<argument>${script.directory}/animate_model.py</argument>
 							</arguments>
 						</configuration>
 					</execution>
