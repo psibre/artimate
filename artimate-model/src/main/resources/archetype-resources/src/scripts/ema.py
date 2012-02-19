@@ -74,10 +74,10 @@ class Sweep:
         return coils
     coils = property(coils)
 
-    def getLoc(self, coil, frame=0):
-        x = self.data[coil + "_X"][frame]
-        y = self.data[coil + "_Y"][frame]
-        z = self.data[coil + "_Z"][frame]
+    def getLoc(self, coil, frame=0, scale=1):
+        x = self.data[coil + "_X"][frame] * scale
+        y = self.data[coil + "_Y"][frame] * scale
+        z = self.data[coil + "_Z"][frame] * scale
         return x, y, z
 
     def getRot(self, coil, frame=0):

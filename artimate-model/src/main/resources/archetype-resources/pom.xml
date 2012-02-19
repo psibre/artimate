@@ -29,6 +29,7 @@
 		<copied.header.file>${copied.resources.directory}/headers.txt</copied.header.file>
 		<generated.lab.file>${generated.resources.directory}/${lab.file}</generated.lab.file>
 		<generated.dae.file>${generated.resources.directory}/${dae.file}</generated.dae.file>
+		<generated.blend.file>${generated.resources.directory}/${model.file}</generated.blend.file>
 
 		<blender.log.level>info</blender.log.level>
 	</properties>
