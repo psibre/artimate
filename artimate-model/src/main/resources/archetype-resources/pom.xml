@@ -20,7 +20,7 @@
 		<path.to.praat>/Applications/Praat.app/Contents/MacOS/praat</path.to.praat>
 		<path.to.python>python</path.to.python>
 
-		<copied.resources.directory>${project.build.directory}/raw-resources</copied.resources.directory>
+		<copied.resources.directory>${project.build.directory}/copied-resources</copied.resources.directory>
 		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
 		<generated.test.resources.directory>${project.build.directory}/test-generated-resources</generated.test.resources.directory>
 
@@ -69,8 +69,9 @@
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
+
 					<execution>
-						<id>copy-resources</id>
+						<id>copy-ema-resources</id>
 						<phase>generate-resources</phase>
 						<goals>
 							<goal>copy-resources</goal>
@@ -82,8 +83,22 @@
 									<directory>${data.directory}/pos</directory>
 									<includes>
 										<include>*.pos</include>
+										<include>headers.txt</include>
 									</includes>
 								</resource>
+							</resources>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>copy-wav-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${copied.resources.directory}</outputDirectory>
+							<resources>
 								<resource>
 									<directory>${data.directory}/wav</directory>
 									<includes>
@@ -91,15 +106,30 @@
 										<include>*.TextGrid</include>
 									</includes>
 								</resource>
+							</resources>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>copy-model-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${copied.resources.directory}</outputDirectory>
+							<resources>
 								<resource>
 									<directory>${data.directory}</directory>
 									<includes>
 										<include>*.ply</include>
+										<include>*.blend</include>
 									</includes>
 								</resource>
 							</resources>
 						</configuration>
 					</execution>
+
 					<execution>
 						<id>copy-scripts</id>
 						<phase>generate-resources</phase>
@@ -116,6 +146,7 @@
 							</resources>
 						</configuration>
 					</execution>
+
 				</executions>
 			</plugin>
 
