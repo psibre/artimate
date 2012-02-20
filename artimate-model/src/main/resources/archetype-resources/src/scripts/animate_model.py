@@ -52,8 +52,8 @@ def create_coils():
     # create dummy material
     material = bpy.data.materials.new(name="DUMMY")
     
-    # create coil objects
-    for coilname in sweep.coils[::-1]:
+    # create coil objects (reversed so that actions are in ascending order)
+    for coilname in reversed(sweep.coils):
         # create armature
         armaturename = coilname + "Armature"
         armaturearm = bpy.data.armatures.new(name=armaturename)
@@ -174,7 +174,8 @@ def create_ik_targets():
     seeds = [obj for obj in bpy.data.objects if obj.name.endswith("TargetSeed")]
     tongue = bpy.data.objects["Tongue"]
     
-    for seed in seeds:
+    # iterate over seeds, sorted by their object name, reversed
+    for seed in reversed(sorted(seeds, key=lambda obj: obj.name)):
         # select only the seed
         bpy.ops.object.select_all(action='DESELECT')
         seed.select = True
@@ -183,6 +184,7 @@ def create_ik_targets():
         constraint = seed.constraints.new(type='SHRINKWRAP')
         constraint.target = tongue
         bpy.ops.object.visual_transform_apply()
+        seed.constraints.remove(constraint)
         
         # create IK targets (create armature, object, link to scene, activate, position)
         iktargetname = seed.name.replace("Seed", "")
@@ -191,19 +193,19 @@ def create_ik_targets():
         bpy.context.scene.objects.link(iktarget)
         bpy.context.scene.objects.active = iktarget
         iktarget.location = seed.location
-        iktarget.location.z -= BONESIZE
         
-        # add bones (in edit mode)
+        # assign EMA coil animation to IK target
+        coiltargetname = iktargetname.replace("Target", "Armature")
+        coiltarget = bpy.data.objects[coiltargetname]
+        iktargetanimation = iktarget.animation_data_create()
+        iktargetanimation.action = coiltarget.animation_data.action
+        
+        # add bone (in edit mode)
         bpy.ops.object.mode_set(mode='EDIT')
         editbone = iktargetarmature.edit_bones.new(name="Bone")
-        
-        editbone.head = editbone.tail = ORIGIN
-        editbone.tail.z += BONESIZE
-        
-        coiltargetname = iktargetname.replace("Target", "Armature")
-        bpy.data.objects[coiltargetname]
-        
+        editbone.head.z -= BONESIZE
         bpy.ops.object.mode_set(mode='OBJECT')
+        
         logging.debug("Created IK target tracking %s" % coiltargetname)
 
 def save_model(blendfile):
@@ -215,6 +217,6 @@ if __name__ == '__main__':
     process_sweep()
     create_coils()
     animate_coils()
-    clean_animation_data()
+    #clean_animation_data()
     create_ik_targets()
     save_model("${generated.blend.file}")
