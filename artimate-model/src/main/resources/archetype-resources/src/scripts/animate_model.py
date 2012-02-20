@@ -67,7 +67,14 @@ def create_coils():
         # add bone
         bpy.ops.object.mode_set(mode='EDIT')
         armaturebone = armaturearm.edit_bones.new(name="Bone")
-        armaturebone.tail.z = 1
+        armaturebone.tail.z = 0.5
+        
+        # prettify display in blender
+        armaturearm.draw_type = 'ENVELOPE'
+        armaturebone.envelope_distance = 0
+        armaturebone.head_radius = 0.2
+        armaturebone.tail_radius = 0.01
+        
         bpy.ops.object.mode_set(mode='OBJECT')
         
         # create coil object at temporary location and name it
@@ -85,7 +92,7 @@ def create_coils():
         
         # DEBUG
         coil.hide = True
-        armature.show_name = True
+        #armature.show_name = True
 
 def animate_coils():
     # set frame range
