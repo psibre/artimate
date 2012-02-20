@@ -104,29 +104,31 @@ def animate_coils():
             
             # add animation to armature
             armature.animation_data_create()
-            action = bpy.data.actions.new(armaturename + "Action")
+            action = bpy.data.actions.new(coilname + "Action")
             armature.animation_data.action = action
             fcurves = armature.animation_data.action.fcurves
             
-            fcurves.new(data_path="location", index=0)
-            fcurves.new(data_path="location", index=1)
-            fcurves.new(data_path="location", index=2)
-            fcurves.new(data_path="rotation_euler", index=0)
-            fcurves.new(data_path="rotation_euler", index=1)
-            fcurves.new(data_path="rotation_euler", index=2)
+            fcurves.new(data_path="delta_location", index=0)
+            fcurves.new(data_path="delta_location", index=1)
+            fcurves.new(data_path="delta_location", index=2)
+            fcurves.new(data_path="delta_rotation_euler", index=0)
+            fcurves.new(data_path="delta_rotation_euler", index=1)
+            fcurves.new(data_path="delta_rotation_euler", index=2)
             # TODO fix rotation value wrapping
             
             for fc, fcurve in enumerate(fcurves):
                 fcurve.keyframe_points.add(sweep.size)
                 
-                for fn in range(sweep.size):
+                for fn in range(1, sweep.size):
                     # there should be a better way to set interpolation...
                     fcurve.keyframe_points[fn].interpolation = 'LINEAR'
                     value = sweep.getValue(coilname, fc, fn)
+                    prevvalue = sweep.getValue(coilname, fc, fn - 1)
+                    delta = value - prevvalue
                     if fc < 3:
                         # convert mm to cm for x, y, z
-                        value /= 10
-                    fcurve.keyframe_points[fn].co = fn, value
+                        delta /= 10
+                    fcurve.keyframe_points[fn].co = fn, delta
     
     finish = time.time()
     processingtime = finish - start
