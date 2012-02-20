@@ -215,6 +215,125 @@ def create_ik_targets():
         
         logging.debug("Created IK target tracking %s" % coiltargetname)
 
+def addbone(parentbonename, targetobjectname):
+    '''
+    utility function to add bone and set all parameters
+    '''
+    BBONE_SEGMENTS = 8
+    
+    logging.debug("Creating bone from %s to %s" % (parentbonename, targetobjectname))
+    
+    # get parent bone
+    rig = bpy.data.objects["TongueArmature"]
+    parentbone = rig.data.edit_bones[parentbonename]
+    
+    # get target
+    target = bpy.data.objects[targetobjectname]
+    targethead = target.pose.bones['Bone'].head
+    targetlocation = target.location - rig.location + targethead
+    
+    # create bone
+    bonename = targetobjectname + "Bone"
+    editbone = rig.data.edit_bones.new(name=bonename)
+    editbone.parent = parentbone
+    if parentbonename == "RootBone":
+        editbone.head = editbone.parent.head
+    else:
+        editbone.use_connect = True
+    editbone.tail = targetlocation
+    
+    # set number of bezier bone segments
+    editbone.bbone_segments = BBONE_SEGMENTS
+    
+    # setup constraints (must be in pose mode)
+    bpy.ops.object.mode_set(mode='POSE')
+    posebone = rig.pose.bones[bonename]
+    
+    # IK constraint
+    constraint = posebone.constraints.new(type='IK')
+    constraint.target = target
+    constraint.subtarget = "Bone"
+    
+    # IK chain length goes back up to root
+    constraint.chain_count = len(posebone.parent_recursive)
+    # axis reference
+    constraint.reference_axis = 'TARGET'
+    # TODO consider adding pole targets
+    # allow full stretching
+    posebone.ik_stretch = 1
+    
+    # volume constraint
+    posebone.constraints.new(type='MAINTAIN_VOLUME')
+    
+    bpy.ops.object.mode_set(mode='EDIT')
+
+def create_rig():
+    # create armature
+    rigname = "TongueArmature"
+    rigarm = bpy.data.armatures.new(name=rigname)
+    
+    # create rig object, link to scene, activate, and position
+    rig = bpy.data.objects.new(name=rigname, object_data=rigarm)
+    bpy.context.scene.objects.link(rig)
+    bpy.context.scene.objects.active = rig
+    root = bpy.data.objects["Root"]
+    rig.location = root.location
+    
+    # set type to bezier bone
+    rig.data.draw_type = 'BBONE'
+    
+    # enter edit mode to assemble armature
+    bpy.ops.object.mode_set(mode='EDIT')
+    
+    # root bone
+    rootbone = rigarm.edit_bones.new(name="RootBone")
+    rootbone.tail.z += 1
+
+    # TODO temporarily hard-coded bone hierarchy
+    # maybe replace with graphviz dot file (parsed with networkx?)
+    
+    # bone hierarchy
+    #digraph TongueArmature {
+    #    Root -> Channel08 -> Channel06 -> Channel01;
+    #    Channel08 -> Channel05 -> Channel03;
+    #    Channel08 -> Channel10 -> Channel11;
+    #}
+    
+    addbone("RootBone", "Channel08Target")
+    addbone("Channel08TargetBone", "Channel06Target")
+    addbone("Channel06TargetBone", "Channel01Target")
+    
+    addbone("Channel08TargetBone", "Channel05Target")
+    addbone("Channel05TargetBone", "Channel03Target")
+    
+    addbone("Channel08TargetBone", "Channel10Target")
+    addbone("Channel10TargetBone", "Channel11Target")
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+    
+    # more IK config
+    rig.pose.ik_solver = 'ITASC'
+    # ITASC params
+    # see also
+    # http://wiki.blender.org/index.php/Dev:Source/GameEngine/RobotIKSolver
+    # http://www.blender.org/documentation/blender_python_api_2_60_0/bpy.types.Itasc.html
+    rig.pose.ik_param.mode = 'SIMULATION'
+    
+    # select only the rig and tongue, with the rig active
+    tongue = bpy.data.objects["Tongue"]
+    bpy.ops.object.select_all(action='DESELECT')
+    tongue.select = True
+    rig.select = True
+    bpy.context.scene.objects.active = rig
+    bpy.ops.object.parent_set(type='ARMATURE_AUTO')
+    rig.select = False
+    
+    bpy.context.scene.objects.active = tongue
+    # remove root vertex group
+    bpy.context.object.vertex_groups.remove(tongue.vertex_groups["RootBone"])
+    
+    logging.debug("Rigged model to armature")
+
 def save_model(blendfile):
     logging.info("Saving %s" % blendfile)
     bpy.ops.wm.save_as_mainfile(filepath=blendfile)
@@ -226,4 +345,5 @@ if __name__ == '__main__':
     animate_coils()
     #clean_animation_data()
     create_ik_targets()
+    create_rig()
     save_model("${generated.blend.file}")
