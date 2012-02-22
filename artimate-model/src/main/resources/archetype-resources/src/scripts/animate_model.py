@@ -290,26 +290,26 @@ def addbone(parentbonename, targetobjectname):
     bpy.ops.object.mode_set(mode='EDIT')
 
 def create_rig():
-    # create armature
-    rigname = "TongueArmature"
-    rigarm = bpy.data.armatures.new(name=rigname)
+    # create tongue armature
+    trigname = "TongueArmature"
+    trigarm = bpy.data.armatures.new(name=trigname)
     
     # create rig object, link to scene, activate, and position
-    rig = bpy.data.objects.new(name=rigname, object_data=rigarm)
-    bpy.context.scene.objects.link(rig)
-    bpy.context.scene.objects.active = rig
+    trig = bpy.data.objects.new(name=trigname, object_data=trigarm)
+    bpy.context.scene.objects.link(trig)
+    bpy.context.scene.objects.active = trig
     root = bpy.data.objects["Root"]
-    rig.location = root.location
+    trig.location = root.location
     
     # set type to bezier bone
-    rig.data.draw_type = 'BBONE'
+    trig.data.draw_type = 'BBONE'
     
     # enter edit mode to assemble armature
     bpy.ops.object.mode_set(mode='EDIT')
     
     # root bone
-    rootbone = rigarm.edit_bones.new(name="RootBone")
-    rootbone.tail.z += 1
+    trootbone = trigarm.edit_bones.new(name="RootBone")
+    trootbone.tail.z += 1
 
     # TODO temporarily hard-coded bone hierarchy
     # maybe replace with graphviz dot file (parsed with networkx?)
@@ -334,28 +334,62 @@ def create_rig():
     bpy.ops.object.mode_set(mode='OBJECT')
     
     # more IK config
-    rig.pose.ik_solver = 'ITASC'
+    trig.pose.ik_solver = 'ITASC'
     # ITASC params
     # see also
     # http://wiki.blender.org/index.php/Dev:Source/GameEngine/RobotIKSolver
     # http://www.blender.org/documentation/blender_python_api_2_60_0/bpy.types.Itasc.html
-    rig.pose.ik_param.mode = 'SIMULATION'
+    trig.pose.ik_param.mode = 'SIMULATION'
     
     # select only the rig and tongue, with the rig active
     tongue = bpy.data.objects["Tongue"]
     bpy.ops.object.select_all(action='DESELECT')
     tongue.select = True
-    rig.select = True
-    bpy.context.scene.objects.active = rig
+    trig.select = True
+    bpy.context.scene.objects.active = trig
     bpy.ops.object.parent_set(type='ARMATURE_AUTO')
-    rig.select = False
+    trig.select = False
     
     bpy.context.scene.objects.active = tongue
     # remove root vertex group
     bpy.context.object.vertex_groups.remove(tongue.vertex_groups["RootBone"])
     
     # DEBUG
-    rig.show_x_ray = True
+    trig.show_x_ray = True
+    
+    # jaw rig
+        # create tongue armature
+    jrigname = "JawArmature"
+    jrigarm = bpy.data.armatures.new(name=jrigname)
+    jrig = bpy.data.objects.new(name=jrigname, object_data=jrigarm)
+    bpy.context.scene.objects.link(jrig)
+    bpy.context.scene.objects.active = jrig
+    jrig.location = root.location
+    
+    # enter edit mode to assemble armature
+    bpy.ops.object.mode_set(mode='EDIT')
+    
+    # root bone
+    jrootbone = jrigarm.edit_bones.new(name="RootBone")
+    jrootbone.tail.z += 1
+    
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+    # add constraint to track EMA coil on lower incisor
+    constraint = jrig.constraints.new(type='TRACK_TO')
+    # TODO: this has to be configurable!
+    constraint.target = bpy.data.objects["Channel02Armature"]
+    constraint.subtarget = "Bone"
+    
+    # parent mandible to jaw armature
+    jaw = bpy.data.objects["Mandible"]
+    jaw.select = True
+    bpy.ops.object.parent_set()
+    
+    # parent tongue armature to jaw armature
+    jaw.select = False
+    trig.select = True
+    bpy.ops.object.parent_set()
     
     logging.debug("Rigged model to armature")
 
@@ -443,4 +477,4 @@ if __name__ == '__main__':
     create_ik_targets()
     create_rig()
     save_model("${generated.blend.file}")
-    generate_testsweeps()
+    #generate_testsweeps()
