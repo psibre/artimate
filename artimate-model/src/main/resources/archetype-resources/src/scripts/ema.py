@@ -105,8 +105,10 @@ class Sweep:
         self.data[channel + "_X"].append(x)
         self.data[channel + "_Y"].append(y)
         self.data[channel + "_Z"].append(z)
-        self.data[channel + "_phi"].append(phi)
-        self.data[channel + "_theta"].append(theta)
+        phi_deg = math.degrees(phi)
+        self.data[channel + "_phi"].append(phi_deg)
+        theta_deg = math.degrees(theta)
+        self.data[channel + "_theta"].append(theta_deg)
         self.data[channel + "_RMS"].append(rms)
         self.data[channel + "_Extra"].append(extra)
 

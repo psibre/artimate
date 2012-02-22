@@ -115,27 +115,24 @@ def animate_coils():
             armature.animation_data.action = action
             fcurves = armature.animation_data.action.fcurves
             
-            fcurves.new(data_path="delta_location", index=0)
-            fcurves.new(data_path="delta_location", index=1)
-            fcurves.new(data_path="delta_location", index=2)
-            fcurves.new(data_path="delta_rotation_euler", index=0)
-            fcurves.new(data_path="delta_rotation_euler", index=1)
-            fcurves.new(data_path="delta_rotation_euler", index=2)
+            fcurves.new(data_path="location", index=0)
+            fcurves.new(data_path="location", index=1)
+            fcurves.new(data_path="location", index=2)
+            fcurves.new(data_path="rotation_euler", index=0)
+            fcurves.new(data_path="rotation_euler", index=1)
             # TODO fix rotation value wrapping
             
             for fc, fcurve in enumerate(fcurves):
                 fcurve.keyframe_points.add(sweep.size)
                 
-                for fn in range(1, sweep.size):
+                for fn in range(sweep.size):
                     # there should be a better way to set interpolation...
                     fcurve.keyframe_points[fn].interpolation = 'LINEAR'
                     value = sweep.getValue(coilname, fc, fn)
-                    prevvalue = sweep.getValue(coilname, fc, fn - 1)
-                    delta = value - prevvalue
                     if fc < 3:
                         # convert mm to cm for x, y, z
-                        delta /= 10
-                    fcurve.keyframe_points[fn].co = fn, delta
+                        value /= 10
+                    fcurve.keyframe_points[fn].co = fn, value
     
     finish = time.time()
     processingtime = finish - start
@@ -201,11 +198,24 @@ def create_ik_targets():
         bpy.context.scene.objects.active = iktarget
         iktarget.location = seed.location
         
-        # assign EMA coil animation to IK target
+        # create IK target action and copy EMA coil animation
+        iktargetanimation = iktarget.animation_data_create()
+        ikaction = bpy.data.actions.new(iktargetname + "Action")
+        iktargetanimation.action = ikaction
         coiltargetname = iktargetname.replace("Target", "Armature")
         coiltarget = bpy.data.objects[coiltargetname]
-        iktargetanimation = iktarget.animation_data_create()
-        iktargetanimation.action = coiltarget.animation_data.action
+        distance = coiltarget.location - iktarget.location
+        # TODO: for now we disregard rotation!
+        for i in range(3):
+            fcurve = ikaction.fcurves.new(data_path="location", index=i)
+            fcurve.keyframe_points.add(sweep.size)
+            coilfcurve = coiltarget.animation_data.action.fcurves[i]
+            # set delta values for each frame
+            for fn in range(sweep.size):
+                fcurve.keyframe_points[fn].interpolation = 'LINEAR'
+                value = coilfcurve.keyframe_points[fn].co[1]
+                value -= distance[i]
+                fcurve.keyframe_points[fn].co = fn, value
         
         # add bone (in edit mode)
         bpy.ops.object.mode_set(mode='EDIT')
@@ -338,6 +348,77 @@ def save_model(blendfile):
     logging.info("Saving %s" % blendfile)
     bpy.ops.wm.save_as_mainfile(filepath=blendfile)
 
+def generate_testsweeps():
+    # setup test variables
+    testdir = "${test.resources.directory}"
+    if not os.path.exists(testdir):
+        os.makedirs(testdir)
+    coilposfile = "%s/coils.pos" % testdir
+    iktargetposfile = "%s/ik_targets.pos" % testdir
+    tongueposfile = "%s/tongue.pos" % testdir
+    
+    # initialize test sweeps
+    coilsweep = ema.Sweep()
+    iktargetsweep = ema.Sweep()
+    tonguesweep = ema.Sweep()
+    
+    # tongue armature
+    rig = bpy.data.objects["TongueArmature"]
+    rigbones = rig.pose.bones["RootBone"].children_recursive
+
+    # iterate over all animation frames in timeline
+    for frame in range(bpy.context.scene.frame_start, bpy.context.scene.frame_end + 1):
+        bpy.context.scene.frame_set(frame)
+        
+        # iterate over EMA channels
+        for channel in sweep.coils:
+            # process tongue armature bones
+            #rigbonename = channel
+            #for bone in rigbones:
+            #    x, y, z = bone.tail
+            #    print(frame, x, y, z)
+            
+            # actual EMA coil
+            coilname = channel + "Armature"
+            coil = bpy.data.objects[coilname]
+            x, y, z = coil.location * 10 # convert back to mm
+            phi, theta, psi = coil.rotation_euler
+            
+            coilsweep.appendFrame(channel, x, y, z, phi, theta)
+
+            # get IK target armature
+            targetname = channel + "Target"
+            try:
+                target = bpy.data.objects[targetname]
+                x, y, z = target.location * 10 # convert back to mm
+                phi, theta, psi = target.rotation_euler
+                iktargetsweep.appendFrame(channel, x, y, z, phi, theta)
+            except KeyError:
+                iktargetsweep.appendFrame(channel)
+            
+            # tongue armature
+            bone = None
+            for rigbone in rigbones:
+                if rigbone.name == targetname + "Bone":
+                    bone = rigbone
+                    break
+            if bone != None:
+                x, y, z = bone.tail * 10 # convert back to mm
+                tonguesweep.appendFrame(channel, x, y, z)
+            else:
+                tonguesweep.appendFrame(channel)
+                
+    # upsample back to 200 Hz and save test sweeps
+    coilsweep.upsample()
+    coilsweep.save(coilposfile)
+    logging.info("Saved EMA coil positions to %s" % coilposfile)
+    iktargetsweep.upsample()
+    iktargetsweep.save(iktargetposfile)
+    logging.info("Saved IK target positions to %s" % iktargetposfile)
+    tonguesweep.upsample()
+    tonguesweep.save(tongueposfile)
+    logging.info("Saved tongue armature bone positions to %s" % tongueposfile)
+
 if __name__ == '__main__':
     sweep = load_sweep("${generated.pos.file}", "${copied.header.file}", "${generated.lab.file}")
     process_sweep()
@@ -347,3 +428,4 @@ if __name__ == '__main__':
     create_ik_targets()
     create_rig()
     save_model("${generated.blend.file}")
+    generate_testsweeps()
