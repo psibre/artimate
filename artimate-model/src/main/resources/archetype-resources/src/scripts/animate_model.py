@@ -173,6 +173,7 @@ def clean_animation_data(rmse_threshold=15):
 
 def create_ik_targets():
     BONESIZE = 1
+    Z_LIMIT = 1
     
     # get target seeds and tongue
     seeds = [obj for obj in bpy.data.objects if obj.name.endswith("TargetSeed")]
@@ -223,6 +224,16 @@ def create_ik_targets():
         editbone.head.z -= BONESIZE
         bpy.ops.object.mode_set(mode='OBJECT')
         
+        # add z constraints
+        zconstraint = iktarget.constraints.new(type='LIMIT_LOCATION')
+        zconstraint.min_z = iktarget.location.z - Z_LIMIT
+        zconstraint.use_min_z = True
+        zconstraint.max_z = iktarget.location.z + Z_LIMIT
+        zconstraint.use_max_z = True
+        
+        # DEBUG
+        iktarget.show_x_ray = True
+        
         logging.debug("Created IK target tracking %s" % coiltargetname)
 
 def addbone(parentbonename, targetobjectname):
@@ -248,6 +259,7 @@ def addbone(parentbonename, targetobjectname):
     editbone.parent = parentbone
     if parentbonename == "RootBone":
         editbone.head = editbone.parent.head
+        editbone.bbone_in = 0
     else:
         editbone.use_connect = True
     editbone.tail = targetlocation
@@ -341,6 +353,9 @@ def create_rig():
     bpy.context.scene.objects.active = tongue
     # remove root vertex group
     bpy.context.object.vertex_groups.remove(tongue.vertex_groups["RootBone"])
+    
+    # DEBUG
+    rig.show_x_ray = True
     
     logging.debug("Rigged model to armature")
 
