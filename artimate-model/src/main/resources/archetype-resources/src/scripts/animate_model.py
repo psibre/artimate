@@ -30,6 +30,7 @@ def load_sweep(posfile, headerfile, labfile):
     # load or generate header
     if os.path.isfile(headerfile):
         logging.info("Loading %s" % headerfile)
+        header = [line.strip() for line in open(headerfile)]
     else:
         logging.debug("%s not found; generating default header" % headerfile)
         header = ema.generate_header()
@@ -315,21 +316,21 @@ def create_rig():
     # maybe replace with graphviz dot file (parsed with networkx?)
     
     # bone hierarchy
-    #digraph TongueArmature {
-    #    Root -> Channel08 -> Channel06 -> Channel01;
-    #    Channel08 -> Channel05 -> Channel03;
-    #    Channel08 -> Channel10 -> Channel11;
+    #digraph  TongueArmature {
+    #    Root -> TBackC -> TMidC -> TTipC;
+    #    TBackC -> TMidL -> TBladeL;
+    #    TBackC -> TMidR -> TBladeR;
     #}
     
-    addbone("RootBone", "Channel08Target")
-    addbone("Channel08TargetBone", "Channel06Target")
-    addbone("Channel06TargetBone", "Channel01Target")
+    addbone("RootBone", "TBackCTarget")
+    addbone("TBackCTargetBone", "TMidCTarget")
+    addbone("TMidCTargetBone", "TTipCTarget")
     
-    addbone("Channel08TargetBone", "Channel05Target")
-    addbone("Channel05TargetBone", "Channel03Target")
+    addbone("TBackCTargetBone", "TMidLTarget")
+    addbone("TMidLTargetBone", "TBladeLTarget")
     
-    addbone("Channel08TargetBone", "Channel10Target")
-    addbone("Channel10TargetBone", "Channel11Target")
+    addbone("TBackCTargetBone", "TMidRTarget")
+    addbone("TMidRTargetBone", "TBladeRTarget")
     
     bpy.ops.object.mode_set(mode='OBJECT')
     
@@ -378,7 +379,7 @@ def create_rig():
     # add constraint to track EMA coil on lower incisor
     constraint = jrig.constraints.new(type='TRACK_TO')
     # TODO: this has to be configurable!
-    constraint.target = bpy.data.objects["Channel02Armature"]
+    constraint.target = bpy.data.objects["JawArmature"]
     constraint.subtarget = "Bone"
     
     # parent mandible to jaw armature
