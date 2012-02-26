@@ -95,6 +95,36 @@ def create_coils():
         coil.hide = True
         #armature.show_name = True
 
+def normalize():
+    ref1 = bpy.data.objects["Ref1Armature"]
+    ref2 = bpy.data.objects["Ref2Armature"]
+    ref3 = bpy.data.objects["Ref3Armature"]
+    logging.debug("Normalizing wrt to %s, %s, and %s" % (ref1.name, ref2.name, ref3.name))
+    
+    # create root node
+    bpy.ops.object.add()
+    root = bpy.context.scene.objects.active
+    root.name = "Root"
+    root.show_axis = True
+    
+    # track ref1 location
+    constraint = root.constraints.new(type='COPY_LOCATION')
+    constraint.target = ref1
+    constraint.subtarget = "Bone"
+    
+    # point x axis to ref2
+    constraint = root.constraints.new(type='TRACK_TO')
+    constraint.target = ref2
+    constraint.subtarget = "Bone"
+    constraint.track_axis = 'TRACK_X'
+    
+    # rotate around x axis so that ref3 intersects xy plane
+    constraint = root.constraints.new(type='LOCKED_TRACK')
+    constraint.target = ref3
+    constraint.subtarget = "Bone"
+    constraint.track_axis = 'TRACK_Y'
+    constraint.lock_axis = 'LOCK_X'
+
 def animate_coils():
     # set frame range
     bpy.context.scene.frame_end = sweep.size
@@ -299,8 +329,8 @@ def create_rig():
     trig = bpy.data.objects.new(name=trigname, object_data=trigarm)
     bpy.context.scene.objects.link(trig)
     bpy.context.scene.objects.active = trig
-    root = bpy.data.objects["Root"]
-    trig.location = root.location
+    troot = bpy.data.objects["TRoot"]
+    trig.location = troot.location
     
     # set type to bezier bone
     trig.data.draw_type = 'BBONE'
@@ -365,7 +395,7 @@ def create_rig():
     jrig = bpy.data.objects.new(name=jrigname, object_data=jrigarm)
     bpy.context.scene.objects.link(jrig)
     bpy.context.scene.objects.active = jrig
-    jrig.location = root.location
+    jrig.location = troot.location
     
     # enter edit mode to assemble armature
     bpy.ops.object.mode_set(mode='EDIT')
@@ -473,6 +503,7 @@ if __name__ == '__main__':
     sweep = load_sweep("${generated.pos.file}", "${copied.header.file}", "${generated.lab.file}")
     process_sweep()
     create_coils()
+    normalize()
     animate_coils()
     #clean_animation_data()
     create_ik_targets()
