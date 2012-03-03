@@ -23,8 +23,21 @@ logging.basicConfig(format='[blender] [%(levelname)s] %(message)s', level=loglev
 sys.path.append("${script.directory}")
 import ema, lab
 
+# utility function for layer access
+def single_layer(i):
+    if i not in range(20):
+        logging.error("Cannot access layer: %d. Index must be between 0 and 19" % i)
+        raise IndexError
+    layers = [False] * 20
+    layers[i] = True
+    return layers
+
 # constants
 ORIGIN = (0, 0, 0)
+layers = {"main" : single_layer(0),
+          "seeds" : single_layer(1),
+          "ema" : single_layer(2),
+          "cameras" : single_layer(3)}
 
 def load_sweep(posfile, headerfile, labfile):
     # load or generate header
@@ -424,6 +437,14 @@ def create_rig():
     
     logging.debug("Rigged model to armature")
 
+def assign_to_layers():
+    # move ema coils and their armatures to the "ema" layer
+    coils = [obj for obj in bpy.data.objects if obj.name.endswith("Coil")]
+    for coil in coils:
+        coil.layers = layers["ema"]
+        armature = coil.parent
+        armature.layers = layers["ema"]
+
 def save_model(blendfile):
     logging.info("Saving %s" % blendfile)
     bpy.ops.wm.save_as_mainfile(filepath=blendfile)
@@ -508,5 +529,6 @@ if __name__ == '__main__':
     #clean_animation_data()
     create_ik_targets()
     create_rig()
+    assign_to_layers()
     save_model("${generated.blend.file}")
     #generate_testsweeps()
