@@ -445,9 +445,20 @@ def assign_to_layers():
         armature = coil.parent
         armature.layers = layers["ema"]
 
-def save_model(blendfile):
+def save_model(daefile, blendfile):
     logging.info("Saving %s" % blendfile)
     bpy.ops.wm.save_as_mainfile(filepath=blendfile)
+    
+#    # bake animation
+#    logging.debug("Baking animation for %d frames" % sweep.size)
+#    start = time.time()
+#    bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
+#    finish = time.time()
+#    processingtime = finish - start
+#    logging.debug("Finished in %.3f s" % processingtime)
+    
+    logging.info("Exporting to %s" % daefile)
+    bpy.ops.wm.collada_export(filepath=daefile)
 
 def generate_testsweeps():
     # setup test variables
@@ -521,6 +532,8 @@ def generate_testsweeps():
     logging.info("Saved tongue armature bone positions to %s" % tongueposfile)
 
 if __name__ == '__main__':
+    # unpack embedded files
+    bpy.ops.file.unpack_all()
     sweep = load_sweep("${generated.pos.file}", "${copied.header.file}", "${generated.lab.file}")
     process_sweep()
     create_coils()
@@ -530,5 +543,5 @@ if __name__ == '__main__':
     create_ik_targets()
     create_rig()
     assign_to_layers()
-    save_model("${generated.blend.file}")
+    save_model("${generated.dae.file}", "${generated.blend.file}")
     #generate_testsweeps()
