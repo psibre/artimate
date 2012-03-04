@@ -226,6 +226,8 @@
 								<include>**/*.dae</include>
 								<include>**/*.wav</include>
 								<include>**/*.lab</include>
+								<include>**/*.jpg</include>
+								<include>**/*.tga</include>
 							</includes>
 						</configuration>
 					</execution>
