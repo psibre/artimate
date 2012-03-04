@@ -425,15 +425,20 @@ def create_rig():
     constraint.target = bpy.data.objects["JawArmature"]
     constraint.subtarget = "Bone"
     
-    # parent mandible to jaw armature
-    jaw = bpy.data.objects["Mandible"]
-    jaw.select = True
-    bpy.ops.object.parent_set()
+#    # parent mandible to jaw armature
+#    bpy.ops.object.select_all(action='DESELECT')
+#    jaw = bpy.data.objects["Mandible"]
+#    jaw.select = True
+#    jrig.select = True
+#    bpy.context.scene.objects.active = jrig
+#    bpy.ops.object.parent_set()
     
-    # parent tongue armature to jaw armature
-    jaw.select = False
-    trig.select = True
-    bpy.ops.object.parent_set()
+#    # parent tongue armature to jaw armature
+#    bpy.ops.object.select_all(action='DESELECT')
+#    jaw.select = False
+#    trig.select = True
+#    bpy.context.scene.objects.active = jrig
+#    bpy.ops.object.parent_set()
     
     logging.debug("Rigged model to armature")
 
@@ -449,13 +454,15 @@ def save_model(daefile, blendfile):
     logging.info("Saving %s" % blendfile)
     bpy.ops.wm.save_as_mainfile(filepath=blendfile)
     
-#    # bake animation
-#    logging.debug("Baking animation for %d frames" % sweep.size)
-#    start = time.time()
-#    bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
-#    finish = time.time()
-#    processingtime = finish - start
-#    logging.debug("Finished in %.3f s" % processingtime)
+    # bake animation
+    logging.debug("Baking animation for %d frames" % sweep.size)
+    start = time.time()
+    trig = bpy.data.objects["TongueArmature"]
+    bpy.context.scene.objects.active = trig
+    bpy.ops.nla.bake(frame_end=bpy.context.scene.frame_end, only_selected=False)
+    finish = time.time()
+    processingtime = finish - start
+    logging.debug("Finished in %.3f s" % processingtime)
     
     logging.info("Exporting to %s" % daefile)
     bpy.ops.wm.collada_export(filepath=daefile)
@@ -542,6 +549,6 @@ if __name__ == '__main__':
     #clean_animation_data()
     create_ik_targets()
     create_rig()
-    assign_to_layers()
+    #assign_to_layers()
     save_model("${generated.dae.file}", "${generated.blend.file}")
     #generate_testsweeps()
