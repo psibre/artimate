@@ -76,7 +76,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 	private UIHud hud;
 
-	protected void initExample(String modelFileName, String targetNodeName, String targetMeshName) {
+	protected void initExample(String modelFileName) {
 		ardor3d._canvas.setTitle("OrbitCam DemoApp");
 
 		// make new console panel
@@ -102,12 +102,11 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 		// Load the collada scene
 		try {
-			ColladaTextGridModel model = new ColladaTextGridModel(ardor3d.animation, modelFileName, targetNodeName,
-					targetMeshName);
+			ColladaTextGridModel model = new ColladaTextGridModel(ardor3d.animation, modelFileName);
 			synthesizer = new AnimationSynthesizer(model.getUnitDB(), ardor3d);
 
-			ardor3d._control.setLookAtSpatial(model.getMesh());
-			ardor3d._root.attachChild(model.getTargetNode());
+			ardor3d._control.setLookAtSpatial(model.getScene());
+			ardor3d._root.attachChild(model.getScene());
 
 			try {
 				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
@@ -181,7 +180,7 @@ public class DemoApp implements Runnable, Updater, Scene {
 
 		// TODO make this flexible!
 		// initExample("flexiquad.dae", "Cube", "Cube_001-mesh");
-		initExample("Tongue.dae", "Tongue", "pink1");
+		initExample("Tongue.dae");
 
 		ardor3d._root.updateGeometricState(0);
 	}
