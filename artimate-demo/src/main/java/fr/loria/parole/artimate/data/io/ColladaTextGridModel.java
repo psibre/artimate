@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import com.ardor3d.extension.animation.skeletal.AnimationManager;
-import com.ardor3d.extension.animation.skeletal.SkinnedMesh;
 import com.ardor3d.extension.animation.skeletal.blendtree.ClipSource;
 import com.ardor3d.extension.animation.skeletal.clip.AnimationClip;
 import com.ardor3d.extension.animation.skeletal.clip.JointChannel;
@@ -14,6 +13,7 @@ import com.ardor3d.extension.model.collada.jdom.ColladaImporter;
 import com.ardor3d.extension.model.collada.jdom.data.ColladaStorage;
 import com.ardor3d.extension.model.collada.jdom.data.SkinData;
 import com.ardor3d.scenegraph.Node;
+import com.ardor3d.scenegraph.Spatial;
 
 import fr.loria.parole.artimate.data.Unit;
 import fr.loria.parole.artimate.data.UnitDB;
@@ -23,15 +23,12 @@ public class ColladaTextGridModel {
 	private static final Logger logger = Logger.getLogger(ColladaTextGridModel.class.getName());
 	private UnitDB unitDB;
 	private AnimationManager manager;
-	private Node targetNode;
-	private SkinnedMesh mesh;
+	private Node scene;
 
-	public ColladaTextGridModel(AnimationManager manager, String modelFileName, String targetNodeName, String targetMaterialName)
+	public ColladaTextGridModel(AnimationManager manager, String modelFileName)
 			throws IOException {
 		ColladaStorage storage = new ColladaImporter().load(modelFileName);
-		targetNode = (Node) storage.getScene().getChild(targetNodeName);
-		Node geom = (Node) targetNode.getChild(targetNodeName);
-		mesh = (SkinnedMesh) geom.getChild(String.format("%s[%s]", targetNodeName, targetMaterialName));
+		scene = storage.getScene();
 
 		this.manager = manager;
 		setupAnimations(storage);
@@ -79,12 +76,8 @@ public class ColladaTextGridModel {
 		return unitDB;
 	}
 
-	public Node getTargetNode() {
-		return targetNode;
-	}
-
-	public SkinnedMesh getMesh() {
-		return mesh;
+	public Spatial getScene() {
+		return scene;
 	}
 
 }

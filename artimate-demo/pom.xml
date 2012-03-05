@@ -61,7 +61,6 @@
 		<resources>
 			<resource>
 				<directory>${project.resource.directory}</directory>
-				<filtering>true</filtering>
 				<excludes>
 					<exclude>*.blend*</exclude>
 				</excludes>
