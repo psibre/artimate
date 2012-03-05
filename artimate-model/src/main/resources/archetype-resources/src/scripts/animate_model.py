@@ -34,9 +34,9 @@ def single_layer(i):
 
 # constants
 ORIGIN = (0, 0, 0)
-layers = {"main" : single_layer(0),
-          "seeds" : single_layer(1),
-          "ema" : single_layer(2),
+layers = {"main"    : single_layer(0),
+          "seeds"   : single_layer(1),
+          "ema"     : single_layer(2),
           "cameras" : single_layer(3)}
 
 def load_sweep(posfile, headerfile, labfile):
@@ -412,20 +412,25 @@ def create_rig():
     bpy.ops.object.mode_set(mode='EDIT')
     jawbonename = "JawTargetBone"
     jawbone = trig.data.edit_bones.new(name=jawbonename)
+    
+    # TODO: this has to be configurable!
+    jawtarget = bpy.data.objects["JawTarget"]
+    jawtargethead = jawtarget.pose.bones['Bone'].head
+    jawtargetlocation = jawtarget.location - trig.location + jawtargethead
+    
     parentbone = trig.data.edit_bones["RootBone"]
     jawbone.parent = parentbone
-    jawbone.head = (-1, 0, 0)
-    jawbone.tail = (-1, 0, 1)
+    jawbone.head = parentbone.head
+    jawbone.head.x -= 1
+    jawbone.tail = jawtargetlocation
+    logging.debug("Creating %s to %s" % (jawbonename, jawtarget.name))
     
     # add tracking constraint
     bpy.ops.object.mode_set(mode='POSE')
     posebone = trig.pose.bones[jawbonename]
-    # TODO: this has to be configurable!
-    constraint = posebone.constraints.new(type='TRACK_TO')
-    constraint.target = bpy.data.objects["JawTarget"]
+    constraint = posebone.constraints.new(type='IK')
+    constraint.target = jawtarget
     constraint.subtarget = "Bone"
-    constraint.track_axis = 'TRACK_X'
-    constraint.use_target_z = True
     
     # parent mandible and lower teeth to jaw bone
     jaw = bpy.data.objects["Mandible"]
