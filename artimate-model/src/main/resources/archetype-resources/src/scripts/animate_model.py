@@ -67,9 +67,10 @@ def create_coils():
     material = bpy.data.materials.new(name="DUMMY")
     
     # create coil objects (reversed so that actions are in ascending order)
+    coils = []
     for coilname in reversed(sweep.coils):
         # create armature
-        armaturename = coilname + "Armature"
+        armaturename = coilname + "CoilArmature"
         armaturearm = bpy.data.armatures.new(name=armaturename)
         
         # create armature object and link to scene
@@ -107,11 +108,14 @@ def create_coils():
         # DEBUG
         coil.hide = True
         #armature.show_name = True
+        
+        coils.append(coil)
+    return coils
 
 def normalize():
-    ref1 = bpy.data.objects["Ref1Armature"]
-    ref2 = bpy.data.objects["Ref2Armature"]
-    ref3 = bpy.data.objects["Ref3Armature"]
+    ref1 = bpy.data.objects["Ref1CoilArmature"]
+    ref2 = bpy.data.objects["Ref2CoilArmature"]
+    ref3 = bpy.data.objects["Ref3CoilArmature"]
     logging.debug("Normalizing wrt to %s, %s, and %s" % (ref1.name, ref2.name, ref3.name))
     
     # create root node
@@ -146,7 +150,7 @@ def animate_coils():
 
     for coilname in sweep.coils:
             # get armature
-            armaturename = coilname + "Armature"
+            armaturename = coilname + "CoilArmature"
             armature = bpy.data.objects[armaturename]
             
             # transform armature to channel position and rotation
@@ -247,7 +251,7 @@ def create_ik_targets():
         iktargetanimation = iktarget.animation_data_create()
         ikaction = bpy.data.actions.new(iktargetname + "Action")
         iktargetanimation.action = ikaction
-        coiltargetname = iktargetname.replace("Target", "Armature")
+        coiltargetname = iktargetname.replace("Target", "CoilArmature")
         coiltarget = bpy.data.objects[coiltargetname]
         distance = coiltarget.location - iktarget.location
         # TODO: for now we disregard rotation!
@@ -422,7 +426,7 @@ def create_rig():
     # add constraint to track EMA coil on lower incisor
     constraint = jrig.constraints.new(type='TRACK_TO')
     # TODO: this has to be configurable!
-    constraint.target = bpy.data.objects["JawArmature"]
+    constraint.target = bpy.data.objects["JawCoilArmature"]
     constraint.subtarget = "Bone"
     
 #    # parent mandible to jaw armature
@@ -477,14 +481,14 @@ def generate_testsweeps():
     tongueposfile = "%s/tongue.pos" % testdir
     
     # initialize test sweeps
-    coilsweep = ema.Sweep()
-    iktargetsweep = ema.Sweep()
-    tonguesweep = ema.Sweep()
+    coilsweep = ema.Sweep(header=sweep.header)
+    iktargetsweep = ema.Sweep(header=sweep.header)
+    tonguesweep = ema.Sweep(header=sweep.header)
     
     # tongue armature
     rig = bpy.data.objects["TongueArmature"]
     rigbones = rig.pose.bones["RootBone"].children_recursive
-
+    
     # iterate over all animation frames in timeline
     for frame in range(bpy.context.scene.frame_start, bpy.context.scene.frame_end + 1):
         bpy.context.scene.frame_set(frame)
@@ -498,7 +502,7 @@ def generate_testsweeps():
             #    print(frame, x, y, z)
             
             # actual EMA coil
-            coilname = channel + "Armature"
+            coilname = channel + "CoilArmature"
             coil = bpy.data.objects[coilname]
             x, y, z = coil.location * 10 # convert back to mm
             phi, theta, psi = coil.rotation_euler
@@ -543,12 +547,12 @@ if __name__ == '__main__':
     bpy.ops.file.unpack_all()
     sweep = load_sweep("${generated.pos.file}", "${copied.header.file}", "${generated.lab.file}")
     process_sweep()
-    create_coils()
+    coils = create_coils()
     normalize()
     animate_coils()
     #clean_animation_data()
     create_ik_targets()
     create_rig()
     #assign_to_layers()
-    save_model("${generated.dae.file}", "${generated.blend.file}")
     #generate_testsweeps()
+    save_model("${generated.dae.file}", "${generated.blend.file}")
