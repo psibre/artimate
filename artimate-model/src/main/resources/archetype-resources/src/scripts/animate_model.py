@@ -453,6 +453,18 @@ def create_rig():
         bpy.ops.object.vertex_group_assign()
         bpy.ops.object.mode_set(mode='OBJECT')
     
+    # parent maxilla and upper teeth to jaw bone
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.scene.objects.active = trig
+    jaw = bpy.data.objects["Maxilla"]
+    jaw.select = True
+    upperteeth = [obj for obj in bpy.data.objects
+                  if obj.name.startswith("Tooth1") or obj.name.startswith("Tooth2")]
+    for tooth in upperteeth:
+        tooth.hide_select = False
+        tooth.select = True
+    bpy.ops.object.parent_set(type='ARMATURE_NAME')
+    
     logging.debug("Rigged model to armature")
 
 def assign_to_layers():
