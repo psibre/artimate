@@ -20,14 +20,18 @@
 		<path.to.praat>/Applications/Praat.app/Contents/MacOS/praat</path.to.praat>
 		<path.to.python>python</path.to.python>
 
-		<copied.resources.directory>${project.build.directory}/raw-resources</copied.resources.directory>
+		<copied.resources.directory>${project.build.directory}/copied-resources</copied.resources.directory>
 		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
-		<generated.test.resources.directory>${project.build.directory}/test-generated-resources</generated.test.resources.directory>
+		<test.resources.directory>${project.build.directory}/test-generated-resources</test.resources.directory>
 
-		<copied.mesh.file>${copied.resources.directory}/${mesh.file}</copied.mesh.file>
+		<copied.model.file>${copied.resources.directory}/${model.file}</copied.model.file>
 		<generated.pos.file>${generated.resources.directory}/${pos.file}</generated.pos.file>
+		<copied.header.file>${copied.resources.directory}/headers.txt</copied.header.file>
 		<generated.lab.file>${generated.resources.directory}/${lab.file}</generated.lab.file>
 		<generated.dae.file>${generated.resources.directory}/${dae.file}</generated.dae.file>
+		<generated.blend.file>${generated.resources.directory}/${model.file}</generated.blend.file>
+
+		<blender.log.level>info</blender.log.level>
 	</properties>
 
 	<build>
@@ -69,8 +73,9 @@
 			<plugin>
 				<artifactId>maven-resources-plugin</artifactId>
 				<executions>
+
 					<execution>
-						<id>copy-resources</id>
+						<id>copy-ema-resources</id>
 						<phase>generate-resources</phase>
 						<goals>
 							<goal>copy-resources</goal>
@@ -82,8 +87,22 @@
 									<directory>${data.directory}/pos</directory>
 									<includes>
 										<include>*.pos</include>
+										<include>headers.txt</include>
 									</includes>
 								</resource>
+							</resources>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>copy-wav-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${copied.resources.directory}</outputDirectory>
+							<resources>
 								<resource>
 									<directory>${data.directory}/wav</directory>
 									<includes>
@@ -91,15 +110,29 @@
 										<include>*.TextGrid</include>
 									</includes>
 								</resource>
+							</resources>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>copy-model-resources</id>
+						<phase>generate-resources</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${copied.resources.directory}</outputDirectory>
+							<resources>
 								<resource>
 									<directory>${data.directory}</directory>
 									<includes>
-										<include>*.ply</include>
+										<include>${model.file}</include>
 									</includes>
 								</resource>
 							</resources>
 						</configuration>
 					</execution>
+
 					<execution>
 						<id>copy-scripts</id>
 						<phase>generate-resources</phase>
@@ -116,6 +149,7 @@
 							</resources>
 						</configuration>
 					</execution>
+
 				</executions>
 			</plugin>
 
@@ -168,9 +202,10 @@
 							<workingDirectory>${script.directory}</workingDirectory>
 							<executable>${path.to.blender}</executable>
 							<arguments>
+								<argument>${copied.model.file}</argument>
 								<argument>--background</argument>
 								<argument>--python</argument>
-								<argument>${script.directory}/generate_model.py</argument>
+								<argument>${script.directory}/animate_model.py</argument>
 							</arguments>
 						</configuration>
 					</execution>
@@ -191,6 +226,8 @@
 								<include>**/*.dae</include>
 								<include>**/*.wav</include>
 								<include>**/*.lab</include>
+								<include>**/*.jpg</include>
+								<include>**/*.tga</include>
 							</includes>
 						</configuration>
 					</execution>
