@@ -405,44 +405,48 @@ def create_rig():
     # DEBUG
     trig.show_x_ray = True
     
-    # jaw rig
-        # create tongue armature
-    jrigname = "JawArmature"
-    jrigarm = bpy.data.armatures.new(name=jrigname)
-    jrig = bpy.data.objects.new(name=jrigname, object_data=jrigarm)
-    bpy.context.scene.objects.link(jrig)
-    bpy.context.scene.objects.active = jrig
-    jrig.location = troot.location
+    # enter edit mode to add jaw bone
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.scene.objects.active = trig
     
-    # enter edit mode to assemble armature
     bpy.ops.object.mode_set(mode='EDIT')
+    jawbonename = "JawTargetBone"
+    jawbone = trig.data.edit_bones.new(name=jawbonename)
+    parentbone = trig.data.edit_bones["RootBone"]
+    jawbone.parent = parentbone
+    jawbone.head = (-1, 0, 0)
+    jawbone.tail = (-1, 0, 1)
     
-    # root bone
-    jrootbone = jrigarm.edit_bones.new(name="RootBone")
-    jrootbone.tail.z += 1
-    
-    bpy.ops.object.mode_set(mode='OBJECT')
-
-    # add constraint to track EMA coil on lower incisor
-    constraint = jrig.constraints.new(type='TRACK_TO')
+    # add tracking constraint
+    bpy.ops.object.mode_set(mode='POSE')
+    posebone = trig.pose.bones[jawbonename]
     # TODO: this has to be configurable!
-    constraint.target = bpy.data.objects["JawCoilArmature"]
+    constraint = posebone.constraints.new(type='TRACK_TO')
+    constraint.target = bpy.data.objects["JawTarget"]
     constraint.subtarget = "Bone"
+    constraint.track_axis = 'TRACK_X'
+    constraint.use_target_z = True
     
-#    # parent mandible to jaw armature
-#    bpy.ops.object.select_all(action='DESELECT')
-#    jaw = bpy.data.objects["Mandible"]
-#    jaw.select = True
-#    jrig.select = True
-#    bpy.context.scene.objects.active = jrig
-#    bpy.ops.object.parent_set()
+    # parent mandible and lower teeth to jaw bone
+    jaw = bpy.data.objects["Mandible"]
+    jaw.select = True
+    lowerteeth = [obj for obj in bpy.data.objects
+                  if obj.name.startswith("Tooth3") or obj.name.startswith("Tooth4")]
+    for tooth in lowerteeth:
+        tooth.hide_select = False
+        tooth.select = True
+    bpy.ops.object.parent_set(type='ARMATURE_NAME')
     
-#    # parent tongue armature to jaw armature
-#    bpy.ops.object.select_all(action='DESELECT')
-#    jaw.select = False
-#    trig.select = True
-#    bpy.context.scene.objects.active = jrig
-#    bpy.ops.object.parent_set()
+    # set vertex groups to jaw bone for jaw/lower teeth
+    bpy.ops.object.mode_set(mode='OBJECT')
+    bpy.ops.object.select_all(action='DESELECT')
+    for object in [jaw] + lowerteeth:
+        bpy.context.scene.objects.active = object
+        bpy.ops.object.mode_set(mode='EDIT')
+        # possibly redundant, but let's be sure:
+        bpy.ops.object.vertex_group_set_active(group=jawbonename)
+        bpy.ops.object.vertex_group_assign()
+        bpy.ops.object.mode_set(mode='OBJECT')
     
     logging.debug("Rigged model to armature")
 
