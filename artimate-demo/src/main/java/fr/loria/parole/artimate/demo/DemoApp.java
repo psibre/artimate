@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import com.ardor3d.annotation.MainThread;
-import com.ardor3d.extension.animation.skeletal.util.SkeletalDebugger;
 import com.ardor3d.framework.Scene;
 import com.ardor3d.framework.Updater;
 import com.ardor3d.image.util.AWTImageLoader;
@@ -209,9 +208,6 @@ public class DemoApp implements Runnable, Updater, Scene {
 		if (ardor3d._showNormals) {
 			Debugger.drawNormals(ardor3d._root, renderer);
 			Debugger.drawTangents(ardor3d._root, renderer);
-		}
-		if (ardor3d._showSkeleton) {
-			SkeletalDebugger.drawSkeletons(ardor3d._root, renderer, false, true);
 		}
 	}
 
