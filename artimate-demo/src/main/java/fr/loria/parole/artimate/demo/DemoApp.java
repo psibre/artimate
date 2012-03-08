@@ -66,8 +66,8 @@ public class DemoApp implements Runnable, Updater, Scene {
 			ardor3d._root.attachChild(model.getScene());
 
 			try {
-				XWavesSegmentation testsegmentation = new XWavesSegmentation("test.lab");
-				synthesizer.synthesizeAnimation(testsegmentation);
+				XWavesSegmentation database = new XWavesSegmentation("all.lab");
+				synthesizer.synthesizeAnimation(database);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
