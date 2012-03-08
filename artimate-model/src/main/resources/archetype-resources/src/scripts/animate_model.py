@@ -1,7 +1,7 @@
 #!${path.to.blender} ${copied.model.file} --background --python
 
 # imports
-import os, sys
+import os, sys, re
 
 # import blender modules
 try:
@@ -324,13 +324,19 @@ def addbone(parentbonename, targetobjectname):
     constraint.target = target
     constraint.subtarget = "Bone"
     
-    # IK chain length goes back up to root
-    constraint.chain_count = len(posebone.parent_recursive)
+    # IK chain length goes back up to *one before* root
+    constraint.chain_count = len(posebone.parent_recursive) - 1
     # axis reference
     constraint.reference_axis = 'TARGET'
     # TODO consider adding pole targets
     # allow full stretching
     posebone.ik_stretch = 1
+    
+    # first bone on lateral branch gets fresh angle
+    # TODO make this configurable!
+    lateral_pattern = re.compile(r'.*[a-z][LR].*')
+    if lateral_pattern.match(bonename) and not lateral_pattern.match(parentbonename):
+        posebone.bone.bbone_in = 0
     
     # volume constraint
     posebone.constraints.new(type='MAINTAIN_VOLUME')
@@ -370,14 +376,16 @@ def create_rig():
     #}
     
     addbone("RootBone", "TBackCTarget")
-    addbone("TBackCTargetBone", "TMidCTarget")
-    addbone("TMidCTargetBone", "TTipCTarget")
     
     addbone("TBackCTargetBone", "TMidLTarget")
     addbone("TMidLTargetBone", "TBladeLTarget")
     
     addbone("TBackCTargetBone", "TMidRTarget")
     addbone("TMidRTargetBone", "TBladeRTarget")
+    
+    # center branch mut be added *last* to avoid lateral deformation
+    addbone("TBackCTargetBone", "TMidCTarget")
+    addbone("TMidCTargetBone", "TTipCTarget")
     
     bpy.ops.object.mode_set(mode='OBJECT')
     
@@ -475,10 +483,11 @@ def assign_to_layers():
         armature = coil.parent
         armature.layers = layers["ema"]
 
-def save_model(daefile, blendfile):
+def save_model(blendfile):
     logging.info("Saving %s" % blendfile)
     bpy.ops.wm.save_as_mainfile(filepath=blendfile)
     
+def export_model(daefile):
     # bake animation
     logging.debug("Baking animation for %d frames" % sweep.size)
     start = time.time()
@@ -576,4 +585,5 @@ if __name__ == '__main__':
     create_rig()
     #assign_to_layers()
     #generate_testsweeps()
-    save_model("${generated.dae.file}", "${generated.blend.file}")
+    save_model("${generated.blend.file}")
+    export_model("${generated.dae.file}")
