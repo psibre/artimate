@@ -16,10 +16,6 @@
 	<properties>
 		<script.directory>${project.build.directory}/scripts</script.directory>
 
-		<path.to.blender>/Applications/blender.app/Contents/MacOS/blender</path.to.blender>
-		<path.to.praat>/Applications/Praat.app/Contents/MacOS/praat</path.to.praat>
-		<path.to.python>python</path.to.python>
-
 		<copied.resources.directory>${project.build.directory}/copied-resources</copied.resources.directory>
 		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
 		<test.resources.directory>${project.build.directory}/test-generated-resources</test.resources.directory>
