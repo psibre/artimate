@@ -42,12 +42,6 @@ Prerequisites
   This can be done either on the command line, using <<<-Dpath.to.program=/path/on/my/system/program>>>,
   or by editing the file <<<build.config>>> in your staging directory.
 
-* Python
- 
-  {{{http://python.org/}Python home page}}
-
-  Property: <<<path.to.python>>>
-
 * Praat
  
   {{{http://praat.org/}Praat home page}}
