@@ -204,6 +204,16 @@
 
 	</build>
 
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>11.0.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<reporting>
 		<plugins>
 			<plugin>
