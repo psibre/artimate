@@ -30,6 +30,14 @@
 		<blender.log.level>info</blender.log.level>
 	</properties>
 
+	<dependencies>
+		<dependency>
+			<groupId>${project.parent.groupId}</groupId>
+			<artifactId>artimate-model</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+	</dependencies>
+
 	<build>
 
 		<resources>
@@ -158,15 +166,13 @@
 						<id>concatenate-pos</id>
 						<phase>generate-resources</phase>
 						<goals>
-							<goal>exec</goal>
+							<goal>java</goal>
 						</goals>
 						<configuration>
-							<workingDirectory>${script.directory}</workingDirectory>
-							<executable>${path.to.python}</executable>
+							<mainClass>fr.loria.parole.artimate.model.PosConcatenator</mainClass>
 							<arguments>
-								<argument>CatPos.py</argument>
-								<argument>--input-directory=${copied.resources.directory}</argument>
-								<argument>--output-file=${generated.pos.file}</argument>
+								<argument>${copied.resources.directory}</argument>
+								<argument>${generated.pos.file}</argument>
 							</arguments>
 						</configuration>
 					</execution>
