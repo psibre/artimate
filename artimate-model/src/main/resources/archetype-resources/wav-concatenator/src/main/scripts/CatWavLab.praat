@@ -1,10 +1,9 @@
 #!/usr/bin/env praat
 
 # arguments
-form Input directory
-  sentence Input_directory
-  sentence Output_directory
-endform
+input_directory$ = "${src.wav.directory}"
+wav_out$ = "${target.wav.file}"
+output_directory$ = left$(wav_out$, rindex(wav_out$, "/"))
 
 # glob input files to array, exit if none found
 list = Create Strings as file list... fileList 'input_directory$'/*.wav
@@ -18,10 +17,8 @@ for w to wav.size
 endfor
 Remove
 
-# output files
-output_basename$ = "all"
-wav_out$ = "'output_directory$'/'output_basename$'.wav"
-tg_out$ = "'output_directory$'/'output_basename$'.TextGrid"
+# output
+tg_out$ = wav_out$ - ".wav" + ".TextGrid"
 
 # append each input wav file
 offset = 0

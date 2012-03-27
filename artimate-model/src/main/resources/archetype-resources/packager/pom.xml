@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>${groupId}</groupId>
+		<artifactId>${artifactId}</artifactId>
+		<version>${version}</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<artifactId>${rootArtifactId}-packager</artifactId>
+	<packaging>jar</packaging>
+
+	<properties>
+		<properties.file>${project.parent.relativePath}/${properties.file.name}</properties.file>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-remote-resources-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>bundle</goal>
+						</goals>
+						<configuration>
+							<resourcesDirectory>${target.data.directory}</resourcesDirectory>
+							<includes>
+								<include>**/*</include>
+							</includes>
+							<excludes>
+							    <exclude>**/remote-resources.xml</exclude>
+								<exclude>**/*.pos</exclude>
+								<exclude>**/*.TextGrid</exclude>
+								<exclude>**/*.blend*</exclude>
+							</excludes>
+							<outputDirectory>${target.data.directory}</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<classesDirectory>${target.data.directory}</classesDirectory>
+					<excludes>
+						<exclude>**/*.pos</exclude>
+						<exclude>**/*.TextGrid</exclude>
+						<exclude>**/*.blend*</exclude>
+					</excludes>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<file>${project.build.directory}/${project.build.finalName}.${project.packaging}</file>
+							<groupId>${project.parent.groupId}</groupId>
+							<artifactId>${project.parent.artifactId}</artifactId>
+							<version>${project.parent.version}</version>
+							<packaging>${project.packaging}</packaging>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

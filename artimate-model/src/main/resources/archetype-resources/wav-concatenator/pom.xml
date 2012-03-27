@@ -11,4 +11,52 @@
 
 	<artifactId>${rootArtifactId}-wav-concatenator</artifactId>
 
+	<properties>
+		<properties.file>${project.parent.relativePath}/${properties.file.name}</properties.file>
+
+		<src.wav.directory>${src.data.directory}/wav</src.wav.directory>
+		<target.wav.file>${target.data.directory}/${wav.file}</target.wav.file>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.build.scriptSourceDirectory}</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>concatenate-wav-lab</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${project.build.outputDirectory}</workingDirectory>
+							<executable>${path.to.praat}</executable>
+							<arguments>
+								<argument>CatWavLab.praat</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-install</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

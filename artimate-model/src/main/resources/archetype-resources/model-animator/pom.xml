@@ -11,4 +11,58 @@
 
 	<artifactId>${rootArtifactId}-model-animator</artifactId>
 
+	<properties>
+		<properties.file>${project.parent.relativePath}/${properties.file.name}</properties.file>
+
+		<src.pos.file>${target.data.directory}/${pos.file}</src.pos.file>
+		<src.header.file>${src.data.directory}/pos/headers.txt</src.header.file>
+		<src.lab.file>${target.data.directory}/${lab.file}</src.lab.file>
+
+		<target.blend.file>${target.data.directory}/${model.file}</target.blend.file>
+		<target.dae.file>${target.data.directory}/${dae.file}</target.dae.file>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.build.scriptSourceDirectory}</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>blender</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${path.to.blender}</executable>
+							<arguments>
+								<argument>${src.data.directory}/${model.file}</argument>
+								<argument>--background</argument>
+								<argument>--python</argument>
+								<argument>${project.build.outputDirectory}/animate_model.py</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-install</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
 </project>

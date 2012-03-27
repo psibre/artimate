@@ -20,7 +20,7 @@ if not isinstance(loglevel, int):
 logging.basicConfig(format='[blender] [%(levelname)s] %(message)s', level=loglevel)
 
 # import custom modules
-sys.path.append("${script.directory}")
+sys.path.append("${project.build.outputDirectory}")
 import ema, lab
 
 # utility function for layer access
@@ -53,7 +53,11 @@ def load_sweep(posfile, headerfile, labfile):
     
     # load EMA sweep
     logging.info("Loading %s" % posfile)
-    sweep = ema.Sweep(posfile, header, labfile)
+    try:
+        sweep = ema.Sweep(posfile, header, labfile)
+    except IOError:
+        logging.error(sys.exc_info()[1])
+        sys.exit(1)
     return sweep
 
 def process_sweep():
@@ -113,9 +117,13 @@ def create_coils():
     return coils
 
 def normalize():
-    ref1 = bpy.data.objects["Ref1CoilArmature"]
-    ref2 = bpy.data.objects["Ref2CoilArmature"]
-    ref3 = bpy.data.objects["Ref3CoilArmature"]
+    try:
+        ref1 = bpy.data.objects["Ref1CoilArmature"]
+        ref2 = bpy.data.objects["Ref2CoilArmature"]
+        ref3 = bpy.data.objects["Ref3CoilArmature"]
+    except KeyError:
+        logging.error(sys.exc_info()[1])
+        sys.exit(1)
     logging.debug("Normalizing wrt to %s, %s, and %s" % (ref1.name, ref2.name, ref3.name))
     
     # create root node
@@ -575,7 +583,7 @@ def generate_testsweeps():
 if __name__ == '__main__':
     # unpack embedded files
     bpy.ops.file.unpack_all()
-    sweep = load_sweep("${generated.pos.file}", "${copied.header.file}", "${generated.lab.file}")
+    sweep = load_sweep("${src.pos.file}", "${src.header.file}", "${src.lab.file}")
     process_sweep()
     coils = create_coils()
     normalize()
@@ -585,5 +593,5 @@ if __name__ == '__main__':
     create_rig()
     #assign_to_layers()
     #generate_testsweeps()
-    save_model("${generated.blend.file}")
-    export_model("${generated.dae.file}")
+    save_model("${target.blend.file}")
+    export_model("${target.dae.file}")

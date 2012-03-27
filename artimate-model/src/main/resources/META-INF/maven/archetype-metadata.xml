@@ -34,5 +34,6 @@
 				</fileSet>
 			</fileSets>
 		</module>
+		<module dir="packager" />
 	</modules>
 </archetype-descriptor>
