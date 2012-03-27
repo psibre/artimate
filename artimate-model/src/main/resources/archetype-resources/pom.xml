@@ -11,7 +11,7 @@
 	<groupId>${groupId}</groupId>
 	<artifactId>${artifactId}</artifactId>
 	<version>${version}</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
 	<properties>
 		<script.directory>${project.build.directory}/scripts</script.directory>
@@ -27,6 +27,12 @@
 		<generated.dae.file>${generated.resources.directory}/${dae.file}</generated.dae.file>
 		<generated.blend.file>${generated.resources.directory}/${model.file}</generated.blend.file>
 	</properties>
+
+	<modules>
+		<module>pos-concatenator</module>
+		<module>wav-concatenator</module>
+		<module>model-animator</module>
+	</modules>
 
 	<dependencies>
 		<dependency>
