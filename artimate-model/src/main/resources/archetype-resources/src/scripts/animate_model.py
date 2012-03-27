@@ -13,7 +13,7 @@ except ImportError:
 # logging
 import time
 import logging
-blenderloglevel = "${blender.log.level}"
+blenderloglevel = "${log.level}"
 loglevel = getattr(logging, blenderloglevel.upper(), None)
 if not isinstance(loglevel, int):
     raise ValueError('Invalid log level: %s' % blenderloglevel)

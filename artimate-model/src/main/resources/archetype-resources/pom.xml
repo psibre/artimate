@@ -26,8 +26,6 @@
 		<generated.lab.file>${generated.resources.directory}/${lab.file}</generated.lab.file>
 		<generated.dae.file>${generated.resources.directory}/${dae.file}</generated.dae.file>
 		<generated.blend.file>${generated.resources.directory}/${model.file}</generated.blend.file>
-
-		<blender.log.level>info</blender.log.level>
 	</properties>
 
 	<dependencies>
@@ -174,6 +172,16 @@
 								<argument>${copied.resources.directory}</argument>
 								<argument>${generated.pos.file}</argument>
 							</arguments>
+							<systemProperties>
+								<systemProperty>
+									<key>log.format</key>
+									<value>${log.format}</value>
+								</systemProperty>
+								<systemProperty>
+									<key>log.level</key>
+									<value>${log.level}</value>
+								</systemProperty>
+							</systemProperties>
 						</configuration>
 					</execution>
 
