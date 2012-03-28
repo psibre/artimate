@@ -90,6 +90,11 @@
 				</plugin>
 
 				<plugin>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>1.0.1</version>
+				</plugin>
+
+				<plugin>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>2.3.1</version>
 				</plugin>
@@ -143,6 +148,20 @@
 										<versionRange>[2.1,)</versionRange>
 										<goals>
 											<goal>copy-dependencies</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-enforcer-plugin</artifactId>
+										<versionRange>[1.0.1,)</versionRange>
+										<goals>
+											<goal>enforce</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>

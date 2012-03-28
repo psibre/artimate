@@ -14,6 +14,7 @@
 	<properties>
 		<properties.file>${project.parent.relativePath}/${properties.file.name}</properties.file>
 
+		<src.blend.file>${src.data.directory}/${model.file}</src.blend.file>
 		<src.pos.file>${target.data.directory}/${pos.file}</src.pos.file>
 		<src.header.file>${src.data.directory}/pos/headers.txt</src.header.file>
 		<src.lab.file>${target.data.directory}/${lab.file}</src.lab.file>
@@ -32,6 +33,28 @@
 
 		<plugins>
 			<plugin>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<rules>
+								<requireFilesExist>
+									<files>
+										<file>${src.blend.file}</file>
+									</files>
+								</requireFilesExist>
+							</rules>
+							<fail>true</fail>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
 				<executions>
@@ -44,7 +67,7 @@
 						<configuration>
 							<executable>${path.to.blender}</executable>
 							<arguments>
-								<argument>${src.data.directory}/${model.file}</argument>
+								<argument>${src.blend.file}</argument>
 								<argument>--background</argument>
 								<argument>--python</argument>
 								<argument>${project.build.outputDirectory}/animate_model.py</argument>

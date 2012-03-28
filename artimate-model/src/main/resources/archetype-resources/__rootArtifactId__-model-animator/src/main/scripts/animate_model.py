@@ -1,4 +1,4 @@
-#!${path.to.blender} ${copied.model.file} --background --python
+#!${path.to.blender} ${src.blend.file} --background --python
 
 # imports
 import os, sys, re
