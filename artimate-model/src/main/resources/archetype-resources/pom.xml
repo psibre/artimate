@@ -24,10 +24,10 @@
 	</properties>
 
 	<modules>
-		<module>pos-concatenator</module>
-		<module>wav-concatenator</module>
-		<module>model-animator</module>
-		<module>packager</module>
+		<module>${rootArtifactId}-pos-concatenator</module>
+		<module>${rootArtifactId}-wav-concatenator</module>
+		<module>${rootArtifactId}-model-animator</module>
+		<module>${rootArtifactId}-packager</module>
 	</modules>
 
 	<dependencyManagement>

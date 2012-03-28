@@ -4,18 +4,22 @@
 
 	<parent>
 		<groupId>${groupId}</groupId>
-		<artifactId>${artifactId}</artifactId>
+		<artifactId>${rootArtifactId}</artifactId>
 		<version>${version}</version>
 		<relativePath>..</relativePath>
 	</parent>
 
-	<artifactId>${rootArtifactId}-wav-concatenator</artifactId>
+	<artifactId>${rootArtifactId}-model-animator</artifactId>
 
 	<properties>
 		<properties.file>${project.parent.relativePath}/${properties.file.name}</properties.file>
 
-		<src.wav.directory>${src.data.directory}/wav</src.wav.directory>
-		<target.wav.file>${target.data.directory}/${wav.file}</target.wav.file>
+		<src.pos.file>${target.data.directory}/${pos.file}</src.pos.file>
+		<src.header.file>${src.data.directory}/pos/headers.txt</src.header.file>
+		<src.lab.file>${target.data.directory}/${lab.file}</src.lab.file>
+
+		<target.blend.file>${target.data.directory}/${model.file}</target.blend.file>
+		<target.dae.file>${target.data.directory}/${dae.file}</target.dae.file>
 	</properties>
 
 	<build>
@@ -32,16 +36,18 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>concatenate-wav-lab</id>
+						<id>blender</id>
 						<phase>compile</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
 						<configuration>
-							<workingDirectory>${project.build.outputDirectory}</workingDirectory>
-							<executable>${path.to.praat}</executable>
+							<executable>${path.to.blender}</executable>
 							<arguments>
-								<argument>CatWavLab.praat</argument>
+								<argument>${src.data.directory}/${model.file}</argument>
+								<argument>--background</argument>
+								<argument>--python</argument>
+								<argument>${project.build.outputDirectory}/animate_model.py</argument>
 							</arguments>
 						</configuration>
 					</execution>

@@ -13,8 +13,8 @@
 		</fileSet>
 	</fileSets>
 	<modules>
-		<module dir="pos-concatenator" />
-		<module dir="wav-concatenator">
+		<module id="${rootArtifactId}-pos-concatenator" dir="__rootArtifactId__-pos-concatenator" />
+		<module id="${rootArtifactId}-wav-concatenator" dir="__rootArtifactId__-wav-concatenator">
 			<fileSets>
 				<fileSet>
 					<directory />
@@ -24,7 +24,7 @@
 				</fileSet>
 			</fileSets>
 		</module>
-		<module dir="model-animator">
+		<module id="${rootArtifactId}-model-animator" dir="__rootArtifactId__-model-animator">
 			<fileSets>
 				<fileSet>
 					<directory />
@@ -34,6 +34,6 @@
 				</fileSet>
 			</fileSets>
 		</module>
-		<module dir="packager" />
+		<module id="${rootArtifactId}-packager" dir="__rootArtifactId__-packager" />
 	</modules>
 </archetype-descriptor>
