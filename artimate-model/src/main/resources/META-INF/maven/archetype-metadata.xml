@@ -24,6 +24,16 @@
 				</fileSet>
 			</fileSets>
 		</module>
+		<module id="${rootArtifactId}-lab-concatenator" dir="__rootArtifactId__-lab-concatenator">
+			<fileSets>
+				<fileSet>
+					<directory />
+					<includes>
+						<include>**</include>
+					</includes>
+				</fileSet>
+			</fileSets>
+		</module>
 		<module id="${rootArtifactId}-model-animator" dir="__rootArtifactId__-model-animator">
 			<fileSets>
 				<fileSet>

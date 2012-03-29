@@ -26,6 +26,7 @@
 	<modules>
 		<module>${rootArtifactId}-pos-concatenator</module>
 		<module>${rootArtifactId}-wav-concatenator</module>
+		<module>${rootArtifactId}-lab-concatenator</module>
 		<module>${rootArtifactId}-model-animator</module>
 		<module>${rootArtifactId}-packager</module>
 	</modules>
