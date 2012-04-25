@@ -1,8 +1,8 @@
 #!/usr/bin/env praat
 
 # arguments
-input_directory$ = "${src.wav.directory}"
-wav_out$ = "${target.wav.file}"
+input_directory$ = "${src.lab.directory}"
+wav_out$ = "${target.lab.file}"
 output_directory$ = left$(wav_out$, rindex(wav_out$, "/"))
 
 # glob input files to array, exit if none found
