@@ -23,6 +23,11 @@
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>fr.loria.parole</groupId>
+			<artifactId>labelutils</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>

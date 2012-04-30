@@ -32,8 +32,8 @@
 				<artifactId>exec-maven-plugin</artifactId>
 				<executions>
 					<execution>
-						<id>concatenate-lab</id>
-						<phase>compile</phase>
+						<id>generate-textgrids</id>
+						<phase>generate-resources</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -41,7 +41,7 @@
 							<workingDirectory>${project.build.outputDirectory}</workingDirectory>
 							<executable>${path.to.praat}</executable>
 							<arguments>
-								<argument>CatLab.praat</argument>
+								<argument>GenerateTextGrids.praat</argument>
 							</arguments>
 						</configuration>
 					</execution>
