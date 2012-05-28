@@ -15,8 +15,16 @@
 		<properties.file>${project.parent.relativePath}/${properties.file.name}</properties.file>
 
 		<src.lab.directory>${src.data.directory}/wav</src.lab.directory>
+		<target.textgrid.file>${target.data.directory}/${textgrid.file}</target.textgrid.file>
 		<target.lab.file>${target.data.directory}/${lab.file}</target.lab.file>
 	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>fr.loria.parole</groupId>
+			<artifactId>artimate-model</artifactId>
+		</dependency>
+	</dependencies>
 
 	<build>
 		<resources>
@@ -33,7 +41,7 @@
 				<executions>
 					<execution>
 						<id>generate-textgrids</id>
-						<phase>generate-resources</phase>
+						<phase>process-resources</phase>
 						<goals>
 							<goal>exec</goal>
 						</goals>
@@ -42,6 +50,46 @@
 							<executable>${path.to.praat}</executable>
 							<arguments>
 								<argument>GenerateTextGrids.praat</argument>
+							</arguments>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>concatenate-textgrids</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+						<configuration>
+							<mainClass>fr.loria.parole.artimate.model.TextGridConcatenator</mainClass>
+							<arguments>
+								<argument>${project.build.outputDirectory}</argument>
+								<argument>${target.textgrid.file}</argument>
+							</arguments>
+							<systemProperties>
+								<systemProperty>
+									<key>log.format</key>
+									<value>${log.format}</value>
+								</systemProperty>
+								<systemProperty>
+									<key>log.level</key>
+									<value>${log.level}</value>
+								</systemProperty>
+							</systemProperties>
+						</configuration>
+					</execution>
+
+					<execution>
+						<id>convert-textgrid</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<workingDirectory>${project.build.outputDirectory}</workingDirectory>
+							<executable>${path.to.praat}</executable>
+							<arguments>
+								<argument>ConvertTextGrid.praat</argument>
 							</arguments>
 						</configuration>
 					</execution>
