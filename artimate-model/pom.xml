@@ -13,6 +13,23 @@
 	<artifactId>artimate-model</artifactId>
 	<name>Artimate Model Compiler</name>
 
+	<dependencies>
+		<dependency>
+			<groupId>log4j</groupId>
+			<artifactId>log4j</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>fr.loria.parole</groupId>
+			<artifactId>labelutils</artifactId>
+		</dependency>
+	</dependencies>
+
 	<build>
 		<plugins>
 			<plugin>

@@ -1,0 +1,91 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>${groupId}</groupId>
+		<artifactId>${rootArtifactId}</artifactId>
+		<version>${version}</version>
+		<relativePath>..</relativePath>
+	</parent>
+
+	<artifactId>${rootArtifactId}-model-animator</artifactId>
+
+	<properties>
+		<properties.file>${project.parent.relativePath}/${properties.file.name}</properties.file>
+
+		<src.blend.file>${src.data.directory}/${model.file}</src.blend.file>
+		<src.pos.file>${target.data.directory}/${pos.file}</src.pos.file>
+		<src.header.file>${src.data.directory}/pos/headers.txt</src.header.file>
+		<src.lab.file>${target.data.directory}/${lab.file}</src.lab.file>
+
+		<target.blend.file>${target.data.directory}/${model.file}</target.blend.file>
+		<target.dae.file>${target.data.directory}/${dae.file}</target.dae.file>
+	</properties>
+
+	<build>
+		<resources>
+			<resource>
+				<directory>${project.build.scriptSourceDirectory}</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
+
+		<plugins>
+			<plugin>
+				<artifactId>maven-enforcer-plugin</artifactId>
+				<executions>
+					<execution>
+						<goals>
+							<goal>enforce</goal>
+						</goals>
+						<phase>generate-resources</phase>
+						<configuration>
+							<rules>
+								<requireFilesExist>
+									<files>
+										<file>${src.blend.file}</file>
+									</files>
+								</requireFilesExist>
+							</rules>
+							<fail>true</fail>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>blender</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>exec</goal>
+						</goals>
+						<configuration>
+							<executable>${path.to.blender}</executable>
+							<arguments>
+								<argument>${src.blend.file}</argument>
+								<argument>--background</argument>
+								<argument>--python</argument>
+								<argument>${project.build.outputDirectory}/animate_model.py</argument>
+							</arguments>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-install</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+</project>

@@ -120,6 +120,11 @@
 				</plugin>
 
 				<plugin>
+					<artifactId>maven-enforcer-plugin</artifactId>
+					<version>1.0.1</version>
+				</plugin>
+
+				<plugin>
 					<artifactId>maven-install-plugin</artifactId>
 					<version>2.3.1</version>
 				</plugin>
@@ -189,6 +194,20 @@
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>org.apache.maven.plugins</groupId>
+										<artifactId>maven-enforcer-plugin</artifactId>
+										<versionRange>[1.0.1,)</versionRange>
+										<goals>
+											<goal>enforce</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.apache.maven.plugins</groupId>
 										<artifactId>maven-remote-resources-plugin</artifactId>
 										<versionRange>[1.2.1,)</versionRange>
 										<goals>
@@ -208,6 +227,7 @@
 										<versionRange>[1.2.1,)</versionRange>
 										<goals>
 											<goal>exec</goal>
+											<goal>java</goal>
 										</goals>
 									</pluginExecutionFilter>
 									<action>
@@ -252,6 +272,36 @@
 		</pluginManagement>
 
 	</build>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>log4j</groupId>
+				<artifactId>log4j</artifactId>
+				<version>1.2.16</version>
+			</dependency>
+
+			<dependency>
+				<groupId>com.google.guava</groupId>
+				<artifactId>guava</artifactId>
+				<version>11.0.2</version>
+			</dependency>
+
+			<dependency>
+				<groupId>fr.loria.parole</groupId>
+				<artifactId>labelutils</artifactId>
+				<version>0.1.2</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<repositories>
+		<repository>
+			<id>LabelUtils</id>
+			<name>LabelUtils Repo</name>
+			<url>http://psibre.github.com/LabelUtils/repository</url>
+		</repository>
+	</repositories>
 
 	<reporting>
 		<plugins>

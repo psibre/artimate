@@ -32,49 +32,42 @@
 	<groupId>${groupId}</groupId>
 	<artifactId>${artifactId}</artifactId>
 	<version>${version}</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
 	<properties>
-		<script.directory>${project.build.directory}/scripts</script.directory>
+		<properties.file.name>build.config</properties.file.name>
+		<properties.file>${properties.file.name}</properties.file>
 
-		<path.to.blender>/Applications/blender.app/Contents/MacOS/blender</path.to.blender>
-		<path.to.praat>/Applications/Praat.app/Contents/MacOS/praat</path.to.praat>
-		<path.to.python>python</path.to.python>
-
-		<copied.resources.directory>${project.build.directory}/copied-resources</copied.resources.directory>
-		<generated.resources.directory>${project.build.directory}/generated-resources</generated.resources.directory>
-		<test.resources.directory>${project.build.directory}/test-generated-resources</test.resources.directory>
-
-		<copied.model.file>${copied.resources.directory}/${model.file}</copied.model.file>
-		<generated.pos.file>${generated.resources.directory}/${pos.file}</generated.pos.file>
-		<copied.header.file>${copied.resources.directory}/headers.txt</copied.header.file>
-		<generated.lab.file>${generated.resources.directory}/${lab.file}</generated.lab.file>
-		<generated.dae.file>${generated.resources.directory}/${dae.file}</generated.dae.file>
-		<generated.blend.file>${generated.resources.directory}/${model.file}</generated.blend.file>
-
-		<blender.log.level>info</blender.log.level>
+		<data.directory.name>data</data.directory.name>
+		<!-- the data dir paths are invalid here, but resolved correctly by modules -->
+		<src.data.directory>${basedir}/${project.parent.relativePath}/src/${data.directory.name}</src.data.directory>
+		<target.data.directory>${basedir}/${project.parent.relativePath}/target/${data.directory.name}</target.data.directory>
 	</properties>
 
+	<modules>
+		<module>${rootArtifactId}-pos-concatenator</module>
+		<module>${rootArtifactId}-wav-concatenator</module>
+		<module>${rootArtifactId}-lab-concatenator</module>
+		<module>${rootArtifactId}-model-animator</module>
+		<module>${rootArtifactId}-packager</module>
+	</modules>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>fr.loria.parole</groupId>
+				<artifactId>artimate-model</artifactId>
+				<version>0.0.1-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
 	<build>
-
-		<resources>
-			<resource>
-				<directory>${generated.resources.directory}</directory>
-				<excludes>
-					<exclude>**/*.pos</exclude>
-					<exclude>**/*.TextGrid</exclude>
-					<exclude>**/*.blend*</exclude>
-				</excludes>
-			</resource>
-		</resources>
-
 		<plugins>
-
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>properties-maven-plugin</artifactId>
 				<executions>
-
 					<execution>
 						<id>read-config</id>
 						<phase>initialize</phase>
@@ -83,173 +76,8 @@
 						</goals>
 						<configuration>
 							<files>
-								<file>${basedir}/build.config</file>
+								<file>${properties.file}</file>
 							</files>
-						</configuration>
-					</execution>
-
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-resources-plugin</artifactId>
-				<executions>
-
-					<execution>
-						<id>copy-ema-resources</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${copied.resources.directory}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${data.directory}/pos</directory>
-									<includes>
-										<include>*.pos</include>
-										<include>headers.txt</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>copy-wav-resources</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${copied.resources.directory}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${data.directory}/wav</directory>
-									<includes>
-										<include>*.wav</include>
-										<include>*.TextGrid</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>copy-model-resources</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${copied.resources.directory}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${data.directory}</directory>
-									<includes>
-										<include>${model.file}</include>
-									</includes>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>copy-scripts</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${script.directory}</outputDirectory>
-							<resources>
-								<resource>
-									<directory>${basedir}/src/scripts</directory>
-									<filtering>true</filtering>
-								</resource>
-							</resources>
-						</configuration>
-					</execution>
-
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<executions>
-
-					<execution>
-						<id>concatenate-pos</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<workingDirectory>${script.directory}</workingDirectory>
-							<executable>${path.to.python}</executable>
-							<arguments>
-								<argument>CatPos.py</argument>
-								<argument>--input-directory=${copied.resources.directory}</argument>
-								<argument>--output-file=${generated.pos.file}</argument>
-							</arguments>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>concatenate-wav-lab</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<workingDirectory>${script.directory}</workingDirectory>
-							<executable>${path.to.praat}</executable>
-							<arguments>
-								<argument>CatWavLab.praat</argument>
-								<argument>${copied.resources.directory}</argument>
-								<argument>${generated.resources.directory}</argument>
-							</arguments>
-						</configuration>
-					</execution>
-
-					<execution>
-						<id>blender</id>
-						<phase>generate-resources</phase>
-						<goals>
-							<goal>exec</goal>
-						</goals>
-						<configuration>
-							<workingDirectory>${script.directory}</workingDirectory>
-							<executable>${path.to.blender}</executable>
-							<arguments>
-								<argument>${copied.model.file}</argument>
-								<argument>--background</argument>
-								<argument>--python</argument>
-								<argument>${script.directory}/animate_model.py</argument>
-							</arguments>
-						</configuration>
-					</execution>
-
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-remote-resources-plugin</artifactId>
-				<executions>
-					<execution>
-						<goals>
-							<goal>bundle</goal>
-						</goals>
-						<configuration>
-							<resourcesDirectory>${generated.resources.directory}</resourcesDirectory>
-							<includes>
-								<include>**/*.dae</include>
-								<include>**/*.wav</include>
-								<include>**/*.lab</include>
-								<include>**/*.jpg</include>
-								<include>**/*.tga</include>
-							</includes>
 						</configuration>
 					</execution>
 				</executions>
@@ -264,6 +92,15 @@
 				</configuration>
 			</plugin>
 
+			<plugin>
+				<artifactId>maven-install-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>default-install</id>
+						<phase>none</phase>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>

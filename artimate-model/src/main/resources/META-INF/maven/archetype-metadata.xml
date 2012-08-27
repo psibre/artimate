@@ -1,43 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-  #%L
-  Artimate Model Compiler
-  %%
-  Copyright (C) 2011 - 2012 INRIA
-  %%
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as
-  published by the Free Software Foundation, either version 3 of the 
-  License, or (at your option) any later version.
-  
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-  
-  You should have received a copy of the GNU General Public 
-  License along with this program.  If not, see
-  <http://www.gnu.org/licenses/gpl-3.0.html>.
-  #L%
-  -->
-
-<archetype-descriptor xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd" name="artimate-model"
-    xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <fileSets>
-    <fileSet encoding="UTF-8">
-      <directory>src/scripts</directory>
-      <includes>
-        <include>**/*.py</include>
-        <include>**/*.pl</include>
-        <include>**/*.praat</include>
-      </includes>
-    </fileSet>
-    <fileSet encoding="UTF-8">
-      <directory></directory>
-      <includes>
-        <include>build.config</include>
-      </includes>
-    </fileSet>
-  </fileSets>
+<archetype-descriptor
+	xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+	name="artimate-model"
+	xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<fileSets>
+		<fileSet encoding="UTF-8">
+			<directory />
+			<includes>
+				<include>build.config</include>
+			</includes>
+		</fileSet>
+	</fileSets>
+	<modules>
+		<module id="${rootArtifactId}-pos-concatenator" dir="__rootArtifactId__-pos-concatenator" />
+		<module id="${rootArtifactId}-wav-concatenator" dir="__rootArtifactId__-wav-concatenator">
+			<fileSets>
+				<fileSet>
+					<directory />
+					<includes>
+						<include>**</include>
+					</includes>
+				</fileSet>
+			</fileSets>
+		</module>
+		<module id="${rootArtifactId}-lab-concatenator" dir="__rootArtifactId__-lab-concatenator">
+			<fileSets>
+				<fileSet>
+					<directory />
+					<includes>
+						<include>**</include>
+					</includes>
+				</fileSet>
+			</fileSets>
+		</module>
+		<module id="${rootArtifactId}-model-animator" dir="__rootArtifactId__-model-animator">
+			<fileSets>
+				<fileSet>
+					<directory />
+					<includes>
+						<include>**</include>
+					</includes>
+				</fileSet>
+			</fileSets>
+		</module>
+		<module id="${rootArtifactId}-packager" dir="__rootArtifactId__-packager" />
+	</modules>
 </archetype-descriptor>

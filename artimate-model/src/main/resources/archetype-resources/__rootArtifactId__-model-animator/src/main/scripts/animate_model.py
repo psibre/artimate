@@ -1,7 +1,7 @@
-#!${path.to.blender} ${copied.model.file} --background --python
+#!${path.to.blender} ${src.blend.file} --background --python
 
 # imports
-import os, sys
+import os, sys, re
 
 # import blender modules
 try:
@@ -13,14 +13,14 @@ except ImportError:
 # logging
 import time
 import logging
-blenderloglevel = "${blender.log.level}"
+blenderloglevel = "${log.level}"
 loglevel = getattr(logging, blenderloglevel.upper(), None)
 if not isinstance(loglevel, int):
     raise ValueError('Invalid log level: %s' % blenderloglevel)
 logging.basicConfig(format='[blender] [%(levelname)s] %(message)s', level=loglevel)
 
 # import custom modules
-sys.path.append("${script.directory}")
+sys.path.append("${project.build.outputDirectory}")
 import ema, lab
 
 # utility function for layer access
@@ -34,9 +34,9 @@ def single_layer(i):
 
 # constants
 ORIGIN = (0, 0, 0)
-layers = {"main" : single_layer(0),
-          "seeds" : single_layer(1),
-          "ema" : single_layer(2),
+layers = {"main"    : single_layer(0),
+          "seeds"   : single_layer(1),
+          "ema"     : single_layer(2),
           "cameras" : single_layer(3)}
 
 def load_sweep(posfile, headerfile, labfile):
@@ -53,7 +53,11 @@ def load_sweep(posfile, headerfile, labfile):
     
     # load EMA sweep
     logging.info("Loading %s" % posfile)
-    sweep = ema.Sweep(posfile, header, labfile)
+    try:
+        sweep = ema.Sweep(posfile, header, labfile)
+    except IOError:
+        logging.error(sys.exc_info()[1])
+        sys.exit(1)
     return sweep
 
 def process_sweep():
@@ -113,9 +117,13 @@ def create_coils():
     return coils
 
 def normalize():
-    ref1 = bpy.data.objects["Ref1CoilArmature"]
-    ref2 = bpy.data.objects["Ref2CoilArmature"]
-    ref3 = bpy.data.objects["Ref3CoilArmature"]
+    try:
+        ref1 = bpy.data.objects["Ref1CoilArmature"]
+        ref2 = bpy.data.objects["Ref2CoilArmature"]
+        ref3 = bpy.data.objects["Ref3CoilArmature"]
+    except KeyError:
+        logging.error(sys.exc_info()[1])
+        sys.exit(1)
     logging.debug("Normalizing wrt to %s, %s, and %s" % (ref1.name, ref2.name, ref3.name))
     
     # create root node
@@ -324,13 +332,19 @@ def addbone(parentbonename, targetobjectname):
     constraint.target = target
     constraint.subtarget = "Bone"
     
-    # IK chain length goes back up to root
-    constraint.chain_count = len(posebone.parent_recursive)
+    # IK chain length goes back up to *one before* root
+    constraint.chain_count = len(posebone.parent_recursive) - 1
     # axis reference
     constraint.reference_axis = 'TARGET'
     # TODO consider adding pole targets
     # allow full stretching
     posebone.ik_stretch = 1
+    
+    # first bone on lateral branch gets fresh angle
+    # TODO make this configurable!
+    lateral_pattern = re.compile(r'.*[a-z][LR].*')
+    if lateral_pattern.match(bonename) and not lateral_pattern.match(parentbonename):
+        posebone.bone.bbone_in = 0
     
     # volume constraint
     posebone.constraints.new(type='MAINTAIN_VOLUME')
@@ -370,14 +384,16 @@ def create_rig():
     #}
     
     addbone("RootBone", "TBackCTarget")
-    addbone("TBackCTargetBone", "TMidCTarget")
-    addbone("TMidCTargetBone", "TTipCTarget")
     
     addbone("TBackCTargetBone", "TMidLTarget")
     addbone("TMidLTargetBone", "TBladeLTarget")
     
     addbone("TBackCTargetBone", "TMidRTarget")
     addbone("TMidRTargetBone", "TBladeRTarget")
+    
+    # center branch mut be added *last* to avoid lateral deformation
+    addbone("TBackCTargetBone", "TMidCTarget")
+    addbone("TMidCTargetBone", "TTipCTarget")
     
     bpy.ops.object.mode_set(mode='OBJECT')
     
@@ -412,20 +428,25 @@ def create_rig():
     bpy.ops.object.mode_set(mode='EDIT')
     jawbonename = "JawTargetBone"
     jawbone = trig.data.edit_bones.new(name=jawbonename)
+    
+    # TODO: this has to be configurable!
+    jawtarget = bpy.data.objects["JawTarget"]
+    jawtargethead = jawtarget.pose.bones['Bone'].head
+    jawtargetlocation = jawtarget.location - trig.location + jawtargethead
+    
     parentbone = trig.data.edit_bones["RootBone"]
     jawbone.parent = parentbone
-    jawbone.head = (-1, 0, 0)
-    jawbone.tail = (-1, 0, 1)
+    jawbone.head = parentbone.head
+    jawbone.head.x -= 1
+    jawbone.tail = jawtargetlocation
+    logging.debug("Creating %s to %s" % (jawbonename, jawtarget.name))
     
     # add tracking constraint
     bpy.ops.object.mode_set(mode='POSE')
     posebone = trig.pose.bones[jawbonename]
-    # TODO: this has to be configurable!
-    constraint = posebone.constraints.new(type='TRACK_TO')
-    constraint.target = bpy.data.objects["JawTarget"]
+    constraint = posebone.constraints.new(type='IK')
+    constraint.target = jawtarget
     constraint.subtarget = "Bone"
-    constraint.track_axis = 'TRACK_X'
-    constraint.use_target_z = True
     
     # parent mandible and lower teeth to jaw bone
     jaw = bpy.data.objects["Mandible"]
@@ -448,6 +469,18 @@ def create_rig():
         bpy.ops.object.vertex_group_assign()
         bpy.ops.object.mode_set(mode='OBJECT')
     
+    # parent maxilla and upper teeth to jaw bone
+    bpy.ops.object.select_all(action='DESELECT')
+    bpy.context.scene.objects.active = trig
+    jaw = bpy.data.objects["Maxilla"]
+    jaw.select = True
+    upperteeth = [obj for obj in bpy.data.objects
+                  if obj.name.startswith("Tooth1") or obj.name.startswith("Tooth2")]
+    for tooth in upperteeth:
+        tooth.hide_select = False
+        tooth.select = True
+    bpy.ops.object.parent_set(type='ARMATURE_NAME')
+    
     logging.debug("Rigged model to armature")
 
 def assign_to_layers():
@@ -458,10 +491,11 @@ def assign_to_layers():
         armature = coil.parent
         armature.layers = layers["ema"]
 
-def save_model(daefile, blendfile):
+def save_model(blendfile):
     logging.info("Saving %s" % blendfile)
     bpy.ops.wm.save_as_mainfile(filepath=blendfile)
     
+def export_model(daefile):
     # bake animation
     logging.debug("Baking animation for %d frames" % sweep.size)
     start = time.time()
@@ -549,7 +583,7 @@ def generate_testsweeps():
 if __name__ == '__main__':
     # unpack embedded files
     bpy.ops.file.unpack_all()
-    sweep = load_sweep("${generated.pos.file}", "${copied.header.file}", "${generated.lab.file}")
+    sweep = load_sweep("${src.pos.file}", "${src.header.file}", "${src.lab.file}")
     process_sweep()
     coils = create_coils()
     normalize()
@@ -559,4 +593,5 @@ if __name__ == '__main__':
     create_rig()
     #assign_to_layers()
     #generate_testsweeps()
-    save_model("${generated.dae.file}", "${generated.blend.file}")
+    save_model("${target.blend.file}")
+    export_model("${target.dae.file}")
