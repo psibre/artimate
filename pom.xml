@@ -45,6 +45,10 @@
 		</site>
 		<downloadUrl>https://gforge.inria.fr/projects/artimate/</downloadUrl>
 	</distributionManagement>
+	<scm>
+		<url>https://github.com/psibre/artimate</url>
+		<connection>scm:git:https://github.com/psibre/artimate.git</connection>
+	</scm>
 
 	<modules>
 		<module>artimate-model</module>
@@ -167,7 +171,7 @@
 					<version>1.0-alpha-2</version>
 				</plugin>
 
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
