@@ -27,22 +27,15 @@
 
 Prerequisites
 
-  The ${project.name} depends on the {{{http://www.ardor3d.com/}Ardor3D}} game engine, specifically version <<0.8-SNAPSHOT r1751>> or higher.
+  The ${project.name} depends on the {{{http://www.ardor3d.com/}Ardor3D}} game engine, specifically version <<0.8-SNAPSHOT r${ardor3dVersion}>> or higher.
   To meet this requirement, it must be downloaded from the third-party subversion repository {{http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/}},
   compiled from source and installed.
-  Fortunately, Maven makes this very easy with a <single command> (and a little patience):
+  Fortunately, Maven makes this very easy with a <single command> (and a little patience).
+  
+  If Ardor3d is not yet installed, you can install it by entering the ${project.name} directory and running the command
 
 +--
-$ mvn scm:bootstrap \
-  -Dproject.basedir=ardor3d \
-  -DconnectionUrl=scm:svn:http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk \
-  -Dgoals=install
-[INFO] Scanning for projects...
-[INFO]                                                                         
-[INFO] ------------------------------------------------------------------------
-[INFO] Building Maven Stub Project (No POM) 1
-[INFO] ------------------------------------------------------------------------
-
+$ mvn -P install-ardor3d initialize
 [...]
 
 [INFO] ------------------------------------------------------------------------
@@ -87,11 +80,11 @@ $ mvn scm:bootstrap \
   Of course it is also possible to manually checkout the sources and separately run Maven:
 
 +--
-$ svn co http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk ardor3d
+$ svn co -r ${ardor3dVersion} http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk ardor3d
 
 [...]
 
-Checked out revision 1751.
+Checked out revision ${ardor3dVersion}.
 $ cd ardor3d
 $ mvn install
 
@@ -121,5 +114,5 @@ $ mvn install
 
   <<Note:>> In both cases, {{{http://subversion.apache.org/}Subversion}} must be installed.
   
-  Alternatively, and especially under Windows, you may prefer to checkout and install Ardor3d using the IDE of your choice, e.g. {{{http://netbeans.org/}NetBeans}}.
+  Alternatively, and especially under Windows without command line <<<mvn>>> or <<<svn>>> installed, you may prefer to checkout and install Ardor3d using the IDE of your choice, e.g. {{{http://netbeans.org/}NetBeans}}.
   The URL to the Ardor3d Subversion repository is of course the same as above.

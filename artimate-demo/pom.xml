@@ -14,6 +14,8 @@
 	<properties>
 		<project.resource.directory>${basedir}/src/main/resources</project.resource.directory>
 		<project.mainclass>${project.groupId}.artimate.demo.DemoAppWrapper</project.mainclass>
+
+		<ardor3dVersion>1802</ardor3dVersion>
 	</properties>
 
 	<dependencies>
@@ -45,12 +47,6 @@
 		<dependency>
 			<groupId>com.ardor3d</groupId>
 			<artifactId>ardor3d-awt</artifactId>
-			<version>0.8-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.ardor3d</groupId>
-			<artifactId>ardor3d-ui</artifactId>
 			<version>0.8-SNAPSHOT</version>
 		</dependency>
 
@@ -89,7 +85,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-remote-resources-plugin</artifactId>
 				<configuration>
 					<resourceBundles>
@@ -106,7 +101,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
@@ -124,7 +118,6 @@
 			</plugin>
 
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<configuration>
 					<archive>
@@ -157,4 +150,36 @@
 			</plugin>
 		</plugins>
 	</reporting>
+
+	<profiles>
+		<profile>
+			<id>install-ardor3d</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<artifactId>maven-scm-plugin</artifactId>
+						<version>1.6</version>
+						<executions>
+							<execution>
+								<id>bootstrap-ardor3d</id>
+								<phase>initialize</phase>
+								<goals>
+									<goal>bootstrap</goal>
+								</goals>
+								<configuration>
+									<connectionUrl>scm:svn:http://ardorlabs.svn.cvsdude.com/Ardor3Dv1/trunk</connectionUrl>
+									<scmVersionType>revision</scmVersionType>
+									<scmVersion>${ardor3dVersion}</scmVersion>
+									<goals>source:jar,javadoc:jar,install</goals>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>

@@ -158,12 +158,6 @@ public class Ardor3DWrapper implements GameEngineWrapper {
 			}
 		}));
 
-		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.S), new TriggerAction() {
-			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
-				_showSkeleton = !_showSkeleton;
-			}
-		}));
-
 		_logicalLayer.registerTrigger(new InputTrigger(new KeyPressedCondition(Key.F1), new TriggerAction() {
 			public void perform(final Canvas source, final TwoInputStates inputState, final double tpf) {
 				_doShot = true;
