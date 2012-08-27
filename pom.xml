@@ -241,10 +241,18 @@
 			<dependency>
 				<groupId>fr.loria.parole</groupId>
 				<artifactId>labelutils</artifactId>
-				<version>0.1</version>
+				<version>0.1.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
+
+	<repositories>
+		<repository>
+			<id>LabelUtils</id>
+			<name>LabelUtils Repo</name>
+			<url>http://psibre.github.com/LabelUtils/repository</url>
+		</repository>
+	</repositories>
 
 	<reporting>
 		<plugins>
