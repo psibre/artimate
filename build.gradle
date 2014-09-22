@@ -1,0 +1,38 @@
+apply plugin: 'download-task'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'de.undercouch:gradle-download-task:1.0'
+    }
+}
+
+task downloadData {
+	description 'Downloads msak0 speaker from MOCHA-TIMIT database.'
+	group 'data'
+	doLast {
+		download {
+			src 'http://data.cstr.ed.ac.uk/mocha/msak0_v1.1.tar.gz'
+			dest buildDir
+			overwrite false
+		}
+	}
+}
+
+task unpackData {
+	description 'Unpacks one utterance from msak0 dataset for our demo.'
+	dependsOn downloadData
+	group 'data'
+}
+
+task buildModel {
+	description 'Uses Blender to build a model using external 3D assets.'
+}
+
+task buildDemo {
+	description 'Uses Blender to compile the model with the data into a demo app.'
+	dependsOn buildModel
+	group 'demo'
+}
