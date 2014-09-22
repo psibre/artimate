@@ -27,8 +27,22 @@ task unpackData {
 	group 'data'
 }
 
+task convertData {
+	description 'Convert EMA files to ASCII format, using EST.'
+	dependsOn unpackData
+	group 'data'
+}
+
+task generateMocapData {
+	description 'Generate BVH files from the ASCII EMA files.'
+	dependsOn convertData
+	group 'data'
+}
+
 task buildModel {
 	description 'Uses Blender to build a model using external 3D assets.'
+	group 'model'
+	outputs.files 'animated_model.blend'
 }
 
 task buildDemo {
