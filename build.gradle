@@ -12,10 +12,12 @@ buildscript {
 task downloadData {
 	description 'Downloads msak0 speaker from MOCHA-TIMIT database.'
 	group 'data'
+	ext.dataFile = new File(buildDir, 'msak0.tar.gz')
+	outputs.files dataFile
 	doLast {
 		download {
 			src 'http://data.cstr.ed.ac.uk/mocha/msak0_v1.1.tar.gz'
-			dest buildDir
+			dest dataFile
 			overwrite false
 		}
 	}
@@ -25,6 +27,18 @@ task unpackData {
 	description 'Unpacks one utterance from msak0 dataset for our demo.'
 	dependsOn downloadData
 	group 'data'
+	def dataDir = new File(buildDir, 'data')
+	outputs.files fileTree(dataDir).include('*.ema')
+	doFirst {
+		dataDir.mkdirs()
+	}
+	doLast {
+		exec {
+			executable '7za'
+			args 'x', downloadData.dataFile, '*.ema', '-y'
+			workingDir dataDir
+		}
+	}
 }
 
 task convertData {
