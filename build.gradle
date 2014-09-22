@@ -78,4 +78,12 @@ task buildDemo {
 	description 'Uses Blender to compile the model with the data into a demo app.'
 	dependsOn buildModel
 	group 'demo'
+	def scriptFile = file('src/python/test.py')
+	doLast {
+		exec {
+			executable blender
+			args '--python', scriptFile
+			workingDir buildDir
+		}
+	}
 }
