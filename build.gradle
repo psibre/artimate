@@ -10,8 +10,7 @@ buildscript {
 }
 
 ext {
-	dataDir = "$buildDir/data"
-	ch_track = "$System.env.HOME/workspace/speech_tools/bin/ch_track"
+	dataDir = file("$buildDir/data")
 }
 
 task downloadData {
@@ -38,7 +37,7 @@ task unpackData {
 	}
 	doLast {
 		exec {
-			executable '7za'
+			executable sevenzip
 			args 'x', downloadData.dataFile, '*.ema', '-y'
 			workingDir dataDir
 		}
