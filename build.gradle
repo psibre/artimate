@@ -9,6 +9,11 @@ buildscript {
     }
 }
 
+ext {
+	dataDir = "$buildDir/data"
+	ch_track = "$System.env.HOME/workspace/speech_tools/bin/ch_track"
+}
+
 task downloadData {
 	description 'Downloads msak0 speaker from MOCHA-TIMIT database.'
 	group 'data'
@@ -27,7 +32,6 @@ task unpackData {
 	description 'Unpacks one utterance from msak0 dataset for our demo.'
 	dependsOn downloadData
 	group 'data'
-	def dataDir = new File(buildDir, 'data')
 	outputs.files fileTree(dataDir).include('*.ema')
 	doFirst {
 		dataDir.mkdirs()
@@ -45,6 +49,18 @@ task convertData {
 	description 'Convert EMA files to ASCII format, using EST.'
 	dependsOn unpackData
 	group 'data'
+	inputs.files fileTree(dataDir).include('*.ema')
+	outputs.files fileTree(dataDir).include('*.txt')
+	doLast {
+		inputs.files.each { infile ->
+			logger.warn "converting $infile.name"
+			exec {
+				executable ch_track
+				args infile.name, '-otype', 'est', '-o', infile.name.replace('.ema', '.txt')
+				workingDir dataDir
+			}
+		}
+	}
 }
 
 task generateMocapData {
