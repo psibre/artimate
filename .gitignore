@@ -16,7 +16,7 @@ build/
 gradle.properties
 
 # Blender
-*.blend*
+*.blend?
 
 # python
 *.pyc
