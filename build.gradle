@@ -66,90 +66,98 @@ task generateMocapData {
     description 'Generate BVH files from the ASCII EMA files.'
     //dependsOn convertData
     group 'data'
-    for (i in 1)
-        def inputFile = file("$buildDir/data/msak0_001.txt")
-    doLast {
-        def processheader = true
-        def header = [:]
-        def frames = ""
-        def roots = []
-        def channels = []
-        def data = []
-        inputFile.eachLine { line ->
-            def strlist = line.split()
-            //header end
-            if (line == "EST_Header_End") {
-                processheader = false
-            } else if (processheader) {
-                //parse header
-                header[strlist[0]] = strlist[1]
-                if (line.startsWith("Channel")) {
-                    def channel = line.split(' ')
-                    channels.add channel[1]
-                } else if (line.startsWith("NumFrames")) {
-                    def numframes = line.split(' ')
-                    frames = numframes[1]
-                }
-
-            }
-            //parse data
-            else {
-                data.add strlist[2..-1].collect { (it as float) / 1000 }
-            }
+    for (txt in 1..460) {
+        def num = Integer.toString(txt)
+        if (num.size() == 1) {
+            num = "00" + num
+        } else if (num.size() == 2) {
+            num = "0" + num
         }
-        header.each { key, value ->
-            if (key.startsWith("Channel")) {
-                def rootlist = value.split('_')
-                if (!roots.contains(rootlist[0]) && rootlist.size() == 2) {
-                    roots.add rootlist[0]
+        def inputFile = file("$buildDir/data/msak0_" + num + ".txt")
+
+        doLast {
+            def processheader = true
+            def header = [:]
+            def frames = ""
+            def roots = []
+            def channels = []
+            def data = []
+            inputFile.eachLine { line ->
+                def strlist = line.split()
+                //header end
+                if (line == "EST_Header_End") {
+                    processheader = false
+                } else if (processheader) {
+                    //parse header
+                    header[strlist[0]] = strlist[1]
+                    if (line.startsWith("Channel")) {
+                        def channel = line.split(' ')
+                        channels.add channel[1]
+                    } else if (line.startsWith("NumFrames")) {
+                        def numframes = line.split(' ')
+                        frames = numframes[1]
+                    }
 
                 }
+                //parse data
+                else {
+                    data.add strlist[2..-1].collect { (it as float) / 1000 }
+                }
             }
-        }
-        println data[0]
+            header.each { key, value ->
+                if (key.startsWith("Channel")) {
+                    def rootlist = value.split('_')
+                    if (!roots.contains(rootlist[0]) && rootlist.size() == 2) {
+                        roots.add rootlist[0]
 
-        //map of channels and data
-        def spreadsheet = [:]
-        channels.eachWithIndex { chan, i ->
-            def datasort = []
-            data.each { dt ->
-                datasort.add dt[i]
-                spreadsheet[chan] = datasort
+                    }
+                }
             }
-        }
+            println data[0]
 
-        //format header
-        println "HIERARCHY"
-        roots.each { root ->
-            println "ROOT " + root
-            println "{"
-            println "\t OFFSET 0 0 0"
-            println "\t CHANNELS 3 XPosition YPosition Z Position"
-            println "\t EndSite"
-            println "\t {"
-            println "\t OFFSET 0 -1 0"
-            println "\t }"
-            println "}"
-        }
-        println "MOTION"
-        println "Frames: " + frames
-        println "Frame Time: 0.002"
+            //map of channels and data
+            def spreadsheet = [:]
+            channels.eachWithIndex { chan, i ->
+                def datasort = []
+                data.each { dt ->
+                    datasort.add dt[i]
+                    spreadsheet[chan] = datasort
+                }
+            }
 
-        //format data
-        int framit = Integer.parseInt(frames)
-        for (f in 1..framit) {
+            //format header
+            println "HIERARCHY"
             roots.each { root ->
-                def x_chan = root + "_x"
-                def y_chan = root + "_y"
-                def x_value = spreadsheet[x_chan][f - 1]
-                def y_value = spreadsheet[y_chan][f - 1]
-                def z_value = "0"
-                print([x_value, y_value, z_value, '\t'].join('\t'))
+                println "ROOT " + root
+                println "{"
+                println "\t OFFSET 0 0 0"
+                println "\t CHANNELS 3 XPosition YPosition Z Position"
+                println "\t EndSite"
+                println "\t {"
+                println "\t OFFSET 0 -1 0"
+                println "\t }"
+                println "}"
             }
-            print "\n"
-        }
+            println "MOTION"
+            println "Frames: " + frames
+            println "Frame Time: 0.002"
 
+            //format data
+            int framit = Integer.parseInt(frames)
+            for (f in 1..framit) {
+                roots.each { root ->
+                    def x_chan = root + "_x"
+                    def y_chan = root + "_y"
+                    def x_value = spreadsheet[x_chan][f - 1]
+                    def y_value = spreadsheet[y_chan][f - 1]
+                    def z_value = "0"
+                    print([x_value, y_value, z_value, '\t'].join('\t'))
+                }
+                print "\n"
+            }
+        }
     }
+
 }
 
 task buildModel {
