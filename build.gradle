@@ -66,7 +66,8 @@ task generateMocapData {
     description 'Generate BVH files from the ASCII EMA files.'
     //dependsOn convertData
     group 'data'
-    def inputFile = file("$buildDir/data/msak0_001.txt")
+    for (i in 1)
+        def inputFile = file("$buildDir/data/msak0_001.txt")
     doLast {
         def processheader = true
         def header = [:]
@@ -134,26 +135,19 @@ task generateMocapData {
         println "Frames: " + frames
         println "Frame Time: 0.002"
 
-        //roots.each { root ->
-        //def z_channel = r + "_z"
-        //def z_data = []
-        //frames.each { f ->
-        //z_data.add "0"
-        //}
-        //spreadsheet[z_channel] = z_data
-        //}
-
         //format data
-        roots.each { root ->
-            def x_chan = root + "_x"
-            def y_chan = root + "_y"
-            def x_value = spreadsheet[x_chan]
-            def y_value = spreadsheet[y_chan]
-            def z_value = 0
-            print([x_value, y_value, z_value].join('\t'))
+        int framit = Integer.parseInt(frames)
+        for (f in 1..framit) {
+            roots.each { root ->
+                def x_chan = root + "_x"
+                def y_chan = root + "_y"
+                def x_value = spreadsheet[x_chan][f - 1]
+                def y_value = spreadsheet[y_chan][f - 1]
+                def z_value = "0"
+                print([x_value, y_value, z_value, '\t'].join('\t'))
+            }
+            print "\n"
         }
-        print "\n"
-
 
     }
 }
