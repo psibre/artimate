@@ -133,8 +133,8 @@ task generateMocapData {
                     it.writeLine "ROOT " + root
                     it.writeLine "{"
                     it.writeLine "\t OFFSET 0 0 0"
-                    it.writeLine "\t CHANNELS 3 XPosition YPosition Z Position"
-                    it.writeLine "\t EndSite"
+                    it.writeLine "\t CHANNELS 3 XPosition YPosition ZPosition"
+                    it.writeLine "\t End Site"
                     it.writeLine "\t {"
                     it.writeLine "\t OFFSET 0 -1 0"
                     it.writeLine "\t }"
