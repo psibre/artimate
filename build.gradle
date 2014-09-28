@@ -113,7 +113,6 @@ task generateMocapData {
                     }
                 }
             }
-            println data[0]
 
             //map of channels and data
             def spreadsheet = [:]
@@ -124,36 +123,40 @@ task generateMocapData {
                     spreadsheet[chan] = datasort
                 }
             }
+            //write to file
+            def bvhfile = new File("msak0_" + num + ".bvh")
+            bvhfile.withWriter('ASCII') {
 
-            //format header
-            println "HIERARCHY"
-            roots.each { root ->
-                println "ROOT " + root
-                println "{"
-                println "\t OFFSET 0 0 0"
-                println "\t CHANNELS 3 XPosition YPosition Z Position"
-                println "\t EndSite"
-                println "\t {"
-                println "\t OFFSET 0 -1 0"
-                println "\t }"
-                println "}"
-            }
-            println "MOTION"
-            println "Frames: " + frames
-            println "Frame Time: 0.002"
-
-            //format data
-            int framit = Integer.parseInt(frames)
-            for (f in 1..framit) {
+                //format header
+                it.writeLine "HIERARCHY"
                 roots.each { root ->
-                    def x_chan = root + "_x"
-                    def y_chan = root + "_y"
-                    def x_value = spreadsheet[x_chan][f - 1]
-                    def y_value = spreadsheet[y_chan][f - 1]
-                    def z_value = "0"
-                    print([x_value, y_value, z_value, '\t'].join('\t'))
+                    it.writeLine "ROOT " + root
+                    it.writeLine "{"
+                    it.writeLine "\t OFFSET 0 0 0"
+                    it.writeLine "\t CHANNELS 3 XPosition YPosition Z Position"
+                    it.writeLine "\t EndSite"
+                    it.writeLine "\t {"
+                    it.writeLine "\t OFFSET 0 -1 0"
+                    it.writeLine "\t }"
+                    it.writeLine "}"
                 }
-                print "\n"
+                it.writeLine "MOTION"
+                it.writeLine "Frames: " + frames
+                it.writeLine "Frame Time: 0.002"
+
+                //format data
+                def frameit = frames.toInteger()
+                for (f in 1..frameit) {
+                    roots.each { root ->
+                        def x_chan = root + "_x"
+                        def y_chan = root + "_y"
+                        def x_value = spreadsheet[x_chan][f - 1]
+                        def y_value = spreadsheet[y_chan][f - 1]
+                        def z_value = "0"
+                        it.write([x_value, y_value, z_value, '\t'].join('\t'))
+                    }
+                    it.write "\n"
+                }
             }
         }
     }
