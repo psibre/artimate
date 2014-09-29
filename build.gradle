@@ -66,16 +66,10 @@ task generateMocapData {
     description 'Generate BVH files from the ASCII EMA files.'
     //dependsOn convertData
     group 'data'
-    for (txt in 1..460) {
-        def num = Integer.toString(txt)
-        if (num.size() == 1) {
-            num = "00" + num
-        } else if (num.size() == 2) {
-            num = "0" + num
-        }
-        def inputFile = file("$buildDir/data/msak0_" + num + ".txt")
-
-        doLast {
+    inputs.files convertData
+    outputs.files fileTree(dataDir).include('*.bvh')
+    doLast {
+        inputs.files.each { inputFile ->
             def processheader = true
             def header = [:]
             def frames = ""
@@ -124,7 +118,7 @@ task generateMocapData {
                 }
             }
             //write to file
-            def bvhfile = new File("msak0_" + num + ".bvh")
+            def bvhfile = file(inputFile.path.replace('.txt', '.bvh'))
             bvhfile.withWriter('ASCII') {
 
                 //format header
@@ -158,9 +152,9 @@ task generateMocapData {
                     it.write "\n"
                 }
             }
-        }
+            logger.warn "Converting $inputFile.name to $bvhfile.name"
+            }
     }
-
 }
 
 task buildModel {
