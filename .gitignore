@@ -4,6 +4,10 @@
 .settings
 .pydevproject
 
+# IDEA
+.idea/
+*.iml
+
 # Mac OS X
 .DS_Store
 
